@@ -3,14 +3,14 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-function mailsend($address, $code) {
+function mailsend($email, $code) {
     $mail = new PHPMailer(true);
     // Указываем, что нужно использовать SMTP
     $mail->isSMTP();
 
     // В целях отладки включаем вывод результатов на страницу отправки
-    $mail->SMTPDebug = 2;
-    $mail->Debugoutput = 'html';
+    // $mail->SMTPDebug = 2;
+    // $mail->Debugoutput = 'html';
 
     // Указываем доступы к SMTP
     $mail->Host = 'smtp.gmail.com'; # хост
@@ -23,7 +23,7 @@ function mailsend($address, $code) {
     // Получатели и отправители
     $mail->setFrom('diorgius@gmail.com'); # от кого
     $mail->addReplyTo('diorgius@gmail.com'); # адрес для ответа
-    $mail->addAddress($address); # кому
+    $mail->addAddress($email); # кому
 
     // Тема и содержание
     $mail->Subject = 'Confirmation of registration'; # тема
@@ -34,7 +34,9 @@ function mailsend($address, $code) {
     // Выводим результат
     if (!$mail->send()) {
         echo "Mailer Error: " . $mail->ErrorInfo;
+        return false;
     } else {
         echo "Message sent!";
+        return true;
     }
 }
