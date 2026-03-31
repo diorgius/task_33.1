@@ -1,0 +1,65 @@
+.div-main-login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 60vh;
+}
+
+.form-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    border: .1rem solid #cccccc;
+    /* border-radius: .25rem; */
+    background-color: #ffffff;
+    width: 30rem;
+    padding: 2rem 1rem;
+}
+
+.input-login {
+    font-size: 1.4rem;
+    border: .1rem solid #cccccc;
+    background-color: #ffffff;
+    /* border-radius: .25rem; */
+    height: 3rem;
+    width: 90%;
+    text-align: center;
+}
+
+.input-login:focus {
+    outline: none;
+}
+
+.div-input-checkbox {
+    color: #7c7c7c;
+}
+
+.input-checkbox{
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: bottom;
+}
+
+.btn-signup {
+    height: 3rem;
+    width: 10rem;
+    margin: .2rem;
+    background-color: #007bff;
+    border: none;
+    /* border-radius: .25rem; */
+    font-size: .8rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-signup:hover {
+    background-color: #2b8ef8;
+}
+
+.wrong-pass{
+    border: .1rem solid #ff0000;
+}

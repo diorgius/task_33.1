@@ -1,0 +1,47 @@
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.main {
+    width: 59.9%;
+    background-color: #ffffff;
+    border: .1rem solid #cccccc;
+    min-height: 100%;
+    flex-grow: 1;
+    color: #007bff;
+    padding-bottom: 2rem;
+}
+
+.div-alert {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 89%;
+    height: 7rem;
+    overflow-y: auto;
+}
+
+.div-alert > p {
+    font-size: 1.1rem;
+    color: #ff0000;
+}
+
+.section-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

@@ -1,0 +1,59 @@
+services:
+  messenger-php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    image: messenger-php
+    container_name: messenger-php
+    volumes:
+      - ../code:/data/messenger.local
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - www-network
+
+  messenger-nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: messenger-nginx
+    container_name: messenger-nginx
+    volumes:
+      - ./nginx/conf/hosts/messenger.local.conf:/etc/nginx/sites-enabled/messenger.local.conf
+      - ../code:/data/messenger.local
+    ports:
+      - "8888:80"
+    networks:
+      - www-network
+
+  messenger-mysql:
+    image: mysql:latest
+    container_name: messenger-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./mysql/dbdata:/var/lib/mysql
+      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    networks:
+      - www-network
+
+  messenger-phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: messenger-phpmyadmin
+    environment:
+      - PMA_HOST=messenger-mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 81:80
+    depends_on:
+      - messenger-mysql
+    networks:
+      - www-network
+
+networks:
+  www-network:
+    driver: bridge

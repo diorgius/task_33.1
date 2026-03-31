@@ -1,0 +1,48 @@
+.header {
+    background-color: #007bff;
+    height: 5rem;
+    width: 60%;
+    border-bottom: .2rem solid #cccccc;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    top: 0;
+    position: sticky;
+}
+
+.div-header-title {
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: .1rem;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.a-header-title {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.btn-login {
+    height: 2rem;
+    width: 8rem;
+    background-color: #007bff;
+    border: .2rem solid #ffffff;
+    /* border-radius: .25rem; */
+    font-size: .8rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-login:hover {
+    background-color: #ffffff;
+    border: .2rem solid #a5cbf3;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.btn-login:active {
+    background-color: #a5cbf3;
+    border: .2rem solid #ffffff;
+}
