@@ -6,6 +6,7 @@ use App\models\Model_Login;
 use App\models\Model_Registration;
 
 require_once CORE . 'logger.php';
+require_once CORE . 'mailer.php';
 
 class Controller_Registration extends Controller
 {
@@ -28,7 +29,17 @@ class Controller_Registration extends Controller
                 logging('warning', $error);
                 $this->view->generate('view_registration.php', 'view_template.php', $data);
             } else {
+                
+                // попробуем реализовать отправку 6-ти заначного КОДА подтверждения на почту 
+                // (НЕ ССЫЛКУ для активании, потому что как потом перенапралять ссылку из письма на localhost???)
+
                 $credentials = $_POST;
+                mailsend($credentials['email'], '123456');
+                exit();    
+
+
+                //
+
                 $this->model = new Model_Registration();
                 $result = $this->model->registration($credentials);
                 if (is_array($result)) {

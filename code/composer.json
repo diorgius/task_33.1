@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "gabordemooij/redbean": "dev-master",
-        "monolog/monolog": "3.0.*"
+        "monolog/monolog": "3.0.*",
+        "phpmailer/phpmailer": "dev-master"
     },
     "autoload": {
         "psr-4": {
