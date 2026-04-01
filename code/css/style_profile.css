@@ -1,5 +1,6 @@
 .div-back {
     margin-top: 2rem;
+    margin-bottom: 1rem;
 }
 
 .btn-back {
@@ -20,10 +21,14 @@
     color: #007bff;
 
 }
+.div-alert-profile {
+    height: 1.5rem;
+    color: #ff0000;
+}
 
 .div-profile-header {
-    margin-top: 4rem;
-    width: 20%;
+    margin-top: 1rem;
+    width: 60%;
     height: 3rem;
     display: flex;
     justify-content: center;
@@ -66,18 +71,18 @@
     width: 90%;
 }
 
-.form-editprofile input {
+.input-editprofile {
     font-size: 1.1rem;
     border: .1rem solid #007bff;
     background-color: #ffffff;
-    border-radius: .25rem;
+    border-radius: .2rem;
     height: 2.5rem;
     width: 80%;
     text-align: center;
     color: #007bff;
 }
 
-.form-editprofile input:focus, select:focus {
+.form-editprofile input:focus {
     outline: none;
 }
 

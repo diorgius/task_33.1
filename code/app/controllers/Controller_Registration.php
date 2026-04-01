@@ -33,7 +33,7 @@ class Controller_Registration extends Controller
                 !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
             ) {
                 // если убрать проверку на бэке, то массив не нужен
-                $data[] = 'CSRF токен не валидный'; 
+                $data = 'CSRF токен не валидный'; 
                 $error = 'Registration: CSRF токен не валидный';
                 logging('warning', $error);
                 $this->view->generate('view_registration.php', 'view_template.php', $data);
@@ -121,8 +121,7 @@ class Controller_Registration extends Controller
                 unset($_SESSION['code']);
                 unset($_SESSION['credentials']);
 
-                // если убрать проверку на бэке, то массив не нужен
-                $data[] = 'Код подтверждения не верный, повторите регистрацию'; 
+                $data = 'Код подтверждения не верный, повторите регистрацию'; 
                 $this->view->generate('view_registration.php', 'view_template.php', $data);
             }
 

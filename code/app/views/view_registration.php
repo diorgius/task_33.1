@@ -6,10 +6,8 @@ $_SESSION['csrf_token'] = $csrf_token;
 <div class="div-main-login-container">
 
     <div class="div-alert">
-        <?php if (!empty($data)): ?> // если убрать проверку на бэке, то массив не нужен
-            <?php foreach ($data as $error): ?>
-                <p><?= $error; ?></p>
-            <?php endforeach; ?>
+        <?php if ($data): ?>
+            <p><?= $data ?></p>
         <?php endif; ?>
     </div>
 
