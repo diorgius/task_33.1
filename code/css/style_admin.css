@@ -60,7 +60,7 @@
     text-align: center;
 }
 
-.input-edituser:focus {
+.form-edituser input:focus, select:focus {
     outline: none;
 }
 

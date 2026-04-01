@@ -1,0 +1,107 @@
+.div-back {
+    margin-top: 2rem;
+}
+
+.btn-back {
+    height: 2.3rem;
+    width: 8rem;
+    margin: .2rem;
+    background-color: #ffffff;
+    border: none;
+    font-size: 1.4rem;
+    color: #007bff;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-back::before {
+    content: "\21A9";
+    font-size: 1.4rem;
+    color: #007bff;
+
+}
+
+.div-profile-header {
+    margin-top: 4rem;
+    width: 20%;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.div-editprofile {
+    width: 60%;
+    margin: 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.div-editprofile-form {
+    padding: 2rem 0 2rem 0;
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: .1rem solid #007bff;
+    border-radius: .2rem;
+}
+
+.form-editprofile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.form-editprofile label{
+    text-align: center;
+    width: 90%;
+}
+
+.form-editprofile input {
+    font-size: 1.1rem;
+    border: .1rem solid #007bff;
+    background-color: #ffffff;
+    border-radius: .25rem;
+    height: 2.5rem;
+    width: 80%;
+    text-align: center;
+    color: #007bff;
+}
+
+.form-editprofile input:focus, select:focus {
+    outline: none;
+}
+
+.btn-editprofile {
+    height: 2.3rem;
+    width: 11rem;
+    margin: .2rem;
+    background-color: #ffffff;
+    border: .1rem solid #007bff;
+    border-radius: .2rem;
+    font-size: .8rem;
+    color: #007bff;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-editprofile:hover {    
+    background-color: #ffffff;
+    border: .1rem solid #a5cbf3;
+    color: #a5cbf3;
+}
+
+.btn-editprofile:active {
+    background-color: #ffffff;
+    border: .1rem solid #007bff;
+    color: #007bff;
+}

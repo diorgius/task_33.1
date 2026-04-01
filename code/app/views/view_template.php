@@ -25,7 +25,7 @@
                 <button class="btn-login" onclick="location.href='/registration'">Регистрация</button>
             <?php else: ?>
                 <button class="btn-login" onclick="location.href='/login/signout'">Выход</button>
-                <button class="btn-login" onclick="location.href='/login/profile'">Профиль</button>
+                <button class="btn-login" onclick="location.href='/profile'">Профиль</button>
             <?php endif; ?>   
         </div>
     </header>
