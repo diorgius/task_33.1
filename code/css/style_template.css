@@ -16,13 +16,13 @@ body {
 }
 
 .main {
-    width: 59.9%;
+    width: 100%;
     background-color: #ffffff;
-    border: .1rem solid #cccccc;
+    /* border: .1rem solid #cccccc; */
     min-height: 100%;
     flex-grow: 1;
     color: #007bff;
-    padding-bottom: 2rem;
+    /* padding-bottom: 2rem; */
 }
 
 .div-alert {

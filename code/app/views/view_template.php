@@ -1,9 +1,8 @@
 <?php
     $auth = $_SESSION['auth'] ?? null;
     $userId = $_SESSION['userId'] ?? null;
-    $login = $_SESSION['login'] ?? null;
+    $nickname = $_SESSION['nickname'] ?? null;
     $role = $_SESSION['role'] ?? null;
-
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +17,7 @@
 <body>
     <header class="header">
         <div class="div-header-title">   
-            <p><a class="a-header-title" href="/">Мессенджер</a></p>
+            <p>Мессенджер</p>
         </div>
         <div class="div-header-btn-login">
             <?php if (!$auth): ?>
@@ -26,6 +25,7 @@
                 <button class="btn-login" onclick="location.href='/registration'">Регистрация</button>
             <?php else: ?>
                 <button class="btn-login" onclick="location.href='/login/signout'">Выход</button>
+                <button class="btn-login" onclick="location.href='/login/profile'">Профиль</button>
             <?php endif; ?>   
         </div>
     </header>
@@ -38,9 +38,9 @@
 
     </main>
 
-    <footer class="footer">
+    <!-- <footer class="footer">
         <p>&copy; 2026 Мессенджер</p>
-    </footer>
+    </footer> -->
 
 </body>
 </html>

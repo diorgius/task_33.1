@@ -12,11 +12,11 @@ $_SESSION['csrf_token'] = $csrf_token;
     </div>
 
     <form class="form-login" action="/login/signup" method="post">
-        <input class="input-login" name="emaillogin" id="emaillogin" type="text" placeholder="email" required autocomplete="off" />
-        <input class="input-login" name="passwordlogin" id="passwordlogin" type="password" placeholder="пароль" required autocomplete="off" />
+        <input class="input-login" name="emaillogin" id="emaillogin" type="text" placeholder="email"  value="diorg@mail.ru" required autocomplete="off" />
+        <input class="input-login" name="passwordlogin" id="passwordlogin" type="password" placeholder="пароль" value="12345678" required autocomplete="off" />
         <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
         <div class="div-input-checkbox">
-            <input class="input-checkbox" name="remember" type="checkbox">&nbsp&nbspЗапомнить меня
+            <input class="input-checkbox" name="remember" type="checkbox" />&nbsp&nbspЗапомнить меня
         </div>
         <button class="btn-signup" name="submit" type="submit">Войти</button>
     </form>
