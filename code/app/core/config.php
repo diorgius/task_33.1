@@ -16,3 +16,5 @@
     define('JS', ROOT . 'js' . DIRECTORY_SEPARATOR);
     define('VENDOR', ROOT . 'vendor' . DIRECTORY_SEPARATOR);
     define('LOG', ROOT . 'logs' . DIRECTORY_SEPARATOR);
+    define('UPLOAD_MAX_SIZE', 100000); // 100 Kb
+    define('ALLOWED_TYPES', ['image/jpeg', 'image/png', 'image/gif']);

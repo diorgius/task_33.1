@@ -81,6 +81,28 @@
     outline: none;
 }
 
+.input-file::file-selector-button {
+    margin: .3rem 3rem 0 .3rem;
+    height: 1.9rem;
+    width: 8rem;
+    background: #007bff;
+    font-size: .8rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    border: none;
+    border-radius: .2rem;
+    cursor: pointer;
+}
+
+.input-file::file-selector-button:hover {
+    background: #2b8ef8;
+}
+.form-editprofile > p {
+    text-align: center;
+    font-size: .7rem;
+    color: #7c7c7c;
+}
+
 .btn-editprofile {
     height: 2.3rem;
     width: 11rem;
