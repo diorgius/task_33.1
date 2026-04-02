@@ -1,65 +1,64 @@
-const filesize = 100000
-const filetype = ['image/jpeg', 'image/png', 'image/gif', 'image/avif']
-const inputemail = document.querySelector('#email')
-const inputpassword = document.querySelector('#password')
-const inputpasswordagain = document.querySelector('#passwordagain')
-const buttonsend = document.querySelector('#send')
-const divalert = document.querySelector('.div-alert')
-const divalertprofile = document.querySelector('.div-alert-profile')
-const inputnickname = document.querySelector('#nickname')
-const inputfileavatar = document.querySelector('#fileavatar')
+const FILE_SIZE = 100000
+const FILE_TYPE = ['image/jpeg', 'image/png', 'image/gif', 'image/avif']
+const INPUTE_MAIL = document.querySelector('#email')
+const INPUT_PASSWORD = document.querySelector('#password')
+const INPUT_PASSWORD_AGAIN = document.querySelector('#passwordagain')
+const BUTTON_SEND = document.querySelector('#send')
+const DIV_ALERT = document.querySelector('.div-alert')
+const INPUT_NICKNAME = document.querySelector('#nickname')
+const INPUT_FILE_AVATAR = document.querySelector('#fileavatar')
 
-if (inputemail !== null) {
-    inputemail.addEventListener('change', (e) => {
+if (INPUTE_MAIL !== null) {
+    INPUTE_MAIL.addEventListener('change', (e) => {
+        if (document.querySelector('#alert') !== null) pAlert.remove()
         validation(e);
     });
 }
 
-if (inputpassword !== null) {
-    inputpassword.addEventListener('change', (e) => {
+if (INPUT_PASSWORD !== null) {
+    INPUT_PASSWORD.addEventListener('change', (e) => {
+        if (document.querySelector('#alert') !== null) pAlert.remove()
         validation(e);
     });
 }
 
-if (inputpasswordagain !== null) {
-    inputpasswordagain.addEventListener('change', (e) => {
+if (INPUT_PASSWORD_AGAIN !== null) {
+    INPUT_PASSWORD_AGAIN.addEventListener('change', (e) => {
+        if (document.querySelector('#alert') !== null) pAlert.remove()
         validation(e);
     });
 }
 
-if (inputnickname !== null) {
-    inputnickname.addEventListener('change', (e) => {
+if (INPUT_NICKNAME !== null) {
+    INPUT_NICKNAME.addEventListener('change', (e) => {
+        if (document.querySelector('#alert') !== null) pAlert.remove()
         validation(e);
     });
 }
 
-if (inputfileavatar !== null) {
-    inputfileavatar.addEventListener('change', (e) => {
+if (INPUT_FILE_AVATAR !== null) {
+    INPUT_FILE_AVATAR.addEventListener('change', (e) => {
+        if (document.querySelector('#alert') !== null) pAlert.remove()
         validation(e);
     });
 }
 
 async function validation(e) {
-    // console.log(e.target.id)
-    // console.log(e.target.value)
     if (e.target.id === 'email') {
         email = e.target.value
         const emailregexp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (!emailregexp.test(email)) {
-            inputemail.classList.add('wrong-data')
-            palertemail = document.createElement('p')
-            palertemail.setAttribute('id', 'alertemail');
-            buttonsend.setAttribute('disabled', '')
-            divalert.appendChild(palertemail)
-            palertemail.textContent = 'Email не валидный'
+            INPUTE_MAIL.classList.add('wrong-data')
+            pAlert = document.createElement('p')
+            pAlert.setAttribute('id', 'alert');
+            BUTTON_SEND.setAttribute('disabled', '')
+            DIV_ALERT.appendChild(pAlert)
+            pAlert.textContent = 'Email не валидный'
         } else {
-            inputemail.classList.remove('wrong-data')
-            buttonsend.removeAttribute('disabled')
-            if (document.querySelector('#alertemail')) {
-                palertemail.remove()
-            }
+            INPUTE_MAIL.classList.remove('wrong-data')
+            BUTTON_SEND.removeAttribute('disabled')
 
-            // посылаем email на бэк и проверяем на есть ли уже такой в базе
+            // посылаем email на бэкенд и проверяем на есть ли уже такой в базе
 
             data = { email: email }
             try {
@@ -74,18 +73,15 @@ async function validation(e) {
                 let result = await response.text()
                 // console.log('Успех: ', result)
                 if (result) {
-                    inputemail.classList.add('wrong-data')
-                    palertemail = document.createElement('p')
-                    palertemail.setAttribute('id', 'alertemail');
-                    buttonsend.setAttribute('disabled', '')
-                    divalert.appendChild(palertemail)
-                    palertemail.textContent = result
+                    INPUTE_MAIL.classList.add('wrong-data')
+                    pAlert = document.createElement('p')
+                    pAlert.setAttribute('id', 'alert');
+                    BUTTON_SEND.setAttribute('disabled', '')
+                    DIV_ALERT.appendChild(pAlert)
+                    pAlert.textContent = result
                 } else {
-                    inputemail.classList.remove('wrong-data')
-                    buttonsend.removeAttribute('disabled')
-                    if (document.querySelector('#alertemail')) {
-                        palertemail.remove()
-                    }
+                    INPUTE_MAIL.classList.remove('wrong-data')
+                    BUTTON_SEND.removeAttribute('disabled')
                 }
             } catch (error) {
                 console.log('Ошибка: ', error)
@@ -95,35 +91,30 @@ async function validation(e) {
     } else if (e.target.id === 'password') {
         pass = e.target.value
         if (pass.length < 8 || pass.length > 20) {
-            inputpassword.classList.add('wrong-data')
-            palertpassword = document.createElement('p')
-            palertpassword.setAttribute('id', 'alertpassword');
-            buttonsend.setAttribute('disabled', '')
-            divalert.appendChild(palertpassword)
-            palertpassword.textContent = 'Пароль меньше 8 символов или больше 20'
+            INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #ff0000;')
+            // INPUT_PASSWORD.classList.add('wrong-data')
+            pAlert = document.createElement('p')
+            pAlert.setAttribute('id', 'alert');
+            BUTTON_SEND.setAttribute('disabled', '')
+            DIV_ALERT.appendChild(pAlert)
+            pAlert.textContent = 'Пароль меньше 8 символов или больше 20'
         } else {
-            inputpassword.classList.remove('wrong-data')
-            buttonsend.removeAttribute('disabled')
-            if (document.querySelector('#alertpassword')) {
-                palertpassword.remove()
-            }
+            INPUT_PASSWORD.classList.remove('wrong-data')
+            BUTTON_SEND.removeAttribute('disabled')
         }
 
     } else if (e.target.id === 'passwordagain') {
         passagain = e.target.value
         if (pass !== passagain) {
-            inputpasswordagain.classList.add('wrong-data')
-            palertpasswordagain = document.createElement('p')
-            palertpasswordagain.setAttribute('id', 'alertpasswordagain');
-            buttonsend.setAttribute('disabled', '')
-            divalert.appendChild(palertpasswordagain)
-            palertpasswordagain.textContent = 'Пароли не совпадают'
+            INPUT_PASSWORD_AGAIN.classList.add('wrong-data')
+            pAlert = document.createElement('p')
+            pAlert.setAttribute('id', 'alert');
+            BUTTON_SEND.setAttribute('disabled', '')
+            DIV_ALERT.appendChild(pAlert)
+            pAlert.textContent = 'Пароли не совпадают'
         } else {
-            inputpasswordagain.classList.remove('wrong-data')
-            buttonsend.removeAttribute('disabled')
-            if (document.querySelector('#alertpasswordagain')) {
-                palertpasswordagain.remove()
-            }
+            INPUT_PASSWORD_AGAIN.classList.remove('wrong-data')
+            BUTTON_SEND.removeAttribute('disabled')
         }
     } else if (e.target.id === 'nickname') {
         nickname = e.target.value
@@ -139,50 +130,38 @@ async function validation(e) {
 
             let result = await response.text()
             if (result) {
-                inputnickname.setAttribute('style', 'border: .1rem solid #ff0000;')
-                palertnickname = document.createElement('p')
-                palertnickname.setAttribute('id', 'alertnickname');
-                buttonsend.setAttribute('disabled', '')
-                divalertprofile.appendChild(palertnickname)
-                palertnickname.textContent = result
+                INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000;')
+                pAlert = document.createElement('p')
+                pAlert.setAttribute('id', 'alert');
+                BUTTON_SEND.setAttribute('disabled', '')
+                DIV_ALERT.appendChild(pAlert)
+                pAlert.textContent = result
             } else {
-                inputnickname.setAttribute('style', 'border: .1rem solid #007bff;')
-                buttonsend.removeAttribute('disabled')
-                if (document.querySelector('#alertnickname')) {
-                    palertnickname.remove()
-                }
+                INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff;')
+                BUTTON_SEND.removeAttribute('disabled')
             }
         } catch (error) {
             console.log('Ошибка: ', error)
         }
     } else if (e.target.id === 'fileavatar') {
         fileavatar = e.target.files[0].name
-        // console.log(e)
-        // console.log(e.target.files[0].name)
-        // console.log(e.target.files[0].size)
-        // console.log(e.target.files[0].type)
-        // console.log(filetype)
-
-        if (e.target.files[0].size > filesize) {
-            inputfileavatar.setAttribute('style', 'border: .1rem solid #ff0000;')
-            palertfileavatar = document.createElement('p')
-            palertfileavatar.setAttribute('id', 'alertfileavatar');
-            buttonsend.setAttribute('disabled', '')
-            divalertprofile.appendChild(palertfileavatar)
-            palertfileavatar.textContent = 'Файл ' + fileavatar + ' больше возможного для загрузки размера'
-        } else if (!filetype.includes(e.target.files[0].type)) {
-            inputfileavatar.setAttribute('style', 'border: .1rem solid #ff0000;')
-            palertfileavatar = document.createElement('p')
-            palertfileavatar.setAttribute('id', 'alertfileavatar');
-            buttonsend.setAttribute('disabled', '')
-            divalertprofile.appendChild(palertfileavatar)
-            palertfileavatar.textContent = 'Неподдерживаемый тип изображения'
+        if (e.target.files[0].size > FILE_SIZE) {
+            INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #ff0000;')
+            pAlert = document.createElement('p')
+            pAlert.setAttribute('id', 'alert');
+            BUTTON_SEND.setAttribute('disabled', '')
+            DIV_ALERT.appendChild(pAlert)
+            pAlert.textContent = 'Файл больше возможного для загрузки размера'
+        } else if (!FILE_TYPE.includes(e.target.files[0].type)) {
+            INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #ff0000;')
+            pAlert = document.createElement('p')
+            pAlert.setAttribute('id', 'alert');
+            BUTTON_SEND.setAttribute('disabled', '')
+            DIV_ALERT.appendChild(pAlert)
+            pAlert.textContent = 'Неподдерживаемый тип изображения'
         } else {
-            inputfileavatar.setAttribute('style', 'border: .1rem solid #007bff;')
-            buttonsend.removeAttribute('disabled')
-            if (document.querySelector('#alertfileavatar')) {
-                palertfileavatar.remove()
-            }
+            INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #007bff;')
+            BUTTON_SEND.removeAttribute('disabled')
         }
     }
 }

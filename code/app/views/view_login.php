@@ -18,6 +18,6 @@ $_SESSION['csrf_token'] = $csrf_token;
         <div class="div-input-checkbox">
             <input class="input-checkbox" name="remember" type="checkbox" />&nbsp&nbspЗапомнить меня
         </div>
-        <button class="btn-signup" name="submit" type="submit">Войти</button>
+        <button class="btn-signup" name="submit" id="send" type="submit">Войти</button>
     </form>
 </div>

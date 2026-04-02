@@ -21,10 +21,6 @@ class Model_Profile extends Model
 
     public function updateUser(array $data, array $file = []): bool
     {
-        
-        // var_dump($_POST);
-        // var_dump($_FILES);
-
         $id = $_SESSION['userId'];
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
@@ -41,18 +37,23 @@ class Model_Profile extends Model
 
         // $avatarFileType = $file['fileavatar']['type'];
 
-        // проверяем, если пароль не менялся, то оставляем старый
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $id);
-
+        
+        // проверяем, если пароль не менялся, то оставляем старый
         if ($password === $user['password']) {
             $password = $user['password'];
         } else {
             $password = password_hash($password, PASSWORD_DEFAULT);
         }
 
-        if ($user['avatar']) $oldAvatarFileName = $user['avatar'];
-        if ($avatarFileName) $avatarFileName = md5($email . time());
+        // проверяем, есть ли новый аватар
+        if ($avatarFileName) {
+            $avatarFileName = md5($email . time());
+            $oldAvatarFileName = $user['avatar'];
+        } else {
+            $avatarFileName = $user['avatar'];
+        }
 
         $credentials = [
             'id' => $id,
@@ -66,7 +67,7 @@ class Model_Profile extends Model
         $user = DB::update('users', $credentials);
 
         if ($user) {
-            if ($avatarFileName) {
+            if (isset($oldAvatarFileName)) {
                 $filePath = AVATARS . basename($avatarFileName);
                 if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
                     return false; // надо как-то обработать ошибки

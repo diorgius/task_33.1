@@ -3,7 +3,7 @@ if(!empty($data)): ?>
 <div class="div-back">
     <button class="btn-back" onclick="location.href='/'">&nbspНазад</button>
 </div>
-<div class="div-alert-profile"></div>
+<div class="div-alert"></div>
 <div class="div-profile-header">
     <p>Пользователь: <?= $data['nickname']?></p>
 </div>
@@ -21,13 +21,13 @@ if(!empty($data)): ?>
                 <input class="input-editprofile" type="email" id="email" name="email" value="<?= $data['email'] ?>" readonly />
             </label>
             <label for="password">Пароль:&nbsp&nbsp&nbsp
-                <input class="input-editprofile" type="text" id="password" name="password" value="<?= $data['password'] ?>" />
+                <input class="input-editprofile" type="password" id="password" name="password" value="<?= $data['password'] ?>" />
             </label>
             <label for="nickname">Ник:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                 <input class="input-editprofile" type="text" id="nickname" name="nickname" value="<?= $data['nickname'] ?>" />
             </label>
             <label for="fileavatar">Аватар:&nbsp&nbsp&nbsp&nbsp
-                <input class="input-editprofile input-file" type="file" id="fileavatar" name="fileavatar" multiple />
+                <input class="input-editprofile input-file" type="file" id="fileavatar" name="fileavatar" />
             </label>
             <p>Максимальный размер файла: <?= UPLOAD_MAX_SIZE / 1000; ?> Кб<br>
                 Допустимые форматы: <?= implode(', ', ALLOWED_TYPES) ?></p>
