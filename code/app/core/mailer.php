@@ -27,16 +27,16 @@ function mailsend($email, $code) {
 
     // Тема и содержание
     $mail->Subject = 'Confirmation of registration'; # тема
-    $mail->msgHTML("<h1>Приветствуем Вас в нашем мессенджере, для подтверждения регистрации введите на сайте messenger.local полученный Вами в этом письме код</h1> <h2>$code<h2>"); # содержание в формате HTML
+    $mail->msgHTML("<h2>Welcome to our messenger. To confirm your registration, enter the code you received in this email on the messenger.local website</h1> <h2>$code<h2>"); # содержание в формате HTML
     $mail->AltBody = 'This is a plain-text message body'; # альтернативный текст, если не удастся использовать HTML
 
 
     // Выводим результат
     if (!$mail->send()) {
-        echo "Mailer Error: " . $mail->ErrorInfo;
+        // echo "Mailer Error: " . $mail->ErrorInfo;
         return false;
     } else {
-        echo "Message sent!";
+        // echo "Message sent!";
         return true;
     }
 }

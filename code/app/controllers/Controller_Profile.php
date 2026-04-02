@@ -25,9 +25,11 @@ class Controller_Profile extends Controller
     {
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->model = new Model_Profile();
-            $user = $this->model->updateUser($_POST);
+            $user = $this->model->updateUser($_POST, $_FILES);
             if ($user) {
                 header('location: /profile');
+            } else {
+                $this->view->generate('view_profile.php', 'view_template.php');
             }
         }
     }

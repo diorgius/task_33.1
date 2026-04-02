@@ -1,5 +1,5 @@
 const filesize = 100000
-const filetype = ['image/jpeg', 'image/png', 'image/gif'] 
+const filetype = ['image/jpeg', 'image/png', 'image/gif', 'image/avif']
 const inputemail = document.querySelector('#email')
 const inputpassword = document.querySelector('#password')
 const inputpasswordagain = document.querySelector('#passwordagain')
@@ -9,13 +9,17 @@ const divalertprofile = document.querySelector('.div-alert-profile')
 const inputnickname = document.querySelector('#nickname')
 const inputfileavatar = document.querySelector('#fileavatar')
 
-inputemail.addEventListener('change', (e) => {
-    validation(e);
-});
+if (inputemail !== null) {
+    inputemail.addEventListener('change', (e) => {
+        validation(e);
+    });
+}
 
-inputpassword.addEventListener('change', (e) => {
-    validation(e);
-});
+if (inputpassword !== null) {
+    inputpassword.addEventListener('change', (e) => {
+        validation(e);
+    });
+}
 
 if (inputpasswordagain !== null) {
     inputpasswordagain.addEventListener('change', (e) => {
@@ -91,7 +95,6 @@ async function validation(e) {
     } else if (e.target.id === 'password') {
         pass = e.target.value
         if (pass.length < 8 || pass.length > 20) {
-            // console.log('пароль меньше 8 символов')
             inputpassword.classList.add('wrong-data')
             palertpassword = document.createElement('p')
             palertpassword.setAttribute('id', 'alertpassword');
@@ -109,7 +112,6 @@ async function validation(e) {
     } else if (e.target.id === 'passwordagain') {
         passagain = e.target.value
         if (pass !== passagain) {
-            // console.log('пароли не совпадают')
             inputpasswordagain.classList.add('wrong-data')
             palertpasswordagain = document.createElement('p')
             palertpasswordagain.setAttribute('id', 'alertpasswordagain');
@@ -125,8 +127,6 @@ async function validation(e) {
         }
     } else if (e.target.id === 'nickname') {
         nickname = e.target.value
-        // console.log(nickname)
-
         data = { nickname: nickname }
         try {
             let response = await fetch('../app/core/CheckData.php', {
@@ -145,7 +145,6 @@ async function validation(e) {
                 buttonsend.setAttribute('disabled', '')
                 divalertprofile.appendChild(palertnickname)
                 palertnickname.textContent = result
-                // console.log(result)
             } else {
                 inputnickname.setAttribute('style', 'border: .1rem solid #007bff;')
                 buttonsend.removeAttribute('disabled')
@@ -157,11 +156,12 @@ async function validation(e) {
             console.log('Ошибка: ', error)
         }
     } else if (e.target.id === 'fileavatar') {
-        fileavatar = e.target.files[0].name 
-        console.log(e)
-        console.log(e.target.files[0].name)
-        console.log(e.target.files[0].size)
-        console.log(e.target.files[0].type)
+        fileavatar = e.target.files[0].name
+        // console.log(e)
+        // console.log(e.target.files[0].name)
+        // console.log(e.target.files[0].size)
+        // console.log(e.target.files[0].type)
+        // console.log(filetype)
 
         if (e.target.files[0].size > filesize) {
             inputfileavatar.setAttribute('style', 'border: .1rem solid #ff0000;')
@@ -170,8 +170,19 @@ async function validation(e) {
             buttonsend.setAttribute('disabled', '')
             divalertprofile.appendChild(palertfileavatar)
             palertfileavatar.textContent = 'Файл ' + fileavatar + ' больше возможного для загрузки размера'
-        } else if (filetype.indexOf(e.target.files[0].type)) {
-            console.log('не поддерживаемый тип')
+        } else if (!filetype.includes(e.target.files[0].type)) {
+            inputfileavatar.setAttribute('style', 'border: .1rem solid #ff0000;')
+            palertfileavatar = document.createElement('p')
+            palertfileavatar.setAttribute('id', 'alertfileavatar');
+            buttonsend.setAttribute('disabled', '')
+            divalertprofile.appendChild(palertfileavatar)
+            palertfileavatar.textContent = 'Неподдерживаемый тип изображения'
+        } else {
+            inputfileavatar.setAttribute('style', 'border: .1rem solid #007bff;')
+            buttonsend.removeAttribute('disabled')
+            if (document.querySelector('#alertfileavatar')) {
+                palertfileavatar.remove()
+            }
         }
     }
 }

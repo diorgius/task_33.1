@@ -31,7 +31,7 @@ class DB
                 `email` VARCHAR(64) NOT NULL ,
                 `password` VARCHAR(128) NOT NULL , 
                 `nickname` VARCHAR(64) NOT NULL , 
-                `avatar` BLOB NULL , 
+                `avatar` VARCHAR(64) NULL , 
                 `role` VARCHAR(20) NULL , 
                 `cookiehash` VARCHAR(128) NULL , 
                 `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
