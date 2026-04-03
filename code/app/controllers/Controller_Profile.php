@@ -7,7 +7,6 @@ use App\models\Model_Profile;
 
 class Controller_Profile extends Controller
 {
-
     protected $model;
 
     public function index()

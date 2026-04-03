@@ -55,6 +55,7 @@
     border-radius: .2rem;
     outline: .1rem solid #007bff;
 }
+
 .input-checkbox:checked::after {
     content: "\2714";
     position: relative;

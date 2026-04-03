@@ -62,7 +62,7 @@
     width: 100%;
 }
 
-.form-editprofile label{
+.form-editprofile label {
     text-align: center;
     width: 90%;
 }
@@ -75,6 +75,28 @@
     height: 2.5rem;
     width: 80%;
     text-align: center;
+    color: #007bff;
+}
+
+.input-short {
+    width: 55%;
+}
+
+.input-checkbox-hideemail {
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    appearance: none;
+    border-radius: .2rem;
+    outline: .1rem solid #007bff;
+}
+
+.input-checkbox-hideemail:checked::after {
+    content: "\2714";
+    position: relative;
+    top: -.4rem;
+    left: .1rem;
+    font-size: 1.4rem;
     color: #007bff;
 }
 
@@ -98,7 +120,8 @@
 .input-file::file-selector-button:hover {
     background: #2b8ef8;
 }
-.form-editprofile > p {
+
+.form-editprofile>p {
     text-align: center;
     font-size: .7rem;
     color: #7c7c7c;
@@ -117,7 +140,7 @@
     cursor: pointer;
 }
 
-.btn-editprofile:hover {    
+.btn-editprofile:hover {
     background-color: #ffffff;
     border: .1rem solid #a5cbf3;
     color: #a5cbf3;

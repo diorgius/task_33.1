@@ -25,6 +25,7 @@ class Model_Profile extends Model
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
         $avatarFileName=$file['fileavatar']['name'];
+        isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
         $nickname = htmlspecialchars(trim($data['nickname']));
 
         // с загрузкой изображений в базу до конца не разобрался, в базу данные загружаются,
@@ -35,17 +36,11 @@ class Model_Profile extends Model
         // сами файлы загружать в директорию avatars, проверять есть ли старый аватар и удалять его
         // $image=addslashes(file_get_contents($file['fileavatar']['tmp_name']));
 
-        // $avatarFileType = $file['fileavatar']['type'];
-
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $id);
         
         // проверяем, если пароль не менялся, то оставляем старый
-        if ($password === $user['password']) {
-            $password = $user['password'];
-        } else {
-            $password = password_hash($password, PASSWORD_DEFAULT);
-        }
+        $password === $user['password'] ? $password = $user['password'] : $password = password_hash($password, PASSWORD_DEFAULT);
 
         // проверяем, есть ли новый аватар
         if ($avatarFileName) {
@@ -61,7 +56,7 @@ class Model_Profile extends Model
             'email' => $email,
             'password' => $password,
             'avatar' => $avatarFileName,
-            // 'avatar' => $image,
+            'hideemail' => $hideemail,
             'nickname' => $nickname,
         ];
 

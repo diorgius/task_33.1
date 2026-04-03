@@ -1,5 +1,7 @@
 <?php 
-if(!empty($data)): ?>    
+if(!empty($data)):
+    $data['hideemail'] != 0 ? $checked = 'checked' : $checked = '';
+?>
 <div class="div-back">
     <button class="btn-back" onclick="location.href='/'">&nbspНазад</button>
 </div>
@@ -17,9 +19,12 @@ if(!empty($data)): ?>
 <div class="div-editprofile">
     <div class="div-editprofile-form">
         <form class="form-editprofile" action="/profile/updateuser" method="post" enctype="multipart/form-data">
-            <label for="email">Email:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                <input class="input-editprofile" type="email" id="email" name="email" value="<?= $data['email'] ?>" readonly />
-            </label>
+            <!-- <div class="div-email-profile"> -->
+                <label for="email">Email:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                    <input class="input-editprofile input-short" type="email" id="email" name="email" value="<?= $data['email'] ?>" readonly />
+                    <input class="input-checkbox-hideemail" name="hideemail" type="checkbox" <?= $checked ?>/>&nbsp&nbspСкрыть email
+                </label>
+            <!-- </div> -->
             <label for="password">Пароль:&nbsp&nbsp&nbsp
                 <input class="input-editprofile" type="password" id="password" name="password" value="<?= $data['password'] ?>" />
             </label>
