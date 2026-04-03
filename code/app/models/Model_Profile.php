@@ -51,6 +51,7 @@ class Model_Profile extends Model
         if ($avatarFileName) {
             $avatarFileName = md5($email . time());
             $oldAvatarFileName = $user['avatar'];
+            $newAvatar = true;
         } else {
             $avatarFileName = $user['avatar'];
         }
@@ -67,15 +68,17 @@ class Model_Profile extends Model
         $user = DB::update('users', $credentials);
 
         if ($user) {
-            if (isset($oldAvatarFileName)) {
+            if (isset($newAvatar)) {
                 $filePath = AVATARS . basename($avatarFileName);
                 if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
+                    echo "Что-то пошло не так";
                     return false; // надо как-то обработать ошибки
                 }
-                if (isset($oldAvatarFileName)) unlink(AVATARS . $oldAvatarFileName);
+                if ($oldAvatarFileName !='') unlink(AVATARS . $oldAvatarFileName);
             }
             return true;
         } else {
+            echo "Что-то пошло не так";
             return false; // надо как-то обработать ошибки
         }
     }
