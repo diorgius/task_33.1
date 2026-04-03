@@ -1,6 +1,6 @@
 <?php
-$csrf_token = hash('gost-crypto', random_int(0, 999999));
-$_SESSION['csrf_token'] = $csrf_token;
+    $csrf_token = hash('gost-crypto', random_int(0, 999999));
+    $_SESSION['csrf_token'] = $csrf_token;
 ?>
 
 <div class="div-main-login-container">

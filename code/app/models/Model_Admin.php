@@ -21,11 +21,6 @@ class Model_Admin extends Model
 
     public function createUser(array $data, array $file = []): bool
     {
-        // $email = htmlspecialchars(trim($data['email']));
-        // $password = password_hash(htmlspecialchars(trim($data['password'])), PASSWORD_DEFAULT);
-        // $nickname = htmlspecialchars(trim($data['nickname']));
-        // $role = htmlspecialchars(trim($data['role']));
-
         $email = htmlspecialchars(trim($data['email']));
         $password = password_hash(htmlspecialchars(trim($data['password'])), PASSWORD_DEFAULT);
         $avatarFileName=$file['fileavatar']['name'];
@@ -80,12 +75,6 @@ class Model_Admin extends Model
 
     public function updateUser(array $data, array $file = []): bool
     {
-        // $id = $data['id'];
-        // $email = htmlspecialchars(trim($data['email']));
-        // $password = htmlspecialchars(trim($data['password']));
-        // $nickname = htmlspecialchars(trim($data['nickname']));
-        // $role = htmlspecialchars(trim($data['role']));
-
         $id = $data['id'];
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
@@ -93,7 +82,6 @@ class Model_Admin extends Model
         isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
         $nickname = htmlspecialchars(trim($data['nickname']));
         $role = htmlspecialchars(trim($data['role']));
-
 
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $id);

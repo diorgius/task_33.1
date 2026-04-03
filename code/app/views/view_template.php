@@ -40,9 +40,9 @@
 
     </main>
 
-    <!-- <footer class="footer">
+    <footer class="footer">
         <p>&copy; 2026 Мессенджер</p>
-    </footer> -->
+    </footer>
 
 </body>
 </html>

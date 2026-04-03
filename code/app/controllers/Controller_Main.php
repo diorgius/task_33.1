@@ -13,10 +13,10 @@ class Controller_Main extends Controller
     {
         $this->checkLogin();
         $this->model = new Model_Main();
-        // $data = $this->model->getData();
-        $this->view->generate('view_main.php', 'view_template.php', $data = null);
+        isset($_SESSION['userId']) ? $userId = $_SESSION['userId'] : $userId = 0;
+        $data = $this->model->getUser($userId);
+        $this->view->generate('view_main.php', 'view_template.php', $data);
     }
-
     public function checkLogin()
     {
         if (isset($_COOKIE['id']) && isset($_COOKIE['hash'])) {

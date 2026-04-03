@@ -6,7 +6,6 @@
     <button class="btn-admin-action" onclick="location.href='/admin/adduser'">Добавить пользователя</button>
 </div>
 
-
 <?php if(!empty($data)): ?>
 <table class="table-users">
     <tr>
