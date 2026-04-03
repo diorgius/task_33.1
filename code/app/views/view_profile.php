@@ -1,6 +1,7 @@
 <?php 
 if(!empty($data)):
     $data['hideemail'] != 0 ? $checked = 'checked' : $checked = '';
+    !empty($data['avatar']) ? $image = URL . 'avatars/' . $data['avatar'] : $image = URL . 'img/avatar_0.jpg' . $data['avatar'];
 ?>
 <div class="div-back">
     <button class="btn-back" onclick="location.href='/'">&nbspНазад</button>
@@ -10,21 +11,15 @@ if(!empty($data)):
     <p>Пользователь: <?= $data['nickname']?></p>
 </div>
 <div class="div-image-conteiner">
-    <?php if(!empty($data['avatar'])): ?> 
-        <img src = "<?= URL . 'avatars/' . $data['avatar']; ?>" width = "70px" height = "70px"/>
-    <?php else: ?>
-        <img src = "<?= URL . 'img/avatar_0.jpg' . $data['avatar']; ?>" width = "70px" height = "70px"/>
-    <?php endif; ?>
+    <img src = "<?= $image; ?>" width = "70px" height = "70px"/>
 </div>
 <div class="div-editprofile">
     <div class="div-editprofile-form">
         <form class="form-editprofile" action="/profile/updateuser" method="post" enctype="multipart/form-data">
-            <!-- <div class="div-email-profile"> -->
-                <label for="email">Email:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    <input class="input-editprofile input-short" type="email" id="email" name="email" value="<?= $data['email'] ?>" readonly />
-                    <input class="input-checkbox-hideemail" name="hideemail" type="checkbox" <?= $checked ?>/>&nbsp&nbspСкрыть email
-                </label>
-            <!-- </div> -->
+            <label for="email">Email:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                <input class="input-editprofile input-short" type="email" id="email" name="email" value="<?= $data['email'] ?>" readonly />&nbsp&nbsp
+                <input class="input-checkbox-hideemail" name="hideemail" type="checkbox" <?= $checked ?>/>&nbsp&nbspСкрыть email
+            </label>
             <label for="password">Пароль:&nbsp&nbsp&nbsp
                 <input class="input-editprofile" type="password" id="password" name="password" value="<?= $data['password'] ?>" />
             </label>

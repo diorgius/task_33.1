@@ -19,19 +19,32 @@ class Model_Admin extends Model
         }
     }
 
-    public function createUser(array $data)
+    public function createUser(array $data, array $file = []): bool
     {
+        // $email = htmlspecialchars(trim($data['email']));
+        // $password = password_hash(htmlspecialchars(trim($data['password'])), PASSWORD_DEFAULT);
+        // $nickname = htmlspecialchars(trim($data['nickname']));
+        // $role = htmlspecialchars(trim($data['role']));
+
         $email = htmlspecialchars(trim($data['email']));
         $password = password_hash(htmlspecialchars(trim($data['password'])), PASSWORD_DEFAULT);
+        $avatarFileName=$file['fileavatar']['name'];
         $nickname = htmlspecialchars(trim($data['nickname']));
         $role = htmlspecialchars(trim($data['role']));
 
-        // надо делать проверки на соответствие введенных данных как при регистрации
+        // проверяем, есть ли новый аватар
+        if ($avatarFileName) {
+            $avatarFileName = md5($email . time());
+            $newAvatar = true;
+        } else {
+            $avatarFileName = '';
+        }
 
         $credentials = [
             'email' => $email,
             'password' => $password,
             'nickname' => $nickname,
+            'avatar' => $avatarFileName,
             'role' => $role
         ];
 
@@ -39,9 +52,17 @@ class Model_Admin extends Model
         $user = DB::create('users', $credentials);
 
         if ($user) {
+            if (isset($newAvatar)) {
+                $filePath = AVATARS . basename($avatarFileName);
+                if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
+                    echo "Что-то пошло не так";
+                    return false; // надо как-то обработать ошибки
+                }
+            }            
             return true;
         } else {
-            return false;
+            echo "Что-то пошло не так";
+            return false; // надо как-то обработать ошибки
         }
     }
 
@@ -57,40 +78,63 @@ class Model_Admin extends Model
         }
     }
 
-    public function updateUser(array $data)
+    public function updateUser(array $data, array $file = []): bool
     {
+        // $id = $data['id'];
+        // $email = htmlspecialchars(trim($data['email']));
+        // $password = htmlspecialchars(trim($data['password']));
+        // $nickname = htmlspecialchars(trim($data['nickname']));
+        // $role = htmlspecialchars(trim($data['role']));
+
         $id = $data['id'];
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
+        $avatarFileName=$file['fileavatar']['name'];
+        isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
         $nickname = htmlspecialchars(trim($data['nickname']));
         $role = htmlspecialchars(trim($data['role']));
 
-        // надо делать проверки на соответствие введенных данных как при регистрации 
 
-        // проверяем, если пароль не менялся, то оставляем старый
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $id);
+        
+        // проверяем, если пароль не менялся, то оставляем старый
+        $password === $user['password'] ? $password = $user['password'] : $password = password_hash($password, PASSWORD_DEFAULT);
 
-        if ($password === $user['password']) {
-            $password = $user['password'];
+        // проверяем, есть ли новый аватар
+        if ($avatarFileName) {
+            $avatarFileName = md5($email . time());
+            $oldAvatarFileName = $user['avatar'];
+            $newAvatar = true;
         } else {
-            $password = password_hash($password, PASSWORD_DEFAULT);
+            $avatarFileName = $user['avatar'];
         }
-
+        
         $credentials = [
             'id' => $id,
             'email' => $email,
             'password' => $password,
             'nickname' => $nickname,
+            'avatar' => $avatarFileName,
+            'hideemail' => $hideemail,
             'role' => $role
         ];
 
         $user = DB::update('users', $credentials);
 
         if ($user) {
+            if (isset($newAvatar)) {
+                $filePath = AVATARS . basename($avatarFileName);
+                if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
+                    echo "Что-то пошло не так";
+                    return false; // надо как-то обработать ошибки
+                }
+                if ($oldAvatarFileName !='') unlink(AVATARS . $oldAvatarFileName);
+            }
             return true;
         } else {
-            return false;
+            echo "Что-то пошло не так";
+            return false; // надо как-то обработать ошибки
         }
     }
 

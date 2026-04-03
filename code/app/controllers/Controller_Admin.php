@@ -38,7 +38,7 @@ class Controller_Admin extends Controller
     {
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->model = new Model_Admin();
-            $user = $this->model->createUser($_POST);
+            $user = $this->model->createUser($_POST, $_FILES);
             if ($user) {
                 header('location: /admin/getusers');
             }
@@ -49,9 +49,8 @@ class Controller_Admin extends Controller
     {
         $id = $data[0];
         $this->model = new Model_Admin();
-        $user = $this->model->editUser($id);
-        if ($user) {
-            $data = $user;
+        $data = $this->model->editUser($id);
+        if ($data) {
             $this->view->generate('view_edituser.php', 'view_template.php', $data);
         }
     }
@@ -60,7 +59,7 @@ class Controller_Admin extends Controller
     {
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->model = new Model_Admin();
-            $user = $this->model->updateUser($_POST);
+            $user = $this->model->updateUser($_POST, $_FILES);
             if ($user) {
                 header('location: /admin/getusers');
             }

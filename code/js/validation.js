@@ -1,3 +1,4 @@
+const URL = window.location.protocol + '//' + window.location.host
 const FILE_SIZE = 100000
 const FILE_TYPE = ['image/jpeg', 'image/png', 'image/gif', 'image/avif']
 const INPUTE_MAIL = document.querySelector('#email')
@@ -62,7 +63,7 @@ async function validation(e) {
 
             data = { email: email }
             try {
-                let response = await fetch('../app/core/CheckData.php', {
+                let response = await fetch(URL + '/app/core/CheckData.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
@@ -120,7 +121,7 @@ async function validation(e) {
         nickname = e.target.value
         data = { nickname: nickname }
         try {
-            let response = await fetch('../app/core/CheckData.php', {
+            let response = await fetch(URL + '/app/core/CheckData.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'

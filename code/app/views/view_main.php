@@ -3,9 +3,7 @@
 <?php else: ?>
     <?php if ($role === 'admin'): ?>
         <button class="btn-admin-action" onclick="location.href='/admin'">Страница администрирования</button>
+        <?php // phpinfo(); ?>
     <?php endif; ?>
-    
-    <?php phpinfo(); ?>
-
 
 <?php endif; ?> 

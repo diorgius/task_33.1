@@ -1,4 +1,6 @@
-<h1>Страница администрирования</h1>
+<div class="div-back">
+    <button class="btn-back" onclick="location.href='/'">&nbspНазад</button>
+</div>
 <div class="div-admin-btn-group">
     <button class="btn-admin-action" onclick="location.href='/admin/getusers'">Список пользователей</button>
     <button class="btn-admin-action" onclick="location.href='/admin/adduser'">Добавить пользователя</button>

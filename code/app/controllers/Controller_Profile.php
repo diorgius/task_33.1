@@ -1,7 +1,6 @@
 <?php
 
 namespace App\controllers;
-
 use App\core\Controller;
 use App\models\Model_Profile;
 
