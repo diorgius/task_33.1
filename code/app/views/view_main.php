@@ -10,17 +10,20 @@
         <?php if (!empty($data)): ?>
             <div class="div-user-avatar">
                 <img src="<?= URL . 'avatars/' . $data['avatar'] ?>" alt="avatar" width="90px">
-                <p><?= $data['nickname']?></p>
+                <p class="p-nickname"><?= $data['nickname']?></p>
             </div>    
         <?php endif; ?>
 
         <button class="btn-add-user" id="btnadduser" name="btnadduser">Добавить пользователя</button>
+        <div class="div-user-chats" id="divuserchats"></div>
     </aside>
     
     <section class="section-main-window">
         <div class="div-seach-users">
             <input class="input-search-users" type="text" id="searchusers" name="searchusers" />
         </div>
+        
+        <div class="div-alert"></div>
 
         <div class="div-list-users" id="divlistusers">
             <input type="text" id="userid" hidden value="<?= $userId?>">
