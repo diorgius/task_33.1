@@ -14,7 +14,7 @@
             </div>    
         <?php endif; ?>
 
-        <p>Здесь будем выводить чаты</p>
+        <button class="btn-add-user" id="btnadduser" name="btnadduser">Добавить пользователя</button>
     </aside>
     
     <section class="section-main-window">
@@ -22,8 +22,13 @@
             <input class="input-search-users" type="text" id="searchusers" name="searchusers" />
         </div>
 
+        <div class="div-list-users" id="divlistusers">
+            <input type="text" id="userid" hidden value="<?= $userId?>">
+        </div>
+
         <div class="div-text-message">
-            <input class="input-text-message" type="text" id="textmessage" name="textmessage" />
+            <textarea class="textarea-text-message" type="text" id="textareatextmessage" name="textareatextmessage" placeholder="Ваше сообщение..."></textarea>&nbsp&nbsp
+            <a class="a-message-send" href="#"><img class="img-message-send" src="../img/send.png" alt="Отправить"></a>
         </div>
     </section>
 

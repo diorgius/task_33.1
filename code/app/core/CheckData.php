@@ -18,7 +18,7 @@ class CheckData
             DB::dbconnect();
             $result = DB::getByProp('users', $prop[0], $value);
 
-               if ($result) {
+            if ($result) {
                 echo $error = "Пользователь с таким {$prop[0]} уже существует";
             }
         }

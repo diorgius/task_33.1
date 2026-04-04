@@ -12,8 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style_styleload.css">
     <script defer src="../../js/validation.js"></script>
-    <!-- <script defer src="../../js/valid_registration.js"></script> -->
-    <!-- <script defer src="../../js/valid_editprofile.js"></script> -->
+    <script defer src="../../js/main.js"></script>
     <title>Мессенджер</title>
 </head>
 <body>
