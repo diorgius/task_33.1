@@ -14,11 +14,11 @@
             </div>    
         <?php endif; ?>
 
-        <button class="btn-add-user" id="btnadduser" name="btnadduser">Добавить пользователя</button>
+        <button class="btn-add-user" id="btnadduser" name="btnadduser">Добавить пользователей</button>
         <div class="div-user-chats" id="divuserchats">
             <?php if (!empty($data['contacts'])): ?>
                 <?php foreach($data['contacts'] as $key => $value): ?>
-                <div class="div-chat-user" id="divchatuser">
+                <div class="div-chat-user" id="divchatuser_<?= $data['contacts'][$key]['contact_user_id']; ?>"  >
                     <div>
                         <img src="<?= URL . 'avatars/' . $data['contacts'][$key]['avatar']; ?>" alt="avatat" width="35">
                     </div>
@@ -35,7 +35,7 @@
         <div class="div-seach-users">
             <input class="input-search-users" type="text" id="searchusers" name="searchusers" />
         </div>
-        <?php var_dump($data)?>
+
         <div class="div-alert"></div>
 
         <div class="div-list-users" id="divlistusers">

@@ -86,10 +86,13 @@ class DB
         $id = $value;
         $stmt = self::$pdo->prepare("
             SELECT contact_user_id, email, nickname, avatar FROM $table AS c LEFT JOIN users AS u ON 
-            u.id = (SELECT contact_user_id FROM user_contacts WHERE contact_user_id = c.contact_user_id AND user_id = $id)
+            u.id = (SELECT contact_user_id FROM user_contacts WHERE contact_user_id = c.contact_user_id AND $prop = :value_)
             WHERE $prop = :value
         ");
-        $stmt->execute(['value' => $value]);
+        $stmt->execute([
+            'value' => $value,
+            'value_' => $value
+        ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

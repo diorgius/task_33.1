@@ -16,7 +16,7 @@ if (TEXT_AREA_MESSAGE) {
 if (BUTTON_ADD_USER) {
     BUTTON_ADD_USER.addEventListener('click', async (e) => {
         if (document.querySelector('#divaddusers')) {
-            BUTTON_ADD_USER.textContent = 'Добавить пользователя'
+            BUTTON_ADD_USER.textContent = 'Добавить пользователей'
             document.querySelector('#divaddusers').remove()
         } else {
             BUTTON_ADD_USER.textContent = 'Убрать список пользователей'
@@ -39,8 +39,8 @@ if (BUTTON_ADD_USER) {
                         let userId = document.querySelector('#userid').value
                         if (`${item.id}` !== userId) {
                             let divUser = document.createElement('div')
-                            divUser.setAttribute('id', 'divuser')
                             divUser.classList.add('div-user')
+                            divUser.setAttribute('id', 'divuser_' + `${item.id}`)
                             divAddUsers.appendChild(divUser)
                             divUser.onclick = function () { addUser(userId, `${item.id}`, `${item.nickname}`, `${item.avatar}`) }
 
@@ -66,7 +66,6 @@ if (BUTTON_ADD_USER) {
                                 divUserNickname.appendChild(pUserEmail)
                                 pUserEmail.textContent = `${item.email}`
                             }
-                            // BUTTON_ADD_USER.setAttribute('disabled', '')
                         }
                     });
                 }
@@ -78,10 +77,9 @@ if (BUTTON_ADD_USER) {
 }
 
 async function addUser(userId, contactUserId, nickname, avatar) {
-
     if (!document.getElementById(nickname)) {
 
-        // здесь отправляем данные на бэк для записи в базу
+        // отправляем данные на бэк для записи в базу
         data = {
             action: 'createContact',
             'userId': userId,
@@ -97,59 +95,76 @@ async function addUser(userId, contactUserId, nickname, avatar) {
             })
             let result = await response.text()
             // console.log('Успех: ', result)
-            if (!result) {
-                let pAlert = document.createElement('p')
-                pAlert.setAttribute('id', 'alert')
-                DIV_ALERT.appendChild(pAlert)
-                pAlert.textContent = 'Пользователь ' + nickname + ' уже в списке чатов'
-                // убираем надпись по таймеру (3 секунды)
-                setTimeout(() =>
-                    pAlert.remove(), 3000
-                )
+            if (result) {
+
+                // добавляем пользователя в боковую панель
+                let divChatUser = document.createElement('div')
+                divChatUser.classList.add('div-chat-user')
+                divChatUser.setAttribute('id', 'divchatuser_' + contactUserId)
+                DIV_USER_CHATS.appendChild(divChatUser)
+
+                let divChatUserAvatar = document.createElement('div')
+                divChatUser.appendChild(divChatUserAvatar)
+                let imgChatUserAvatar = document.createElement('img')
+                imgChatUserAvatar.src = URL + '/avatars/' + avatar
+                imgChatUserAvatar.alt = 'Аватар'
+                imgChatUserAvatar.width = '35'
+                divChatUserAvatar.appendChild(imgChatUserAvatar)
+
+                let divChatUserNickname = document.createElement('div')
+                divChatUserNickname.classList.add('div-user-nickname')
+                divChatUser.appendChild(divChatUserNickname)
+
+                let pChatUser = document.createElement('p')
+                pChatUser.setAttribute('id', nickname)
+                divChatUserNickname.appendChild(pChatUser)
+                pChatUser.textContent = nickname
+            } else {
+
+                // let pAlert = document.createElement('p')
+                // pAlert.setAttribute('id', 'alert')
+                // DIV_ALERT.appendChild(pAlert)
+                // pAlert.textContent = 'Пользователь ' + nickname + ' уже в списке чатов'
+                // // убираем надпись по таймеру (2 секунды)
+                // setTimeout(() =>
+                //     pAlert.remove(), 2000
+                // )
+
             }
         } catch (error) {
             console.log('Ошибка: ', error)
         }
-
-        // здесь добавляем пользователя в боковую панель
-        let divChatUser = document.createElement('div')
-        divChatUser.setAttribute('id', 'divchatuser')
-        divChatUser.classList.add('div-chat-user')
-        DIV_USER_CHATS.appendChild(divChatUser)
-
-        let divChatUserAvatar = document.createElement('div')
-        divChatUser.appendChild(divChatUserAvatar)
-        let imgChatUserAvatar = document.createElement('img')
-        imgChatUserAvatar.src = URL + '/avatars/' + avatar
-        imgChatUserAvatar.alt = 'Аватар'
-        imgChatUserAvatar.width = '35'
-        divChatUserAvatar.appendChild(imgChatUserAvatar)
-
-        let divChatUserNickname = document.createElement('div')
-        divChatUserNickname.classList.add('div-user-nickname')
-        divChatUser.appendChild(divChatUserNickname)
-
-        let pChatUser = document.createElement('p')
-        pChatUser.setAttribute('id', nickname)
-        divChatUserNickname.appendChild(pChatUser)
-        pChatUser.textContent = nickname
     } else {
         let pAlert = document.createElement('p')
         pAlert.setAttribute('id', 'alert')
         DIV_ALERT.appendChild(pAlert)
         pAlert.textContent = 'Пользователь ' + nickname + ' уже в списке чатов'
-        // убираем надпись по таймеру (3 секунды)
+        // убираем надпись по таймеру (2 секунды)
         setTimeout(() =>
-            pAlert.remove(), 3000
+            pAlert.remove(), 2000
         )
     }
-    if (document.querySelector('#divchatuser')) {
-        const DIV_CHAT_USER = document.querySelector('#divchatuser')
+}
 
-        DIV_CHAT_USER.addEventListener('contextmenu', (e) => {
-            e.preventDefault()
-            console.log('test')
+document.body.addEventListener('click', function(event) {
+  if (event.target.classList.contains('div-chat-user')) {
+    console.log('Нажатие на динамический элемент:', event.target);
+  }
+});
 
-        })
-    }
+if (document.querySelector('.div-chat-user')) {
+
+    let divChatUser = document.querySelectorAll('.div-chat-user')
+    console.log(divChatUser)
+
+    divChatUser.forEach(elem => {elem.addEventListener('click', (e) => {
+        e.preventDefault()
+        console.log(elem)
+    })})
+
+    divChatUser.forEach(elem => {elem.addEventListener('contextmenu', (e) => {
+        e.preventDefault()
+        console.log(elem)
+
+    })})
 }

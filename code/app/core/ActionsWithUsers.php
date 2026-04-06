@@ -26,6 +26,7 @@ class ActionsWithUsers
         if ($result) {
             echo json_encode($result);
         } else {
+            // надо как-то обработать ошибки
             echo json_encode('Что-то пошло не так');
         }
     }
@@ -43,8 +44,9 @@ class ActionsWithUsers
             ];
             $result = DB::create('user_contacts', $value);
             if ($result) {
-                return true;
+                echo $result;
             } else {
+                // надо как-то обработать ошибки
                 echo 'Что-то пошло не так';
             }
         }
