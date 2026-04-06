@@ -26,17 +26,30 @@ class DB
         try {
             self::$pdo = new PDO($dsn, $user, $pass, $options);
             $sql =
-                "CREATE TABLE if not exists `messenger`.`users` 
+                "CREATE TABLE IF NOT EXISTS `messenger`.`users` 
                 (`id` INT NOT NULL AUTO_INCREMENT , 
                 `email` VARCHAR(64) NOT NULL ,
                 `password` VARCHAR(128) NOT NULL , 
                 `nickname` VARCHAR(64) NOT NULL , 
                 `avatar` VARCHAR(64) NULL ,
-                `hideemail` tinyint (1) NULL,
+                `hideemail` tinyint(1) NULL,
                 `role` VARCHAR(20) NULL , 
                 `cookiehash` VARCHAR(128) NULL , 
-                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                PRIMARY KEY (`id`), INDEX `email` (`email`)) ENGINE = InnoDB;";
+                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`), INDEX `email` (`email`))";
+
+            self::$pdo->exec($sql);
+
+            $sql = 
+                "CREATE TABLE IF NOT EXISTS `user_contacts` (
+	            `contact_id` INT NOT NULL AUTO_INCREMENT,
+	            `user_id` INT NOT NULL,
+	            `contact_user_id` INT NOT NULL,
+	            `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	            PRIMARY KEY (`contact_id`),
+	            INDEX `FK_user_contacts_users` (`user_id`),
+	            CONSTRAINT `FK_user_contacts_users` FOREIGN KEY (`user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
 
             self::$pdo->exec($sql);
 
@@ -56,6 +69,28 @@ class DB
         $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value");
         $stmt->execute(['value' => $value]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function getByCondition(string $table, string $prop, string $value, string $condition, string $conditionValue)
+    {
+        $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value AND $condition = :condition");
+        $stmt->execute([
+            'value' => $value,
+            'condition' => $conditionValue
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function getContacts(string $table, string $prop, string $value)
+    {
+        $id = $value;
+        $stmt = self::$pdo->prepare("
+            SELECT contact_user_id, email, nickname, avatar FROM $table AS c LEFT JOIN users AS u ON 
+            u.id = (SELECT contact_user_id FROM user_contacts WHERE contact_user_id = c.contact_user_id AND user_id = $id)
+            WHERE $prop = :value
+        ");
+        $stmt->execute(['value' => $value]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function create(string $table, array $values)

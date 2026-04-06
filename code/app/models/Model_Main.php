@@ -13,9 +13,13 @@ class Model_Main extends Model
         if ($id !== 0) {
             DB::dbconnect();
             $user = DB::getByProp('users', 'id', $id);
-
+            $contacts = DB::getContacts('user_contacts', 'user_id', $id);
             if ($user) {
-                return $user;
+                $data = [
+                    'user' => $user,
+                    'contacts' => $contacts
+                ];
+                return $data;
             } else {
                 return false;
             }

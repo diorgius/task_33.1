@@ -9,29 +9,46 @@ require_once DATA . 'DB.php';
 class ActionsWithUsers
 {
  
-    // protected $action;
+    protected $data;
     public function __construct()
     {
         if (isset($_POST)) {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $action = array_keys($data);
-            $method = $data[$action[0]];
+            $this->data = json_decode(file_get_contents("php://input"), true);
+            $method = $this->data['action'];
             $this->$method();
         }
     }
 
     public function getAllUsers()
     {
-            DB::dbconnect();
-            $result = DB::getAll('users');
+        DB::dbconnect();
+        $result = DB::getAll('users');
+        if ($result) {
+            echo json_encode($result);
+        } else {
+            echo json_encode('Что-то пошло не так');
+        }
+    }
 
+    public function createContact()
+    {
+        DB::dbconnect();
+        $result = DB::getByCondition('user_contacts', 'contact_user_id', $this->data['contactUserId'], 'user_id', $this->data['userId']);
+        if ($result) {
+            return false;
+        } else {
+            $value = [
+                'user_id' => $this->data['userId'],
+                'contact_user_id' => $this->data['contactUserId'],
+            ];
+            $result = DB::create('user_contacts', $value);
             if ($result) {
-                echo json_encode($result);
+                return true;
             } else {
-                echo json_encode('Что-то пошло не так');
+                echo 'Что-то пошло не так';
             }
+        }
     }
 }
-
 
 new ActionsWithUsers();
