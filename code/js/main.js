@@ -12,59 +12,66 @@ actions.forEach((e) => {
 })
 
 BUTTON_ADD_USER.addEventListener('click', async (e) => {
+    if (document.querySelector('#divaddusers') !== null) {
+        BUTTON_ADD_USER.textContent = 'Добавить пользователя'
+        document.querySelector('#divaddusers').remove()
+    } else {
+        BUTTON_ADD_USER.textContent = 'Убрать список пользователей'
+        data = { action: 'getAllUsers' }
+        try {
+            let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(data)
+            })
+            let result = await response.json()
+            // console.log('Успех: ', result)
+            if (result) {
+                let divAddUsers = document.createElement('div')
+                DIV_LIST_USERS.appendChild(divAddUsers)
+                divAddUsers.setAttribute('id', 'divaddusers')
+                result.forEach(item => {
+                    let userId = document.querySelector('#userid').value
+                    // console.log(userId)
+                    if (`${item.id}` !== userId) {
+                        let divUser = document.createElement('div')
+                        divUser.setAttribute('id', 'divuser')
+                        divUser.classList.add('div-user')
+                        divAddUsers.appendChild(divUser)
+                        divUser.onclick = function () { addUser(`${item.id}`, `${item.nickname}`, `${item.avatar}`) }
 
-    data = { action: 'getAllUsers' }
-    try {
-        let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(data)
-        })
+                        let divUserAvatar = document.createElement('div')
+                        divUser.appendChild(divUserAvatar)
 
-        let result = await response.json()
-        console.log('Успех: ', result)
-        if (result) {
-            result.forEach(item => {
-                let userId = document.querySelector('#userid').value
-                // console.log(userId)
-                if (`${item.id}` !== userId) {
-                    let divUser = document.createElement('div')
-                    divUser.setAttribute('id', 'divuser')
-                    divUser.classList.add('div-user')
-                    DIV_LIST_USERS.appendChild(divUser)
-                    divUser.onclick = function () { addUser(`${item.id}`, `${item.nickname}`, `${item.avatar}`) }
+                        let imgUserAvatar = document.createElement('img')
+                        imgUserAvatar.src = URL + '/avatars/' + `${item.avatar}`
+                        imgUserAvatar.alt = 'Аватар'
+                        imgUserAvatar.width = '40'
+                        divUserAvatar.appendChild(imgUserAvatar)
 
-                    let divUserAvatar = document.createElement('div')
-                    divUser.appendChild(divUserAvatar)
+                        let divUserNickname = document.createElement('div')
+                        divUserNickname.classList.add('div-user-nickname')
+                        divUser.appendChild(divUserNickname)
 
-                    let imgUserAvatar = document.createElement('img')
-                    imgUserAvatar.src = URL + '/avatars/' + `${item.avatar}`
-                    imgUserAvatar.alt = 'Аватар'
-                    imgUserAvatar.width = '40'
-                    divUserAvatar.appendChild(imgUserAvatar)
+                        let pUserNickname = document.createElement('p')
+                        divUserNickname.appendChild(pUserNickname)
+                        pUserNickname.textContent = `${item.nickname}`
 
-                    let divUserNickname = document.createElement('div')
-                    divUserNickname.classList.add('div-user-nickname')
-                    divUser.appendChild(divUserNickname)
-
-                    let pUserNickname = document.createElement('p')
-                    divUserNickname.appendChild(pUserNickname)
-                    pUserNickname.textContent = `${item.nickname}`
-
-                    if (`${item.hideemail}` === '0') {
-                        let pUserEmail = document.createElement('p')
-                        divUserNickname.appendChild(pUserEmail)
-                        pUserEmail.textContent = `${item.email}`
+                        if (`${item.hideemail}` === '0') {
+                            let pUserEmail = document.createElement('p')
+                            divUserNickname.appendChild(pUserEmail)
+                            pUserEmail.textContent = `${item.email}`
+                        }
+                        // BUTTON_ADD_USER.setAttribute('disabled', '')
                     }
-                    BUTTON_ADD_USER.setAttribute('disabled', '')
-                }
-            });
+                });
 
+            }
+        } catch (error) {
+            console.log('Ошибка: ', error)
         }
-    } catch (error) {
-        console.log('Ошибка: ', error)
     }
 });
 
@@ -101,7 +108,7 @@ function addUser(id, nickname, avatar) {
         DIV_ALERT.appendChild(pAlert)
         pAlert.textContent = 'Пользователь ' + nickname + ' уже в списке чатов'
         // убираем надпись по таймеру (3 секунды)
-        setTimeout(() => 
+        setTimeout(() =>
             pAlert.remove(), 3000
         )
     }
