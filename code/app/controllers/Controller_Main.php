@@ -23,8 +23,8 @@ class Controller_Main extends Controller
 
             DB::dbconnect();
             $user = DB::getByProp('users', 'id', intval($_COOKIE['id']));
-        
-            if(intval($_COOKIE['id']) === $user['id'] && $_COOKIE['hash'] === $user['cookiehash']) {
+
+            if (intval($_COOKIE['id']) === $user['id'] && $_COOKIE['hash'] === $user['cookiehash']) {
                 $_SESSION['auth'] = true;
                 $_SESSION['userId'] = $user['id'];
                 $_SESSION['nickname'] = $user['nickname'];

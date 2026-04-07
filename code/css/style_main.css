@@ -165,3 +165,38 @@
 .a-message-send {
     margin-top: .5rem;
 }
+
+.ul-chat-user-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    min-width: max-content;
+    height: auto;
+    border: .1rem solid #cccccc;
+    border-radius: .2rem;
+    background-color: #ffffff;
+    color: #666666;
+    font-size: .8rem;
+    list-style: none;
+    box-shadow: .1rem .1rem .7rem .1rem #cccccc ;
+}
+
+.ul-chat-user-menu li {
+    padding: .5rem;
+    cursor: pointer;
+
+}
+
+.ul-chat-user-menu li:hover{
+    color: #007bff;
+}
+
+/* .ul-chat-user-menu li:hover a:hover{
+    color: #007bff;
+} */
+
+/* .ul-chat-user-menu a {
+    color: #666666;
+    text-decoration: none;
+    cursor: pointer;
+} */

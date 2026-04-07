@@ -71,15 +71,15 @@ class DB
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function getByCondition(string $table, string $prop, string $value, string $condition, string $conditionValue)
-    {
-        $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value AND $condition = :condition");
-        $stmt->execute([
-            'value' => $value,
-            'condition' => $conditionValue
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    // public static function getByCondition(string $table, string $prop, string $value, string $condition, string $conditionValue)
+    // {
+    //     $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value AND $condition = :condition");
+    //     $stmt->execute([
+    //         'value' => $value,
+    //         'condition' => $conditionValue
+    //     ]);
+    //     return $stmt->fetch(PDO::FETCH_ASSOC);
+    // }
 
     public static function getContacts(string $table, string $prop, string $value)
     {

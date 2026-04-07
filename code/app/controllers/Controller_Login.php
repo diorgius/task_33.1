@@ -38,7 +38,7 @@ class Controller_Login extends Controller
                     $_SESSION['userId'] = $user['id'];
                     $_SESSION['nickname'] = $user['nickname'];
                     $_SESSION['role'] = $user['role'];
-                    if(isset($remember)) $this->model->setcookie($user['id']);
+                    !isset($remember) ?: $this->model->setcookie($user['id']);
                     header('location: /');
                     exit();
                 } else {

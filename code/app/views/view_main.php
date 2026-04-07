@@ -6,7 +6,7 @@
         <?php phpinfo(); ?>
     <?php else: ?>
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="aside-sidebar">
         <?php if (!empty($data['user'])): ?>
             <div class="div-user-avatar">
                 <img src="<?= URL . 'avatars/' . $data['user']['avatar']; ?>" alt="avatar" width="90px">
@@ -18,17 +18,22 @@
         <div class="div-user-chats" id="divuserchats">
             <?php if (!empty($data['contacts'])): ?>
                 <?php foreach($data['contacts'] as $key => $value): ?>
-                <div class="div-chat-user" id="divchatuser_<?= $data['contacts'][$key]['contact_user_id']; ?>"  >
+                <div class="div-chat-user" id="<?= $data['contacts'][$key]['contact_user_id']; ?>"  >
                     <div>
                         <img src="<?= URL . 'avatars/' . $data['contacts'][$key]['avatar']; ?>" alt="avatat" width="35">
                     </div>
                     <div class="div-user-nickname">
-                        <p id="<?= $data['contacts'][$key]['nickname']; ?>"><?= $data['contacts'][$key]['nickname']; ?></p>
+                        <p><?= $data['contacts'][$key]['nickname']; ?></p>
                     </div>
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+
+        <!-- <ul class="ul-chat-user-menu">
+            <li><a href="#" id="deletechatuser">Удалить пользователя из списка чатов</a></li>
+            <li><a href="#" id="deleteuserchat">Удалить чаты с пользователем</a></li>
+        </ul> -->
     </aside>
     
     <section class="section-main-window">

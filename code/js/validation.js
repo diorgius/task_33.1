@@ -9,6 +9,8 @@ const DIV_ALERT = document.querySelector('.div-alert')
 const INPUT_NICKNAME = document.querySelector('#nickname')
 const INPUT_FILE_AVATAR = document.querySelector('#fileavatar')
 
+// надо проверить работу скрипта, если убрать !== null
+
 if (INPUTE_MAIL !== null) {
     INPUTE_MAIL.addEventListener('change', (e) => {
         if (document.querySelector('#alert') !== null) pAlert.remove()
@@ -60,7 +62,6 @@ async function validation(e) {
             BUTTON_SEND.removeAttribute('disabled')
 
             // посылаем email на бэкенд и проверяем на есть ли уже такой в базе
-
             data = { email: email }
             try {
                 let response = await fetch(URL + '/app/core/CheckData.php', {
@@ -70,7 +71,6 @@ async function validation(e) {
                     },
                     body: JSON.stringify(data)
                 })
-
                 let result = await response.text()
                 // console.log('Успех: ', result)
                 if (result) {
@@ -88,7 +88,6 @@ async function validation(e) {
                 console.log('Ошибка: ', error)
             }
         }
-
     } else if (e.target.id === 'password') {
         pass = e.target.value
         if (pass.length < 8 || pass.length > 20) {
@@ -103,7 +102,6 @@ async function validation(e) {
             INPUT_PASSWORD.classList.remove('wrong-data')
             BUTTON_SEND.removeAttribute('disabled')
         }
-
     } else if (e.target.id === 'passwordagain') {
         passagain = e.target.value
         if (pass !== passagain) {
@@ -128,7 +126,6 @@ async function validation(e) {
                 },
                 body: JSON.stringify(data)
             })
-
             let result = await response.text()
             if (result) {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000')

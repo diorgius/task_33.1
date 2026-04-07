@@ -66,15 +66,18 @@ class Model_Profile extends Model
             if (isset($newAvatar)) {
                 $filePath = AVATARS . basename($avatarFileName);
                 if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
+                    // надо как-то обработать ошибки
                     echo "Что-то пошло не так";
-                    return false; // надо как-то обработать ошибки
+                    return false; 
                 }
                 if ($oldAvatarFileName !='') unlink(AVATARS . $oldAvatarFileName);
             }
             return true;
         } else {
+            // надо здесь подумать над возвратом данных, такое условие не работает, потому-что в user, все равно возвращается что-то и это условие не работает
+            // надо как-то обработать ошибки
             echo "Что-то пошло не так";
-            return false; // надо как-то обработать ошибки
+            return false; 
         }
     }
 
