@@ -26,43 +26,21 @@ class ActionsWithUsers
     {
         DB::dbconnect();
         $result = DB::getAll('users');
-        if ($result) {
-            echo json_encode($result);
-        } else {
-            // надо как-то обработать ошибки
-            echo json_encode('Что-то пошло не так');
-        }
+        echo json_encode($result);
     }
 
     public function createContact()
     {
         DB::dbconnect();
-        // $result = DB::getByCondition('user_contacts', 'contact_user_id', $this->data['contactUserId'], 'user_id', $this->data['userId']);
-        // if ($result) {
-        //     return false;
-        // } else {
-            $value = [
-                'user_id' => $this->data['userId'],
-                'contact_user_id' => $this->data['contactUserId'],
-            ];
-            $result = DB::create('user_contacts', $value);
-            
-            // надо здесь подумать над возвратом данных, такое условие не работает, потому-что в result, все равно возвращается что-то и это условие не работает
-            if ($result) {
-                echo $result;
-            } else {
-                // надо как-то обработать ошибки
-                echo 'Что-то пошло не так';
-                return false;
-            }
-        // }
+        $value = [
+            'user_id' => $this->data['userId'],
+            'contact_user_id' => $this->data['contactUserId'],
+        ];
+        DB::create('user_contacts', $value);
     }
 
     public function deleteContact()
     {
-        // echo $this->data['userId'];
-        // echo $this->data['contactUserId'];
-        // exit();
         DB::dbconnect();
         DB::deleteContact('user_contacts', $this->data['userId'], $this->data['contactUserId']);
     }
