@@ -184,19 +184,18 @@
 .ul-chat-user-menu li {
     padding: .5rem;
     cursor: pointer;
-
 }
 
-.ul-chat-user-menu li:hover{
-    color: #007bff;
-}
-
-/* .ul-chat-user-menu li:hover a:hover{
+/* .ul-chat-user-menu li:hover{
     color: #007bff;
 } */
 
-/* .ul-chat-user-menu a {
+.ul-chat-user-menu li:hover a:hover{
+    color: #007bff;
+}
+
+.ul-chat-user-menu a {
     color: #666666;
     text-decoration: none;
     cursor: pointer;
-} */
+}

@@ -142,77 +142,70 @@ async function addUser(userId, contactUserId, nickname, avatar) {
 
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        // console.log('Нажатие на динамический элемент:', e);
         e.target.setAttribute('style', 'border: .1rem solid #007bff')
+
+        // здесь будем обрабатывать вывод чатов с пользователем
 
     }
 });
 
 document.body.addEventListener('contextmenu', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        console.log('Нажатие на динамический элемент правой кнопкой:', e.target.id)
         e.preventDefault()
-        let divChatUserMenu = document.createElement('div')
-        SIDEBAR.appendChild(divChatUserMenu)
-        divChatUserMenu.innerHTML = 
-        `<ul ul class="ul-chat-user-menu" >
-            <li><a href="#" id="deletechatuser">Удалить пользователя из списка чатов</a></li>
-            <li><a href="#" id="deleteuserchat">Удалить чаты с пользователем</a></li>
-        </ul>`
-        // let ulChatUserMenu = document.createElement('ul')
-        // ulChatUserMenu.classList.add('ul-chat-user-menu')
-        // SIDEBAR.appendChild(ulChatUserMenu)
-        // liChatUserMenu_1 = document.createElement('li')
-        // liChatUserMenu_1.setAttribute('id', 'deletechatuser')
-        // liChatUserMenu_1.textContent = 'Удалить пользователя из списка чатов'
-        // liChatUserMenu_1.onclick = function () { deleteChatUser(e.target.id) }
-        // liChatUserMenu_2 = document.createElement('li')
-        // liChatUserMenu_1.setAttribute('id', 'deleteuserchat')
-        // liChatUserMenu_2.textContent = 'Удалить чаты с пользователем'
-        // ulChatUserMenu.append(liChatUserMenu_1, liChatUserMenu_2)
-
-        //<ul ul class="ul-chat-user-menu" >
-        //     <li><a href="#" id="deletechatuser">Удалить пользователя из списка чатов</a></li>
-        //     <li><a href="#" id="deleteuserchat">Удалить чаты с пользователем</a></li>
-        // </ul>
-
         const CHAT_USER_MENU = document.querySelector('.ul-chat-user-menu').style
         CHAT_USER_MENU.display = 'block'
         CHAT_USER_MENU.top = `${e.layerY}px`
         CHAT_USER_MENU.left = `${e.layerX}px`
+
+        let delChatUser = document.querySelector('#deletechatuser')
+        delChatUser.addEventListener('click', async () => {
+            let userId = document.querySelector('#userid').value
+            data = {
+                action: 'deleteContact',
+                'userId': userId,
+                'contactUserId': `${e.target.id}`
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                })
+                let result = await response.text()
+                // console.log('Успех: ', result)
+                document.getElementById(`${e.target.id}`).remove()
+                let pAlert = document.createElement('p')
+                pAlert.setAttribute('id', 'alert')
+                DIV_ALERT.appendChild(pAlert)
+                pAlert.textContent = 'Пользователь успешно удален'
+                // убираем надпись по таймеру (2 секунды)
+                setTimeout(() =>
+                    pAlert.remove(), 2000
+                )
+            } catch (error) {
+                console.log('Ошибка: ', error)
+            }
+        })
+
+        let delUserChats = document.querySelector('#deleteuserchats')
+        delUserChats.addEventListener('click', () => {
+            
+            // здесь будем удалять чаты пользователя
+
+        })
     }
 });
 
-
-
+// убираем меню по клику в любом месте документа
 window.addEventListener('click', () => {
     document.querySelector('.ul-chat-user-menu').style.display = 'none'
 });
 
+// убираем меню по клавише escape
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         document.querySelector('.ul-chat-user-menu').style.display = 'none'
     }
 });
-
-function deleteChatUser(contactUserId) {
-    console.log(contactUserId)
-}
-
-
-// if (document.querySelector('.div-chat-user')) {
-
-//     let divChatUser = document.querySelectorAll('.div-chat-user')
-//     console.log(divChatUser)
-
-//     divChatUser.forEach(elem => {elem.addEventListener('click', (e) => {
-//         e.preventDefault()
-//         console.log(elem)
-//     })})
-
-//     divChatUser.forEach(elem => {elem.addEventListener('contextmenu', (e) => {
-//         e.preventDefault()
-//         console.log(elem)
-
-//     })})
-// }

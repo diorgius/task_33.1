@@ -57,6 +57,15 @@ class ActionsWithUsers
             }
         // }
     }
+
+    public function deleteContact()
+    {
+        // echo $this->data['userId'];
+        // echo $this->data['contactUserId'];
+        // exit();
+        DB::dbconnect();
+        DB::deleteContact('user_contacts', $this->data['userId'], $this->data['contactUserId']);
+    }
 }
 
 new ActionsWithUsers();

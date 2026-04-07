@@ -96,6 +96,15 @@ class DB
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function deleteContact(string $table, string $userId, string $contactUserId): void
+    {
+        $stmt = self::$pdo->prepare("DELETE FROM $table WHERE user_id = :userId AND contact_user_id = :contactUserId");
+        $stmt->execute([
+            'userId' => $userId,
+            'contactUserId' => $contactUserId
+        ]);
+    }
+
     public static function create(string $table, array $values)
     {
         $colums = implode(', ', array_keys($values));

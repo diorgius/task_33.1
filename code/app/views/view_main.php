@@ -30,30 +30,30 @@
             <?php endif; ?>
         </div>
 
-        <!-- <ul class="ul-chat-user-menu">
+        <ul class="ul-chat-user-menu">
             <li><a href="#" id="deletechatuser">Удалить пользователя из списка чатов</a></li>
-            <li><a href="#" id="deleteuserchat">Удалить чаты с пользователем</a></li>
-        </ul> -->
+            <li><a href="#" id="deleteuserchats">Удалить чаты с пользователем</a></li>
+        </ul>
     </aside>
     
     <section class="section-main-window">
+
+        <input type="text" id="userid" hidden value="<?= $userId?>">
+
         <div class="div-seach-users">
             <input class="input-search-users" type="text" id="searchusers" name="searchusers" />
         </div>
 
         <div class="div-alert"></div>
 
-        <div class="div-list-users" id="divlistusers">
-            <input type="text" id="userid" hidden value="<?= $userId?>">
-        </div>
+        <div class="div-list-users" id="divlistusers"></div>
 
         <div class="div-text-message">
             <textarea class="textarea-text-message" type="text" id="textareatextmessage" name="textareatextmessage" placeholder="Ваше сообщение..."></textarea>&nbsp&nbsp
             <a class="a-message-send" href="#"><img class="img-message-send" src="../img/send.png" alt="Отправить"></a>
         </div>
+
     </section>
-
-
 
     <?php endif; ?>
 <?php endif; ?> 
