@@ -11,37 +11,37 @@ const INPUT_FILE_AVATAR = document.querySelector('#fileavatar')
 
 // надо проверить работу скрипта, если убрать !== null
 
-if (INPUTE_MAIL !== null) {
+if (INPUTE_MAIL) {
     INPUTE_MAIL.addEventListener('change', (e) => {
-        if (document.querySelector('#alert') !== null) pAlert.remove()
+        if (document.querySelector('#alert')) document.querySelector('#alert').remove()
         validation(e)
     })
 }
 
-if (INPUT_PASSWORD !== null) {
+if (INPUT_PASSWORD) {
     INPUT_PASSWORD.addEventListener('change', (e) => {
-        if (document.querySelector('#alert') !== null) pAlert.remove()
+        if (document.querySelector('#alert')) document.querySelector('#alert').remove()
         validation(e)
     })
 }
 
-if (INPUT_PASSWORD_AGAIN !== null) {
+if (INPUT_PASSWORD_AGAIN) {
     INPUT_PASSWORD_AGAIN.addEventListener('change', (e) => {
-        if (document.querySelector('#alert') !== null) pAlert.remove()
+        if (document.querySelector('#alert')) document.querySelector('#alert').remove()
         validation(e)
     })
 }
 
-if (INPUT_NICKNAME !== null) {
+if (INPUT_NICKNAME) {
     INPUT_NICKNAME.addEventListener('change', (e) => {
-        if (document.querySelector('#alert') !== null) pAlert.remove()
+        if (document.querySelector('#alert')) document.querySelector('#alert').remove()
         validation(e)
     })
 }
 
-if (INPUT_FILE_AVATAR !== null) {
+if (INPUT_FILE_AVATAR) {
     INPUT_FILE_AVATAR.addEventListener('change', (e) => {
-        if (document.querySelector('#alert') !== null) pAlert.remove()
+        if (document.querySelector('#alert')) document.querySelector('#alert').remove()
         validation(e)
     })
 }
@@ -99,7 +99,8 @@ async function validation(e) {
             DIV_ALERT.appendChild(pAlert)
             pAlert.textContent = 'Пароль меньше 8 символов или больше 20'
         } else {
-            INPUT_PASSWORD.classList.remove('wrong-data')
+            INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #007bff')
+            // INPUT_PASSWORD.classList.remove('wrong-data')
             BUTTON_SEND.removeAttribute('disabled')
         }
     } else if (e.target.id === 'passwordagain') {
@@ -128,6 +129,13 @@ async function validation(e) {
             })
             let result = await response.text()
             if (result) {
+                // здесь пришлось добавлять стиль таким способом
+                // почему-то если на форме регистрации работает добавление стиля через добавление класса
+                // INPUT_EMAIL.classList.add('wrong-data') и он добавляется перед основным классом,
+                // то на форме редактирования профиля этот класс добавляется после основного класса и не работает???
+                // почему так происходит я пока не разобрался
+                // и на поле ввода пароля тоже пришлось изменить, потому-что на форме редактирования это поле тоже есть,
+                // хотя на форме регистрации все отрабатывается
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000')
                 let pAlert = document.createElement('p')
                 pAlert.setAttribute('id', 'alert')
@@ -135,6 +143,7 @@ async function validation(e) {
                 DIV_ALERT.appendChild(pAlert)
                 pAlert.textContent = result
             } else {
+                // убираем стиль
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff')
                 BUTTON_SEND.removeAttribute('disabled')
             }

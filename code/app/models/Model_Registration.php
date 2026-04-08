@@ -18,6 +18,7 @@ class Model_Registration extends Model
             'email' => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT),
             'nickname' => substr($email, 0, strpos($email, '@')),
+            'hideemail' => 0,
             'role' => $role
         ];
         $user = DB::create('users', $credentials);

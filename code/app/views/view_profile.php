@@ -1,7 +1,7 @@
 <?php 
 if(!empty($data)):
     $data['hideemail'] != 0 ? $checked = 'checked' : $checked = '';
-    !empty($data['avatar']) ? $image = URL . 'avatars/' . $data['avatar'] : $image = URL . 'img/avatar_0.jpg' . $data['avatar'];
+    !empty($data['avatar']) ? $image = URL . 'avatars/' . $data['avatar'] : $image = URL . 'img/avatar_0.jpg';
 ?>
 <div class="div-back">
     <button class="btn-back" onclick="location.href='/'">&nbspНазад</button>
