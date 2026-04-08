@@ -83,12 +83,13 @@
 }
 
 .input-checkbox-hideemail {
-    width: 1.5em;
-    height: 1.5em;
+    width: 1.3rem;
+    height: 1.3rem;
     vertical-align: middle;
     appearance: none;
     border-radius: .2rem;
-    outline: .1rem solid #007bff;
+    border: .1rem solid #007bff;
+    outline: none;
 }
 
 .input-checkbox-hideemail:checked::after {
@@ -100,7 +101,8 @@
     color: #007bff;
 }
 
-.form-editprofile input:focus {
+.input-checkbox-hideemail:focus {
+    border: .1rem solid #cccccc;
     outline: none;
 }
 
@@ -119,6 +121,11 @@
 
 .input-file::file-selector-button:hover {
     background: #2b8ef8;
+}
+
+.input-editprofile:focus {
+    border: .1rem solid #cccccc;
+    outline: none;
 }
 
 .form-editprofile > p {
@@ -150,4 +157,9 @@
     background-color: #ffffff;
     border: .1rem solid #007bff;
     color: #007bff;
+}
+
+.btn-editprofile:focus {
+    border: .1rem solid #cccccc;
+    outline: none;
 }

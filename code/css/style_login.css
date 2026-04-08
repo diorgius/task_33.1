@@ -32,6 +32,7 @@
 }
 
 .input-login:focus {
+    border: .1rem solid #cccccc;
     outline: none;
 }
 
@@ -48,12 +49,13 @@
 }
 
 .input-checkbox {
-    width: 1.5em;
-    height: 1.5em;
+    width: 1.3rem;
+    height: 1.3rem;
     vertical-align: bottom;
     appearance: none;
     border-radius: .2rem;
-    outline: .1rem solid #007bff;
+    border: .1rem solid #007bff;
+    outline: none;
 }
 
 .input-checkbox:checked::after {
@@ -63,6 +65,11 @@
     left: .1rem;
     font-size: 1.4rem;
     color: #007bff;
+}
+
+.input-checkbox:focus {
+    border: .1rem solid #cccccc;
+    outline: none;
 }
 
 .btn-signup {
@@ -88,6 +95,11 @@
     background-color: #ffffff;
     border: .1rem solid #007bff;
     color: #007bff;
+}
+
+.btn-signup:focus {
+    border: .1rem solid #cccccc;
+    outline: none;
 }
 
 .wrong-data{

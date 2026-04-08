@@ -81,7 +81,7 @@ if (BUTTON_ADD_USER) {
     });
 }
 
-// добавляем пользователя в список свих контактов
+// добавляем пользователя в список своих контактов
 async function addUser(userId, contactUserId, nickname, avatar) {
     if (!document.getElementById(contactUserId)) {
 
@@ -169,12 +169,12 @@ document.body.addEventListener('click', (e) => {
 
         // остановился на этом варианте,  думаю в данном случае самый оптимальный 
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive == null ? null : divChatUserActive.classList.remove('div-chat-user-active')
+        divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null 
         // console.log(element)
         e.target.classList.add('div-chat-user-active');
 
 
-        
+
     }
 });
 
