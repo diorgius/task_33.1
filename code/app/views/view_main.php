@@ -38,8 +38,8 @@
         </div>
 
         <ul class="ul-chat-user-menu">
-            <li><a href="#" id="deletechatuser">Удалить пользователя из списка чатов</a></li>
-            <li><a href="#" id="deleteuserchats">Удалить чаты с пользователем</a></li>
+            <li id="deletechatuser">Удалить пользователя из списка чатов</li>
+            <li id="deleteuserchats">Удалить чаты с пользователем</li>
         </ul>
         
     </aside>

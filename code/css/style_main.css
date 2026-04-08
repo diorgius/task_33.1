@@ -190,16 +190,10 @@
     cursor: pointer;
 }
 
-/* .ul-chat-user-menu li:hover{
-    color: #007bff;
-} */
-
-.ul-chat-user-menu li:hover a:hover{
+.ul-chat-user-menu li:hover{
     color: #007bff;
 }
 
-.ul-chat-user-menu a {
-    color: #666666;
-    text-decoration: none;
-    cursor: pointer;
+.div-chat-user-active {
+    border: .1rem solid #007bff;
 }

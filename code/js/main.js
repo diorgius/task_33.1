@@ -5,6 +5,7 @@ const DIV_USER_CHATS = document.querySelector('#divuserchats')
 const TEXT_AREA_MESSAGE = document.querySelector('#textareatextmessage')
 let actions = ['input', 'cut', 'paste', 'drop']
 
+// маштабируем текстову область сообщений
 if (TEXT_AREA_MESSAGE) {
     actions.forEach((e) => {
         TEXT_AREA_MESSAGE.addEventListener(e, () => {
@@ -14,6 +15,7 @@ if (TEXT_AREA_MESSAGE) {
     })
 }
 
+// выводим список пользователей для добавления в свои контакты
 if (BUTTON_ADD_USER) {
     BUTTON_ADD_USER.addEventListener('click', async () => {
         if (document.querySelector('#divaddusers')) {
@@ -78,6 +80,7 @@ if (BUTTON_ADD_USER) {
     });
 }
 
+// добавляем пользователя в список свих контактов
 async function addUser(userId, contactUserId, nickname, avatar) {
     if (!document.getElementById(contactUserId)) {
 
@@ -137,18 +140,50 @@ async function addUser(userId, contactUserId, nickname, avatar) {
     }
 }
 
+// обрабатываем клик на пользователях чата (открываем переписку)
+// let active = null
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        e.target.setAttribute('style', 'border: .1rem solid #007bff')
-        // console.log(e)
-        // console.log(`${e.target.id}`)
-        // здесь будем обрабатывать вывод чатов с пользователем
+        console.log(e)
+        // console.log(active)
+        // e.target.classList.toggle('div-chat-user-active');
 
+        if (e.target.classList.contains('.div-chat-user-active')) {
+            console.log('test')
+        }
+
+
+
+        // if (active === e.target) {
+        //     e.target.classList.toggle('div-chat-user-active');
+        // } else {
+        //     active === null ? null : active.classList.remove('div-chat-user-active');
+        //     e.target.classList.add('div-chat-user-active');
+
+        //     active = e.target;
+        //     console.log(active)
+        // }
+
+        // // let clickedUser
+        // console.log(e)
+        // // console.log(e.target.id)
+        // // console.log(clickedUser)
+
+        // if (!clickedUser) {
+        //     let clickedUser = true
+        //     e.target.setAttribute('style', 'border: .1rem solid #007bff')
+        //     console.log(clickedUser)
+        // } else {
+        //     clickedUser = false
+        //     e.target.setAttribute('style', 'border: .1rem solid #cccccc')
+        //     console.log(clickedUser)
+        // }
     }
 });
 
+// обрабатываем меню по клику правой кнопки на пользователях чата
 document.body.addEventListener('contextmenu', (e) => {
-// document.body.addEventListener('contextmenu', function contextMenu(e) {
+    // document.body.addEventListener('contextmenu', function contextMenu(e) {
     if (e.target.classList.contains('div-chat-user')) {
         console.log(e.target.id)
         e.preventDefault()
@@ -161,7 +196,7 @@ document.body.addEventListener('contextmenu', (e) => {
         // удаляем пользователя из списка чатов
         let delChatUser = document.querySelector('#deletechatuser')
         delChatUser.addEventListener('click', async () => {
-        // delChatUser.addEventListener('click', async function clickDeleteChatUser() {
+            // delChatUser.addEventListener('click', async function clickDeleteChatUser() {
             let userId = document.querySelector('#userid').value
             console.log(e.target.id)
             // при клике на меню deletechatuser на разных пользователях накапливались события и происходило
@@ -214,11 +249,11 @@ document.body.addEventListener('contextmenu', (e) => {
                 console.log('Ошибка: ', error)
             }
         },
-        // для остановки EventListener опция once: true
-        {
-            capture: false, once: true 
-        })
-        
+            // для остановки EventListener опция once: true
+            {
+                capture: false, once: true
+            })
+
         // удаляем чаты с пользователем
         let delUserChats = document.querySelector('#deleteuserchats')
         delUserChats.addEventListener('click', () => {
@@ -227,10 +262,10 @@ document.body.addEventListener('contextmenu', (e) => {
 
 
         },
-        // для остановки EventListener опция once: true
-        {
-            capture: false, once: true 
-        })
+            // для остановки EventListener опция once: true
+            {
+                capture: false, once: true
+            })
 
         // убираем меню по клику в любом месте документа
         window.addEventListener('click', () => {
@@ -238,20 +273,20 @@ document.body.addEventListener('contextmenu', (e) => {
             e.target.setAttribute('style', 'border: .1rem solid #cccccc')
 
         });
-        
+
         // убираем меню по клавише escape
-        window.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
+        window.addEventListener('keydown', (press) => {
+            if (press.key === 'Escape') {
                 document.querySelector('.ul-chat-user-menu').style.display = 'none'
                 e.target.setAttribute('style', 'border: .1rem solid #cccccc')
             }
         });
     }
-// },
-// // для остановки EventListener опция once: true
-// // если добавляем здесь, то меню срабатывает только 1 раз
-// {
-//     capture: false, once: true 
+    // },
+    // // для остановки EventListener опция once: true
+    // // если добавляем здесь, то меню срабатывает только 1 раз
+    // {
+    //     capture: false, once: true 
 })
 
 
@@ -265,10 +300,10 @@ document.body.addEventListener('contextmenu', (e) => {
 //         console.log(elem)
 //     })})
 
-//      // при таком подходе не отрабатывается на вновь добавленных элементах, 
+//      // при таком подходе не отрабатывается на вновь добавленных элементах,
 //      // только на тех которые были на момент загрузки страницы
 
-//     divChatUser.forEach(elem => {elem.addEventListener('contextmenu', (e) => { 
+//     divChatUser.forEach(elem => {elem.addEventListener('contextmenu', (e) => {
 //         e.preventDefault()
 //         console.log(e)
 //         const CHAT_USER_MENU = document.querySelector('.ul-chat-user-menu').style
