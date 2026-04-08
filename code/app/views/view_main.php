@@ -9,14 +9,15 @@
     <aside class="sidebar" id="aside-sidebar">
 
         <?php if (!empty($data['user'])): ?>
+            
             <div class="div-user-avatar">
-            <?php isset($data['user']['avatar']) ? $image = URL . 'avatars/' . $data['user']['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
-                <img src="<?= $image; ?>" alt="avatar" width="90px">
-                <p class="p-nickname"><?= $data['user']['nickname']; ?></p>
+                <?php isset($data['user']['avatar']) ? $image = URL . 'avatars/' . $data['user']['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
+                    <img src="<?= $image; ?>" alt="avatar" width="90px">
+                    <p class="p-nickname"><?= $data['user']['nickname']; ?></p>
+                <?php endif; ?>
             </div>    
-        <?php endif; ?>
-
-        <button class="btn-add-user" id="btnadduser" name="btnadduser">Добавить пользователей</button>
+            <button class="btn-add-user" id="btnadduser" name="btnadduser">Добавить пользователей</button>
+            
         <div class="div-user-chats" id="divuserchats">
             
             <?php if (!empty($data['contacts'])): ?>

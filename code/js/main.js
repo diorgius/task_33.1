@@ -3,9 +3,10 @@ const BUTTON_ADD_USER = document.querySelector('#btnadduser')
 const DIV_LIST_USERS = document.querySelector('#divlistusers')
 const DIV_USER_CHATS = document.querySelector('#divuserchats')
 const TEXT_AREA_MESSAGE = document.querySelector('#textareatextmessage')
-let actions = ['input', 'cut', 'paste', 'drop']
 
-// маштабируем текстову область сообщений
+
+// маштабируем текстовую область сообщений
+let actions = ['input', 'cut', 'paste', 'drop']
 if (TEXT_AREA_MESSAGE) {
     actions.forEach((e) => {
         TEXT_AREA_MESSAGE.addEventListener(e, () => {
@@ -140,44 +141,40 @@ async function addUser(userId, contactUserId, nickname, avatar) {
     }
 }
 
-// обрабатываем клик на пользователях чата (открываем переписку)
-// let active = null
+// обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку)
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        console.log(e)
-        // console.log(active)
-        // e.target.classList.toggle('div-chat-user-active');
+        // console.log(e)
 
-        if (e.target.classList.contains('.div-chat-user-active')) {
-            console.log('test')
-        }
-
-
-
+        // варианты переключения классов при клике на #divchatuser
+        // 1. с условиями
+        // let active = null // объявляем переменную вне функции, чтобы не обнулялась
         // if (active === e.target) {
         //     e.target.classList.toggle('div-chat-user-active');
         // } else {
         //     active === null ? null : active.classList.remove('div-chat-user-active');
         //     e.target.classList.add('div-chat-user-active');
-
         //     active = e.target;
         //     console.log(active)
         // }
-
-        // // let clickedUser
-        // console.log(e)
-        // // console.log(e.target.id)
-        // // console.log(clickedUser)
-
-        // if (!clickedUser) {
-        //     let clickedUser = true
-        //     e.target.setAttribute('style', 'border: .1rem solid #007bff')
-        //     console.log(clickedUser)
-        // } else {
-        //     clickedUser = false
-        //     e.target.setAttribute('style', 'border: .1rem solid #cccccc')
-        //     console.log(clickedUser)
+        // 2. цикл forEach
+        // elements = document.querySelectorAll('.div-chat-user'); // перебираем все элементы верхнего класса
+        // elements = document.querySelectorAll('.div-chat-user-active'); // сразу ищем нужный класс
+        // elements.forEach(elem => {elem.classList.remove('div-chat-user-active')})
+        // console.log(elements)
+        // 3. то же с циклом for...of
+        // for (const element of elements) {
+        //      element.classList.remove('div-chat-user-active')
         // }
+
+        // остановился на этом варианте,  думаю в данном случае самый оптимальный 
+        let divChatUserActive = document.querySelector('.div-chat-user-active');
+        divChatUserActive == null ? null : divChatUserActive.classList.remove('div-chat-user-active')
+        // console.log(element)
+        e.target.classList.add('div-chat-user-active');
+
+
+        
     }
 });
 
@@ -185,7 +182,7 @@ document.body.addEventListener('click', (e) => {
 document.body.addEventListener('contextmenu', (e) => {
     // document.body.addEventListener('contextmenu', function contextMenu(e) {
     if (e.target.classList.contains('div-chat-user')) {
-        console.log(e.target.id)
+        // console.log(e.target.id)
         e.preventDefault()
         const CHAT_USER_MENU = document.querySelector('.ul-chat-user-menu').style
         CHAT_USER_MENU.display = 'block'
@@ -198,7 +195,8 @@ document.body.addEventListener('contextmenu', (e) => {
         delChatUser.addEventListener('click', async () => {
             // delChatUser.addEventListener('click', async function clickDeleteChatUser() {
             let userId = document.querySelector('#userid').value
-            console.log(e.target.id)
+            // console.log(e.target.id)
+
             // при клике на меню deletechatuser на разных пользователях накапливались события и происходило
             // последовательное самостоятельное удаление всех пользователей на которых был сделан клик
             // для того что бы при клике события не накапливались (данные не дублировались, не происходило удаление),
@@ -235,7 +233,7 @@ document.body.addEventListener('contextmenu', (e) => {
                 let result = await response.text()
                 // console.log('Успех: ', result)
                 let nickname = e.target.lastElementChild.lastElementChild.innerHTML
-                if (document.getElementById(`${e.target.id}`)) document.getElementById(`${e.target.id}`).remove()
+                document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null
                 let pAlert = document.createElement('p')
                 pAlert.setAttribute('id', 'alert')
                 DIV_ALERT.appendChild(pAlert)

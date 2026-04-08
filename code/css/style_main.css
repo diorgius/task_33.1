@@ -24,6 +24,13 @@
     overflow-y: auto;
 }
 
+/* .div-user-avatar {
+    position:sticky;
+    top: 0;
+    width: 100%;
+    background-color: #ffffff;
+} */
+
 .p-nickname {
     text-align: center;
     margin-bottom: 1rem;
