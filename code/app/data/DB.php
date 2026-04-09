@@ -15,6 +15,7 @@ class DB
         $db = 'messenger';
         $port = '3306';
         $charset = 'utf8mb4';
+        $dsnCreateDB = "mysql:host=$host;port=$port;charset=$charset";
         $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 
         $options = [
@@ -24,7 +25,19 @@ class DB
         ];
 
         try {
+            self::$pdo = new PDO($dsnCreateDB, $user, $pass, $options);
+
+            $sql = "CREATE DATABASE IF NOT EXISTS `messenger` COLLATE 'utf8mb4_0900_ai_ci'";
+
+            self::$pdo->exec($sql);
+
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage(), (int) $e->getCode());
+        } 
+
+        try {
             self::$pdo = new PDO($dsn, $user, $pass, $options);
+
             $sql =
                 "CREATE TABLE IF NOT EXISTS `messenger`.`users` 
                 (`id` INT NOT NULL AUTO_INCREMENT , 
@@ -36,19 +49,35 @@ class DB
                 `role` VARCHAR(20) NULL , 
                 `cookiehash` VARCHAR(128) NULL , 
                 `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`), INDEX `email` (`email`))";
+                PRIMARY KEY (`id`) USING BTREE, INDEX `email` (`email`) USING BTREE)";
 
             self::$pdo->exec($sql);
 
             $sql = 
-                "CREATE TABLE IF NOT EXISTS `user_contacts` (
+                "CREATE TABLE IF NOT EXISTS `messenger`.`contacts` (
 	            `contact_id` INT NOT NULL AUTO_INCREMENT,
 	            `user_id` INT NOT NULL,
 	            `contact_user_id` INT NOT NULL,
 	            `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	            PRIMARY KEY (`contact_id`),
-	            INDEX `FK_user_contacts_users` (`user_id`),
+	            PRIMARY KEY (`contact_id`) USING BTREE,
+	            INDEX `FK_contacts_users` (`user_id`) USING BTREE,
 	            CONSTRAINT `FK_user_contacts_users` FOREIGN KEY (`user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+            self::$pdo->exec($sql);
+
+             $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
+                `message_id` INT NOT NULL AUTO_INCREMENT,
+                `send_user_id` INT NOT NULL,
+                `accept_user_id` INT NOT NULL,
+                `message_text` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`message_id`) USING BTREE,
+                INDEX `FK_messages_users` (`send_user_id`) USING BTREE,
+                INDEX `FK_messages_users_2` (`accept_user_id`) USING BTREE,
+                CONSTRAINT `FK_messages_users` FOREIGN KEY (`send_user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+                CONSTRAINT `FK_messages_users_2` FOREIGN KEY (`accept_user_id`) 
                 REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
 
             self::$pdo->exec($sql);
@@ -86,7 +115,7 @@ class DB
         $id = $value;
         $stmt = self::$pdo->prepare("
             SELECT contact_user_id, email, nickname, avatar FROM $table AS c LEFT JOIN users AS u ON 
-            u.id = (SELECT contact_user_id FROM user_contacts WHERE contact_user_id = c.contact_user_id AND $prop = :value_)
+            u.id = (SELECT contact_user_id FROM contacts WHERE contact_user_id = c.contact_user_id AND $prop = :value_)
             WHERE $prop = :value
         ");
         $stmt->execute([

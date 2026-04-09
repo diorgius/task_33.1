@@ -36,13 +36,13 @@ class ActionsWithUsers
             'user_id' => $this->data['userId'],
             'contact_user_id' => $this->data['contactUserId'],
         ];
-        DB::create('user_contacts', $value);
+        DB::create('contacts', $value);
     }
 
     public function deleteContact()
     {
         DB::dbconnect();
-        DB::deleteContact('user_contacts', $this->data['userId'], $this->data['contactUserId']);
+        DB::deleteContact('contacts', $this->data['userId'], $this->data['contactUserId']);
     }
 }
 
