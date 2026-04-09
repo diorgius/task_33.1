@@ -6,7 +6,7 @@
     font-weight: 200;
 }
 
-.sidebar {
+.sidebar-left {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,112 +15,37 @@
     position: fixed;
     top: 3.1rem;
     left: 0;
-    width: 25%;
+    width: 20%;
     height: 90%;
     transition: all 0.5s ease;
     padding-top: 1rem;
     z-index: 99;
-    overflow: hidden;
-    overflow-y: auto;
+
 }
 
-/* .div-user-avatar {
+.div-user-avatar {
     position:sticky;
     top: 0;
     width: 100%;
     background-color: #ffffff;
-} */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 .p-nickname {
     text-align: center;
     margin-bottom: 1rem;
 }
 
-.btn-add-user {
-    height: 2.5rem;
-    width: 11rem;
-    margin: .2rem;
-    padding: .2rem 0 .2rem 0;
-    background-color: #ffffff;
-    border: .1rem solid #007bff;
-    border-radius: .2rem;
-    font-size: .8rem;
-    color: #007bff;
-    text-transform: uppercase;
-    cursor: pointer;
-}
-
-.btn-add-user:hover {    
-    background-color: #ffffff;
-    border: .1rem solid #a5cbf3;
-    color: #a5cbf3;
-}
-
-.btn-add-user:active {
-    background-color: #ffffff;
-    border: .1rem solid #007bff;
-    color: #007bff;
-}
-
-.section-main-window {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #ffffff;
-    position: fixed;
-    top: 3.1rem;
-    right: 0;
-    width: 74%;
-    height: 75%;
-    transition: all 0.5s ease;
-    padding-top: 1rem;
-    overflow-y: auto;
-}
-
-.div-seach-users {
-    width: 60%;
-    height: 3rem;
-}
-
-.input-search-users {
-    font-size: 1.2rem;
-    border: .1rem solid #cccccc;
-    background-color: #ffffff;
-    border-radius: .2rem;
-    height: 2.5rem;
-    width: 80%;
-    text-align: left;
-    color: #666666;
-    padding: .1rem .5rem .1rem .5rem;
-}
-
-.input-search-users:focus {
-    outline: none;
-}
-
-.div-list-users {
-    margin: 2rem;
-    width: 80%;
-}
-
-.div-user {
-    margin: 1rem;
-    border: .1rem solid #cccccc;
-    border-radius: .2rem;
-    padding: .5rem;
-    color: #666666;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.div-user-nickname {
-    padding-left: .5rem;
-}
-
 .div-user-chats {
+    overflow: hidden;
+    overflow-y: auto;
+    height: 85%;
     width: 90%;
 }
+
 
 .div-chat-user {
     margin: 1rem;
@@ -137,44 +62,119 @@
     padding-left: .5rem;
 }
 
-.div-text-message {
-    width: 74.3%;
-    height: 7rem;
-    position: fixed;
-    bottom: 2.5rem;
-    border-top: .1rem solid #cccccc;
-    padding-left: 2rem;
+.div-chat-user-active {
+    border: .1rem solid #007bff;
+}
+
+.sidebar-right {
     display: flex;
-    justify-content: left;
+    flex-direction: column;
     align-items: center;
+    background: #ffffff;
+    border-left: .1rem solid #cccccc;
+    position: fixed;
+    top: 3.1rem;
+    right: 0;
+    width: 15%;
+    height: 90%;
+    transition: all 0.5s ease;
+    padding-top: 1rem;
+    z-index: 99;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
-.textarea-text-message {
-    border: .1rem solid #cccccc;
+.div-btn-right-group {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: .7rem;
+}
+
+.btn-add {
+    height: 2.5rem;
+    width: 11rem;
     background-color: #ffffff;
+    border: .1rem solid #007bff;
     border-radius: .2rem;
-    height: 3rem;
-    width: 80%;
-    text-align: left;
-    color: #666666;
-    padding: .3rem .8rem .3rem .8rem;
-    resize: none;
-    max-height: 6rem;
-    font-size: 1rem;
-    font-weight: 100;
-    margin-top: .5rem;
+    font-size: .8rem;
+    color: #007bff;
+    text-transform: uppercase;
+    cursor: pointer;
 }
 
-.textarea-text-message:focus {
+.btn-add:hover {    
+    background-color: #ffffff;
+    border: .1rem solid #a5cbf3;
+    color: #a5cbf3;
+}
+
+.btn-add:active {
+    background-color: #ffffff;
+    border: .1rem solid #007bff;
+    color: #007bff;
+}
+
+.btn-add:focus {
+    border: .1rem solid #cccccc;
     outline: none;
 }
 
-.textarea-text-message::placeholder {
-    font-size: .9rem;
+.section-main-window {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    position: fixed;
+    top: 5.2rem;
+    left: 20%;
+    width: 65%;
+    height: 75%;
+    transition: all 0.5s ease;
+    overflow-y: auto;
 }
 
-.a-message-send {
-    margin-top: .5rem;
+/* .div-seach-users {
+    width: 60%;
+    height: 3rem;
+} */
+
+/* .input-search-users {
+    font-size: 1.2rem;
+    border: .1rem solid #cccccc;
+    background-color: #ffffff;
+    border-radius: .2rem;
+    height: 2.5rem;
+    width: 80%;
+    text-align: left;
+    color: #666666;
+    padding: .1rem .5rem .1rem .5rem;
+} */
+
+/* .input-search-users:focus {
+    outline: none;
+} */
+
+.div-list-users {
+    margin: 1rem;
+    width: 80%;
+}
+
+.div-user {
+    margin: 1rem;
+    border: .1rem solid #cccccc;
+    border-radius: .2rem;
+    padding: .5rem;
+    color: #666666;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.div-user-nickname {
+    padding-left: .5rem;
 }
 
 .ul-chat-user-menu {
@@ -201,6 +201,62 @@
     color: #007bff;
 }
 
-.div-chat-user-active {
+.section-message {
+    width: 65%;
+    height: 7.5rem;
+    position: fixed;
+    left: 20%;
+    bottom: 2.5rem;
+    border-top: .1rem solid #cccccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.div-text-message {
+    width: 65%;
+    height: 7rem;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.textarea-text-message {
+    border: .1rem solid #cccccc;
+    background-color: #ffffff;
+    border-radius: .2rem;
+    height: 3rem;
+    width: 80%;
+    text-align: left;
+    color: #666666;
+    padding: .3rem .8rem .3rem .8rem;
+    resize: none;
+    max-height: 6rem;
+    font-size: 1rem;
+    font-weight: 100;
+    margin-top: .5rem;
+}
+
+.textarea-text-message:focus {
+    outline: none;
+}
+
+.textarea-text-message::placeholder {
+    font-size: .9rem;
+    font-weight: 100;
+}
+.textarea-text-message:focus {
     border: .1rem solid #007bff;
+}
+
+.a-message-send {
+    margin-top: .5rem;
+    padding: .3rem;
+}
+
+.a-message-send:focus {
+    border: .1rem solid #007bff;
+    border-radius: .2rem;
+    outline: none;
 }

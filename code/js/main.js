@@ -169,7 +169,7 @@ document.body.addEventListener('click', (e) => {
 
         // остановился на этом варианте,  думаю в данном случае самый оптимальный 
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null 
+        divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null
         // console.log(element)
         e.target.classList.add('div-chat-user-active');
 
@@ -189,6 +189,32 @@ document.body.addEventListener('contextmenu', (e) => {
         CHAT_USER_MENU.top = `${e.layerY}px`
         CHAT_USER_MENU.left = `${e.layerX}px`
         e.target.setAttribute('style', 'border: .1rem solid #007bff')
+
+        // добавляем пользователя в групповой чат
+        let addGroupChat = document.querySelector('#addgroupchat')
+        addGroupChat.addEventListener('click', () => {
+            console.log(e.target.id)
+            // здесь будем добавлять пользователя в групповой чат
+
+
+        },
+            // для остановки EventListener опция once: true
+            {
+                capture: false, once: true
+            })
+
+        // включаем/отключаем оповещение
+        let onoffNotification = document.querySelector('#onoffnotification')
+        onoffNotification.addEventListener('click', () => {
+            console.log(e.target.id)
+            // здесь будем включать/отключать оповещение
+
+
+        },
+            // для остановки EventListener опция once: true
+            {
+                capture: false, once: true
+            })
 
         // удаляем пользователя из списка чатов
         let delChatUser = document.querySelector('#deletechatuser')

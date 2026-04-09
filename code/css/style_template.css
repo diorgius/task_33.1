@@ -25,12 +25,10 @@ body {
 }
 
 .div-alert {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 60%;
-    height: 1.3rem;
-    /* overflow-y: auto; */
+    margin-top: .8rem;
+    width: 70%;
+    height: 1.5rem;
+    text-align: center;
 }
 
 .div-alert > p {

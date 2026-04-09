@@ -40,3 +40,8 @@
     border: .1rem solid #007bff;
     color: #007bff;
 }
+
+.btn-login:focus {
+    border: .1rem solid #cccccc;
+    outline: none;
+}
