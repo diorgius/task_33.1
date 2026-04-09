@@ -21,7 +21,7 @@ class Messenger implements MessageComponentInterface {
 
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection
-        $this->clients->offsetSet($conn);
+        $this->clients->attach($conn);
 
         // Generate unique client ID
         $clientId = uniqid('client_', true);
@@ -301,17 +301,3 @@ class Messenger implements MessageComponentInterface {
         $conn->close();
     }
 }
-
-// Create and run the server
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new Messenger()
-        )
-    ),
-    8888,
-    '0.0.0.0'
-);
-
-echo "WebSocket server running on port 8888\n";
-$server->run();

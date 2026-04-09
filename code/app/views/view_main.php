@@ -57,7 +57,7 @@
 
         <div class="div-alert"></div>
 
-        <section class="section-main-window">
+        <section class="section-main-window" id="mainwindow">
 
             <input type="text" id="userid" hidden value="<?= $userId ?>">
 
@@ -72,9 +72,9 @@
         <section class="section-message">
 
             <div class="div-text-message">
-                <textarea class="textarea-text-message" type="text" id="textareatextmessage" name="textareatextmessage"
+                <textarea class="textarea-text-message" type="text" id="textmessage" name="textmessage"
                     placeholder="Ваше сообщение..."></textarea>&nbsp&nbsp
-                <a class="a-message-send" href="#"><img class="img-message-send" src="../img/send.png" alt="Отправить"></a>
+                <a class="a-message-send" id="messagesend" href="#"><img class="img-message-send" src="../img/send.png" alt="Отправить"></a>
             </div>
 
         </section>

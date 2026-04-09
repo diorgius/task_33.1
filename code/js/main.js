@@ -1,9 +1,8 @@
-const SIDEBAR = document.querySelector('#aside-sidebar')
 const BUTTON_ADD_USER = document.querySelector('#btnadduser')
 const DIV_LIST_USERS = document.querySelector('#divlistusers')
 const DIV_USER_CHATS = document.querySelector('#divuserchats')
-const TEXT_AREA_MESSAGE = document.querySelector('#textareatextmessage')
-
+const MAIN_WINDOW = document.querySelector('#mainwindow')
+const TEXT_AREA_MESSAGE = document.querySelector('#textmessage')
 
 // маштабируем текстовую область сообщений
 let actions = ['input', 'cut', 'paste', 'drop']
@@ -141,6 +140,32 @@ async function addUser(userId, contactUserId, nickname, avatar) {
     }
 }
 
+// открываем соединение websocket
+const ws = new WebSocket("ws://localhost:8080/")
+
+ws.onopen = () => {
+    console.log("Connected")
+    // ws.send(JSON.stringify({ type: "hello" }))
+}
+
+ws.onerror = (error) => {
+    console.error("WebSocket error:", error)
+}
+
+ws.onclose = (event) => {
+    console.log(`Closed: ${event.code} ${event.reason}`)
+}
+
+ws.onmessage = (event) => {
+    let data = JSON.parse(event.data)
+    console.log("Received:", data)
+    let divMessage = document.createElement('div')
+    divMessage.classList.add('div-accept-message')
+    divMessage.setAttribute('id', 'divacceptmessage')
+    divMessage.textContent = data.message
+    DIV_USER_MESSAGES.appendChild(divMessage)
+}
+
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку)
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
@@ -168,30 +193,33 @@ document.body.addEventListener('click', (e) => {
         // }
 
         // остановился на этом варианте,  думаю в данном случае самый оптимальный 
-        let divChatUserActive = document.querySelector('.div-chat-user-active');
+        let divChatUserActive = document.querySelector('.div-chat-user-active')
         divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null
         // console.log(element)
-        e.target.classList.add('div-chat-user-active');
+        e.target.classList.add('div-chat-user-active')
+        document.querySelector('divusermessages') ? document.querySelector('divusermessages').remove() : null
+        let divUserMessenges = document.createElement('div')
+        divUserMessenges.classList.add('div-user-messages')
+        divUserMessenges.setAttribute('id', 'divusermessages')
+        MAIN_WINDOW.appendChild(divUserMessenges)
+        divUserMessenges.textContent = `Чат с пользователем ${e.target.innerText}`
+        document.querySelector('.div-text-message').style.visibility = 'visible'
+        TEXT_AREA_MESSAGE.focus()
 
-        const ws = new WebSocket("ws://messenger.local:8888/");
 
-        ws.onopen = () => {
-            console.log("Connected");
-            ws.send(JSON.stringify({ type: "hello" }));
-        };
+        const MESSAGE_SEND = document.querySelector('#messagesend')
+        MESSAGE_SEND.addEventListener('click', () => {
+            let textMessage = TEXT_AREA_MESSAGE.value
+            TEXT_AREA_MESSAGE.value = ''
+            ws.send(JSON.stringify({ message: textMessage }))
+            let divMessage = document.createElement('div')
+            divMessage.classList.add('div-send-message')
+            divMessage.setAttribute('id', 'divsendmessage')
+            divMessage.textContent = textMessage
+            DIV_USER_MESSAGES.appendChild(divMessage)
+        })  
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log("Received:", data);
-        };
 
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-
-        ws.onclose = (event) => {
-            console.log(`Closed: ${event.code} ${event.reason}`);
-        };
 
     }
 });

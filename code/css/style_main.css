@@ -162,6 +162,35 @@
     width: 80%;
 }
 
+.div-user-messages {
+    color: #666666;
+    width: 80%;
+}
+
+.div-accept-message {
+    color: #666666;
+    border: .1rem solid #cccccc;
+    border-radius: .2rem;
+    padding: .5rem;
+    margin: 1rem 0 1rem 0;
+    width: max-content;
+    height: auto;
+    display: flex;
+    justify-self: left;
+}
+
+.div-send-message {
+    color: #666666;
+    border: .1rem solid #cccccc;
+    border-radius: .2rem;
+    padding: .5rem;
+    margin: 1rem 0 1rem 0;
+    width: max-content;
+    height: auto;
+    display: flex;
+    justify-self: right;
+}
+
 .div-user {
     margin: 1rem;
     border: .1rem solid #cccccc;
@@ -215,6 +244,7 @@
 }
 
 .div-text-message {
+    visibility: hidden;
     width: 65%;
     height: 7rem;
     position: fixed;
@@ -256,8 +286,14 @@
     padding: .3rem;
 }
 
-.a-message-send:focus {
+.a-message-send:hover {
     border: .1rem solid #007bff;
+    border-radius: .2rem;
+    outline: none;
+}
+
+.a-message-send:focus {
+    border: .1rem solid #cccccc;
     border-radius: .2rem;
     outline: none;
 }

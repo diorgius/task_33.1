@@ -124,12 +124,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/gabordemooij/redbean.git",
-                "reference": "273d596c397e46ba944287176694ceca733dcb8f"
+                "reference": "baf9850023d5d78abec42d3a71fc9c211b3a1166"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gabordemooij/redbean/zipball/273d596c397e46ba944287176694ceca733dcb8f",
-                "reference": "273d596c397e46ba944287176694ceca733dcb8f",
+                "url": "https://api.github.com/repos/gabordemooij/redbean/zipball/baf9850023d5d78abec42d3a71fc9c211b3a1166",
+                "reference": "baf9850023d5d78abec42d3a71fc9c211b3a1166",
                 "shasum": ""
             },
             "require": {
@@ -138,6 +138,9 @@
             "default-branch": true,
             "type": "library",
             "autoload": {
+                "files": [
+                    "RedBeanPHP/Functions.php"
+                ],
                 "psr-4": {
                     "RedBeanPHP\\": "RedBeanPHP"
                 }
@@ -162,7 +165,7 @@
                 "issues": "https://github.com/gabordemooij/redbean/issues",
                 "source": "https://github.com/gabordemooij/redbean/tree/master"
             },
-            "time": "2026-02-22T13:15:08+00:00"
+            "time": "2026-03-29T10:02:38+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -378,12 +381,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "cce0438c9bf8ae3285059e5715c78d89ccc10c9c"
+                "reference": "5b0bf65c4862258e554912de6249a6a48da49052"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/cce0438c9bf8ae3285059e5715c78d89ccc10c9c",
-                "reference": "cce0438c9bf8ae3285059e5715c78d89ccc10c9c",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/5b0bf65c4862258e554912de6249a6a48da49052",
+                "reference": "5b0bf65c4862258e554912de6249a6a48da49052",
                 "shasum": ""
             },
             "require": {
@@ -453,7 +456,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-03-24T14:54:25+00:00"
+            "time": "2026-04-06T05:54:59+00:00"
         },
         {
             "name": "psr/http-message",
