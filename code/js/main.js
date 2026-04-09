@@ -150,16 +150,16 @@ document.body.addEventListener('click', (e) => {
         // 1. с условиями
         // let active = null // объявляем переменную вне функции, чтобы не обнулялась
         // if (active === e.target) {
-        //     e.target.classList.toggle('div-chat-user-active');
+        //     e.target.classList.toggle('div-chat-user-active')
         // } else {
-        //     active === null ? null : active.classList.remove('div-chat-user-active');
-        //     e.target.classList.add('div-chat-user-active');
-        //     active = e.target;
+        //     active === null ? null : active.classList.remove('div-chat-user-active')
+        //     e.target.classList.add('div-chat-user-active')
+        //     active = e.target
         //     console.log(active)
         // }
         // 2. цикл forEach
-        // elements = document.querySelectorAll('.div-chat-user'); // перебираем все элементы верхнего класса
-        // elements = document.querySelectorAll('.div-chat-user-active'); // сразу ищем нужный класс
+        // elements = document.querySelectorAll('.div-chat-user') // перебираем все элементы верхнего класса
+        // elements = document.querySelectorAll('.div-chat-user-active') // сразу ищем нужный класс
         // elements.forEach(elem => {elem.classList.remove('div-chat-user-active')})
         // console.log(elements)
         // 3. то же с циклом for...of
@@ -173,7 +173,25 @@ document.body.addEventListener('click', (e) => {
         // console.log(element)
         e.target.classList.add('div-chat-user-active');
 
+        const ws = new WebSocket("ws://messenger.local:8888/");
 
+        ws.onopen = () => {
+            console.log("Connected");
+            ws.send(JSON.stringify({ type: "hello" }));
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("Received:", data);
+        };
+
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
+        ws.onclose = (event) => {
+            console.log(`Closed: ${event.code} ${event.reason}`);
+        };
 
     }
 });

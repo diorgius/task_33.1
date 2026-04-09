@@ -4,7 +4,8 @@
     "require": {
         "gabordemooij/redbean": "dev-master",
         "monolog/monolog": "3.0.*",
-        "phpmailer/phpmailer": "dev-master"
+        "phpmailer/phpmailer": "dev-master",
+        "cboden/ratchet": "v0.5.x-dev"
     },
     "autoload": {
         "psr-4": {
