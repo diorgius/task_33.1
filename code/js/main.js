@@ -5,24 +5,35 @@ const MAIN_WINDOW = document.querySelector('#mainwindow')
 const TEXT_AREA_MESSAGE = document.querySelector('#textmessage')
 
 // !!!TO DO
-// 1. изменить добавление nickname, при регистрации не задавать nickname автоматически 
+// !!!СДЕЛАНО 1. изменить добавление nickname, при регистрации не задавать nickname автоматически 
 // (у разных почтовиков могут быть одинаковые nickname)
 // только если пользователь сам его добавляет, при этом учитывать скрытие email, 
 // если не задан nickname, то не давать возможность скрыть email
 // при выводе списка пользователей и добавленных пользователей вывод nickname/email
+
 // 2. разобраться с отправкой сообщений только выбранному пользователю и 
 // при открытии чата задавать id divusermessages уникальным 
 // (??? nickname? emai? id - уже нельзя, занят в списке добавленных пользоватей)
 // или как-то комбинировать, чтобы потом закрывать и открывать
 // в зависимости от того с кем чат
+
 // 3. если пользователю приходит сообщение от пользователя с которым не открыт чат,
 // активировать пользователя из списка контактов (???имитировать клик), 
 // активировать divusermessages писать в заголовке с кем чат (от кого пришло сообщение)
-// и примать сообщения в него, если у пользователя уже открыт чат с другим пользователем
+// и примать сообщения в него 
+// 
+// 4. если у пользователя уже открыт чат с другим пользователем
 // выдать сообщение о приходе сообщения от другого пользователя
-// или просто делать оповещение в любом случае
-// 4. запись сообщений в базу
-// 5. при активации пользователя загружать из базы ранние сообщения от этого пользователя
+// ??? или просто делать оповещение в любом случае, а чат пусть пользователь открывает сам
+//
+// 5. запись сообщений в базу
+//
+// 6. при активации пользователя загружать из базы ранние сообщения от этого пользователя
+//
+// 7. выдавать звуковое оповещение о приходе сообщения
+//
+// 8. вкл/выкл оповещения и отображение этого
+
 
 
 
@@ -70,7 +81,7 @@ if (BUTTON_ADD_USER) {
                         divUser.classList.add('div-user')
                         divUser.setAttribute('id', 'divuser_' + `${item.id}`)
                         divAddUsers.appendChild(divUser)
-                        divUser.onclick = function () { addUser(userId, item.id, item.nickname, item.avatar) }
+                        divUser.onclick = function () { addUser(userId, item.id, item.email, item.nickname, item.avatar, item.hideemail,) }
 
                         let divUserAvatar = document.createElement('div')
                         divUser.appendChild(divUserAvatar)
@@ -104,7 +115,7 @@ if (BUTTON_ADD_USER) {
 }
 
 // добавляем пользователя в список своих контактов
-async function addUser(userId, contactUserId, nickname, avatar) {
+async function addUser(userId, contactUserId, email, nickname, avatar, hideemail) {
     if (!document.getElementById(contactUserId)) {
 
         // отправляем данные на бэкенд для записи в базу
@@ -142,10 +153,10 @@ async function addUser(userId, contactUserId, nickname, avatar) {
             let divChatUserNickname = document.createElement('div')
             divChatUserNickname.classList.add('div-user-nickname')
             divChatUser.appendChild(divChatUserNickname)
-
+            
             let pChatUser = document.createElement('p')
             divChatUserNickname.appendChild(pChatUser)
-            pChatUser.textContent = nickname
+            nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email
 
         } catch (error) {
             console.log('Ошибка: ', error)

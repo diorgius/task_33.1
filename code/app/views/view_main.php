@@ -13,7 +13,9 @@
                 <div class="div-user-avatar">
                     <?php isset($data['user']['avatar']) ? $image = URL . 'avatars/' . $data['user']['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
                     <img src="<?= $image; ?>" alt="avatar" width="90px">
-                    <p class="p-nickname"><?= $data['user']['nickname']; ?></p>
+                    <?php isset($data['user']['nickname']) && !empty($data['user']['nickname']) ? 
+                        $nickname = $data['user']['nickname'] : $nickname = $data['user']['email']; ?>
+                    <p class="p-nickname"><?= $nickname; ?></p>
                 <?php endif; ?>
             </div>
 
@@ -24,11 +26,14 @@
                     <?php foreach ($data['contacts'] as $key => $value): ?>
                         <div class="div-chat-user" id="<?= $data['contacts'][$key]['contact_user_id']; ?>">
                             <div>
-                                <?php !empty($data['contacts'][$key]['avatar']) ? $image = URL . 'avatars/' . $data['contacts'][$key]['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
+                                <?php !empty($data['contacts'][$key]['avatar']) ? 
+                                    $image = URL . 'avatars/' . $data['contacts'][$key]['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
                                 <img src="<?= $image; ?>" alt="Аватар" width="35">
                             </div>
                             <div class="div-user-nickname">
-                                <p><?= $data['contacts'][$key]['nickname']; ?></p>
+                                <?php isset($data['contacts'][$key]['nickname']) && !empty($data['contacts'][$key]['nickname']) ? 
+                                    $nickname = $data['contacts'][$key]['nickname'] : $nickname = $data['contacts'][$key]['email']; ?>
+                                <p><?= $nickname; ?></p>
                             </div>
                         </div>
                     <?php endforeach; ?>

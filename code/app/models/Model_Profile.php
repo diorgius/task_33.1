@@ -27,7 +27,7 @@ class Model_Profile extends Model
         $avatarFileName=$file['fileavatar']['name'];
         isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
         $nickname = htmlspecialchars(trim($data['nickname']));
-
+                
         // с загрузкой изображений в базу до конца не разобрался, в базу данные загружаются,
         // но почему-то, при извлечении картинка не востанавливается, либо при загрузке двоичных данных в blob, 
         // либо при извлечении что-то не так (разобраться интересно, но пока не хочу тратить время), поэтому в базу

@@ -43,7 +43,7 @@ class DB
                 (`id` INT NOT NULL AUTO_INCREMENT , 
                 `email` VARCHAR(64) NOT NULL ,
                 `password` VARCHAR(128) NOT NULL , 
-                `nickname` VARCHAR(64) NOT NULL , 
+                `nickname` VARCHAR(64) NULL , 
                 `avatar` VARCHAR(64) NULL ,
                 `hideemail` tinyint(1) NULL,
                 `role` VARCHAR(20) NULL , 

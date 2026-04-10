@@ -18,7 +18,7 @@ if(!empty($data)):
         <form class="form-editprofile" action="/profile/updateuser" method="post" enctype="multipart/form-data">
             <label for="email">Email:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                 <input class="input-editprofile input-short" type="email" id="email" name="email" value="<?= $data['email'] ?>" readonly />&nbsp&nbsp
-                <input class="input-checkbox-hideemail" name="hideemail" type="checkbox" <?= $checked ?> />&nbsp&nbspСкрыть email
+                <input class="input-checkbox-hideemail" name="hideemail" id="hideemail"  type="checkbox" <?= $checked ?> />&nbsp&nbspСкрыть email
             </label>
             <label for="password">Пароль:&nbsp&nbsp&nbsp
                 <input class="input-editprofile" type="password" id="password" name="password" value="<?= $data['password'] ?>" />

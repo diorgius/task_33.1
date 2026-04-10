@@ -6,6 +6,7 @@ const INPUT_PASSWORD = document.querySelector('#password')
 const INPUT_PASSWORD_AGAIN = document.querySelector('#passwordagain')
 const BUTTON_SEND = document.querySelector('#send')
 const DIV_ALERT = document.querySelector('.div-alert')
+const INPUT_HIDE_EMAIL = document.querySelector('#hideemail')
 const INPUT_NICKNAME = document.querySelector('#nickname')
 const INPUT_FILE_AVATAR = document.querySelector('#fileavatar')
 
@@ -27,6 +28,13 @@ if (INPUT_PASSWORD) {
 
 if (INPUT_PASSWORD_AGAIN) {
     INPUT_PASSWORD_AGAIN.addEventListener('change', (e) => {
+        if (document.querySelector('#alert')) document.querySelector('#alert').remove()
+        validation(e)
+    })
+}
+
+if (INPUT_HIDE_EMAIL) {
+    INPUT_HIDE_EMAIL.addEventListener('change', (e) => {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove()
         validation(e)
     })
@@ -116,39 +124,62 @@ async function validation(e) {
             INPUT_PASSWORD_AGAIN.classList.remove('wrong-data')
             BUTTON_SEND.removeAttribute('disabled')
         }
-    } else if (e.target.id === 'nickname') {
-        nickname = e.target.value
-        data = { nickname: nickname }
-        try {
-            let response = await fetch(URL + '/app/core/CheckData.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/jsoncharset=utf-8'
-                },
-                body: JSON.stringify(data)
-            })
-            let result = await response.text()
-            if (result) {
-                // здесь пришлось добавлять стиль таким способом
-                // почему-то если на форме регистрации работает добавление стиля через добавление класса
-                // INPUT_EMAIL.classList.add('wrong-data') и он добавляется перед основным классом,
-                // то на форме редактирования профиля этот класс добавляется после основного класса и не работает???
-                // почему так происходит я пока не разобрался
-                // и на поле ввода пароля тоже пришлось изменить, потому-что на форме редактирования это поле тоже есть,
-                // хотя на форме регистрации все отрабатывается
+    } else if (e.target.id === 'hideemail') {
+        if (e.target.checked) {
+            if (!INPUT_NICKNAME.value) {
+                console.log('empty')
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000')
                 let pAlert = document.createElement('p')
                 pAlert.setAttribute('id', 'alert')
                 BUTTON_SEND.setAttribute('disabled', '')
                 DIV_ALERT.appendChild(pAlert)
-                pAlert.textContent = result
+                pAlert.textContent = 'Для скрытия email введите nickname'
             } else {
-                // убираем стиль
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff')
                 BUTTON_SEND.removeAttribute('disabled')
             }
-        } catch (error) {
-            console.log('Ошибка: ', error)
+
+        } else {
+            INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff')
+            BUTTON_SEND.removeAttribute('disabled')
+        }
+    } else if (e.target.id === 'nickname') {
+        nickname = e.target.value
+        if (!INPUT_NICKNAME.value) {
+            INPUT_HIDE_EMAIL.checked = false
+        } else {
+            data = { nickname: nickname }
+            try {
+                let response = await fetch(URL + '/app/core/CheckData.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/jsoncharset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                })
+                let result = await response.text()
+                if (result) {
+                    // здесь пришлось добавлять стиль таким способом
+                    // почему-то если на форме регистрации работает добавление стиля через добавление класса
+                    // INPUT_EMAIL.classList.add('wrong-data') и он добавляется перед основным классом,
+                    // то на форме редактирования профиля этот класс добавляется после основного класса и не работает???
+                    // почему так происходит я пока не разобрался
+                    // и на поле ввода пароля тоже пришлось изменить, потому-что на форме редактирования это поле тоже есть,
+                    // хотя на форме регистрации все отрабатывается
+                    INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000')
+                    let pAlert = document.createElement('p')
+                    pAlert.setAttribute('id', 'alert')
+                    BUTTON_SEND.setAttribute('disabled', '')
+                    DIV_ALERT.appendChild(pAlert)
+                    pAlert.textContent = result
+                } else {
+                    // убираем стиль
+                    INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff')
+                    BUTTON_SEND.removeAttribute('disabled')
+                }
+            } catch (error) {
+                console.log('Ошибка: ', error)
+            }
         }
     } else if (e.target.id === 'fileavatar') {
         fileavatar = e.target.files[0].name
