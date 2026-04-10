@@ -176,7 +176,7 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
 
 // открываем соединение websocket
 const ws = new WebSocket("ws://localhost:8080/")
-
+console.log(ws)
 ws.onopen = () => {
     console.log("Connected")
     // ws.send(JSON.stringify({ type: "hello" }))
@@ -213,7 +213,7 @@ ws.onmessage = (event) => {
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку)
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        console.log(e)
+        // console.log(e)
 
         // варианты переключения классов при клике на #divchatuser
         // 1. с условиями
@@ -241,8 +241,6 @@ document.body.addEventListener('click', (e) => {
         divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null
         e.target.classList.add('div-chat-user-active')
 
-        console.log(document.querySelector('#divusermessages'))
-
         document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null
         let divUserMessages = document.createElement('div')
         divUserMessages.classList.add('div-user-messages')
@@ -259,6 +257,7 @@ document.body.addEventListener('click', (e) => {
             let textMessage = TEXT_AREA_MESSAGE.value
             TEXT_AREA_MESSAGE.value = ''
             message = JSON.stringify({
+                'to': `${e.target.id}`,
                 'contactId': userId,
                 'contactNickname': nickname,
                 'textMessage': textMessage 
