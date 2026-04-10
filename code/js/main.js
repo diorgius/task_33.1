@@ -4,6 +4,29 @@ const DIV_USER_CHATS = document.querySelector('#divuserchats')
 const MAIN_WINDOW = document.querySelector('#mainwindow')
 const TEXT_AREA_MESSAGE = document.querySelector('#textmessage')
 
+// !!!TO DO
+// 1. изменить добавление nickname, при регистрации не задавать nickname автоматически 
+// (у разных почтовиков могут быть одинаковые nickname)
+// только если пользователь сам его добавляет, при этом учитывать скрытие email, 
+// если не задан nickname, то не давать возможность скрыть email
+// при выводе списка пользователей и добавленных пользователей вывод nickname/email
+// 2. разобраться с отправкой сообщений только выбранному пользователю и 
+// при открытии чата задавать id divusermessages уникальным 
+// (??? nickname? emai? id - уже нельзя, занят в списке добавленных пользоватей)
+// или как-то комбинировать, чтобы потом закрывать и открывать
+// в зависимости от того с кем чат
+// 3. если пользователю приходит сообщение от пользователя с которым не открыт чат,
+// активировать пользователя из списка контактов (???имитировать клик), 
+// активировать divusermessages писать в заголовке с кем чат (от кого пришло сообщение)
+// и примать сообщения в него, если у пользователя уже открыт чат с другим пользователем
+// выдать сообщение о приходе сообщения от другого пользователя
+// или просто делать оповещение в любом случае
+// 4. запись сообщений в базу
+// 5. при активации пользователя загружать из базы ранние сообщения от этого пользователя
+
+
+
+
 // маштабируем текстовую область сообщений
 let actions = ['input', 'cut', 'paste', 'drop']
 if (TEXT_AREA_MESSAGE) {
@@ -159,17 +182,27 @@ ws.onclose = (event) => {
 ws.onmessage = (event) => {
     let data = JSON.parse(event.data)
     console.log("Received:", data)
+    if (!document.querySelector('#divusermessages')) {
+        console.log(document.querySelector('#divusermessages'))
+        let divUserMessages = document.createElement('div')
+        divUserMessages.classList.add('div-user-messages')
+        divUserMessages.setAttribute('id', 'divusermessages')
+        divUserMessages.textContent = `Чат с пользователем ${data.contactNickname}`
+        MAIN_WINDOW.appendChild(divUserMessages)
+        document.getElementById(`${data.contactId}`).click()
+    }
+    let divUserMessages = document.querySelector('#divusermessages')
     let divMessage = document.createElement('div')
     divMessage.classList.add('div-accept-message')
     divMessage.setAttribute('id', 'divacceptmessage')
-    divMessage.textContent = data.message
-    DIV_USER_MESSAGES.appendChild(divMessage)
+    divMessage.textContent = data.textMessage
+    divUserMessages.appendChild(divMessage)
 }
 
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку)
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        // console.log(e)
+        console.log(e)
 
         // варианты переключения классов при клике на #divchatuser
         // 1. с условиями
@@ -195,28 +228,36 @@ document.body.addEventListener('click', (e) => {
         // остановился на этом варианте,  думаю в данном случае самый оптимальный 
         let divChatUserActive = document.querySelector('.div-chat-user-active')
         divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null
-        // console.log(element)
         e.target.classList.add('div-chat-user-active')
-        document.querySelector('divusermessages') ? document.querySelector('divusermessages').remove() : null
-        let divUserMessenges = document.createElement('div')
-        divUserMessenges.classList.add('div-user-messages')
-        divUserMessenges.setAttribute('id', 'divusermessages')
-        MAIN_WINDOW.appendChild(divUserMessenges)
-        divUserMessenges.textContent = `Чат с пользователем ${e.target.innerText}`
+
+        console.log(document.querySelector('#divusermessages'))
+
+        document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null
+        let divUserMessages = document.createElement('div')
+        divUserMessages.classList.add('div-user-messages')
+        divUserMessages.setAttribute('id', 'divusermessages')
+        MAIN_WINDOW.appendChild(divUserMessages)
+        divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`
         document.querySelector('.div-text-message').style.visibility = 'visible'
         TEXT_AREA_MESSAGE.focus()
 
-
         const MESSAGE_SEND = document.querySelector('#messagesend')
         MESSAGE_SEND.addEventListener('click', () => {
+            let userId = document.querySelector('#userid').value
+            let nickname = document.querySelector('.p-nickname').innerText
             let textMessage = TEXT_AREA_MESSAGE.value
             TEXT_AREA_MESSAGE.value = ''
-            ws.send(JSON.stringify({ message: textMessage }))
+            message = JSON.stringify({
+                'contactId': userId,
+                'contactNickname': nickname,
+                'textMessage': textMessage 
+            })
+            ws.send(message)
             let divMessage = document.createElement('div')
             divMessage.classList.add('div-send-message')
             divMessage.setAttribute('id', 'divsendmessage')
             divMessage.textContent = textMessage
-            DIV_USER_MESSAGES.appendChild(divMessage)
+            divUserMessages.appendChild(divMessage)
         })  
 
 
