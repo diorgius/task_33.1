@@ -44,7 +44,8 @@
 
             <ul class="ul-chat-user-menu">
                 <li id="addgroupchat">Добавить в групповой чат</li>
-                <li id="onoffnotification">Включить/Отключить оповещение</li>
+                <li id="offnotification">Отключить оповещение</li>
+                <li id="onnotification">Включить оповещение</li>
                 <li id="deletechatuser">Удалить пользователя из списка чатов</li>
                 <li id="deleteuserchats">Удалить чаты с пользователем</li>
             </ul>

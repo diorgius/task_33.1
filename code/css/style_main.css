@@ -297,3 +297,7 @@
     border-radius: .2rem;
     outline: none;
 }
+
+.chat-user-without-notice {
+    background-color: #eeeeee;
+}
