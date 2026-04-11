@@ -2,33 +2,34 @@
 
 namespace App\core;
 
+use stdClass;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class Messenger implements MessageComponentInterface
 {
-    protected $clients;
-    protected $clientInfo;
+    protected $clients = [];
+    protected $usersId;
 
     public function __construct()
     {
-        $this->clients = new \SplObjectStorage();
-        $this->clientInfo = [];
+        // $this->users = new stdClass();
+        // $this->clients = new \SplObjectStorage();
         echo "WebSocket Server started\n";
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
-
-        // Generate unique client ID
-        $clientId = uniqid('client_', true);
-        $this->clientInfo[$conn->resourceId] = [
-            'id' => $clientId,
-            'connection' => $conn,
-            // 'rooms' => [],
-            // 'metadata' => []
-        ];
+        // $this->clients->attach($conn);
+        $this->clients[$conn->resourceId] = $conn;
+        $message = json_encode(['onconnection' => $conn->resourceId]);
+        $conn->send($message);
+        // $this->usersInfo[$conn->resourceId] = [
+        //     'id' => $userId,
+        //     'connection' => $conn,
+        //     // 'rooms' => [],
+        //     // 'metadata' => []
+        // ];
 
         // Send welcome message
         // $conn->send(json_encode([
@@ -36,7 +37,7 @@ class Messenger implements MessageComponentInterface
         //     'client_id' => $clientId,
         //     'timestamp' => time()
         // ]));
-
+        var_dump($this->clients);
         echo "New connection! ({$conn->resourceId})\n";
     }
 
@@ -44,11 +45,24 @@ class Messenger implements MessageComponentInterface
     {
 
         $data = json_decode($msg, true);
+        // $this->users->usersId;
 
-        echo $data['to'];
-        echo $data['textMessage'];
+        if ($data['command'] === 'register') {
+            // добавлять еще и resourceId???
+            $this->usersId['contactsId'][] = $data['userId'];
+            // $conn->send( $message);
+        } elseif ($data['command'] === 'message') {
+            echo $data['to'];
+            echo $data['textMessage'];
+        }
 
-        $this->sendPrivateMessage($from, $data['to'] ?? '', $data['textMessage'] ?? '');
+        var_dump($from);
+        var_dump($this->usersId);
+        var_dump($this->clients);
+        var_dump($data);
+
+
+        // $this->sendPrivateMessage($from, $data['to'] ?? '', $data['textMessage'] ?? '');
 
 
         // рассылка всем подключенным клиентам
@@ -75,7 +89,7 @@ class Messenger implements MessageComponentInterface
         $toConn = null;
 
         // Find recipient connection
-        foreach ($this->clientInfo as $info) {
+        foreach ($this->usersInfo as $info) {
             if ($info['id'] === $toClientId) {
                 $toConn = $info['connection'];
                 break;
