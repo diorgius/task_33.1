@@ -298,6 +298,10 @@
     outline: none;
 }
 
-.chat-user-without-notice {
+.div-chat-user-without-notice {
     background-color: #eeeeee;
+}
+
+.div-chat-user-onchat {
+    background-color: #bffdb0;
 }

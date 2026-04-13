@@ -15,42 +15,42 @@ if (INPUTE_MAIL) {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
-};
+}
 
 if (INPUT_PASSWORD) {
     INPUT_PASSWORD.addEventListener('change', (e) => {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
-};
+}
 
 if (INPUT_PASSWORD_AGAIN) {
     INPUT_PASSWORD_AGAIN.addEventListener('change', (e) => {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
-};
+}
 
 if (INPUT_HIDE_EMAIL) {
     INPUT_HIDE_EMAIL.addEventListener('change', (e) => {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
-};
+}
 
 if (INPUT_NICKNAME) {
     INPUT_NICKNAME.addEventListener('change', (e) => {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
-};
+}
 
 if (INPUT_FILE_AVATAR) {
     INPUT_FILE_AVATAR.addEventListener('change', (e) => {
         if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
-};
+}
 
 async function validation(e) {
     if (e.target.id === 'email') {
@@ -70,7 +70,7 @@ async function validation(e) {
             BUTTON_SEND.removeAttribute('disabled');
 
             // посылаем email на бэкенд и проверяем на есть ли уже такой в базе
-            data = { email: email };
+            data = { email: email }
             try {
                 let response = await fetch(URL + '/app/core/CheckData.php', {
                     method: 'POST',
@@ -94,8 +94,8 @@ async function validation(e) {
                 }
             } catch (error) {
                 console.log('Ошибка: ', error);
-            };
-        };
+            }
+        }
     } else if (e.target.id === 'password') {
         pass = e.target.value;
 
@@ -142,7 +142,7 @@ async function validation(e) {
             } else {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff');
                 BUTTON_SEND.removeAttribute('disabled');
-            };
+            }
         } else {
             INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff');
             BUTTON_SEND.removeAttribute('disabled');
@@ -166,7 +166,7 @@ async function validation(e) {
                 BUTTON_SEND.removeAttribute('disabled');
                 
                 // посылаем nickname на бэкенд и проверяем на есть ли уже такой в базе
-                data = { nickname: nickname };
+                data = { nickname: nickname }
                 try {
                     let response = await fetch(URL + '/app/core/CheckData.php', {
                         method: 'POST',
@@ -197,9 +197,9 @@ async function validation(e) {
                     }
                 } catch (error) {
                     console.log('Ошибка: ', error);
-                };
-            };
-        };
+                }
+            }
+        }
     } else if (e.target.id === 'fileavatar') {
         fileavatar = e.target.files[0].name;
 
@@ -223,6 +223,6 @@ async function validation(e) {
         } else {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #007bff');
             BUTTON_SEND.removeAttribute('disabled');
-        };
-    };
-};
+        }
+    }
+}

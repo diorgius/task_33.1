@@ -3,7 +3,9 @@ const DIV_LIST_USERS = document.querySelector('#divlistusers');
 const DIV_USER_CHATS = document.querySelector('#divuserchats');
 const MAIN_WINDOW = document.querySelector('#mainwindow');
 const TEXT_AREA_MESSAGE = document.querySelector('#textmessage');
-const USER_ID = document.querySelector('#userid').value;
+if (document.querySelector('#userid')) {
+    const USER_ID = document.querySelector('#userid').value;
+}
 
 // !!!TO DO
 // !!!СДЕЛАНО 1. изменить добавление nickname, при регистрации не задавать nickname автоматически 
@@ -45,7 +47,7 @@ if (TEXT_AREA_MESSAGE) {
             TEXT_AREA_MESSAGE.style.height = TEXT_AREA_MESSAGE.scrollHeight + 'px';
         });
     });
-};
+}
 
 // выводим список пользователей для добавления в свои контакты
 if (BUTTON_ADD_USER) {
@@ -101,8 +103,8 @@ if (BUTTON_ADD_USER) {
                             let pUserEmail = document.createElement('p');
                             divUserNickname.appendChild(pUserEmail);
                             pUserEmail.textContent = item.email;
-                        };
-                    };
+                        }
+                    }
                 });
             } catch (error) {
                 console.log('Ошибка: ', error);
@@ -168,85 +170,8 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
         setTimeout(() =>
             pAlert.remove(), 2000
         );
-    };
-};
-
-// открываем соединение websocket
-const ws = new WebSocket("ws://localhost:8080/");
-console.log(ws);
-
-ws.onopen = () => {
-    console.log("Connected");
-    ws.send(JSON.stringify({ command: 'register', userId: USER_ID }))
-};
-
-ws.onerror = (error) => {
-    console.error("WebSocket error:", error);
-};
-
-ws.onclose = (event) => {
-    console.log(`Closed: ${event.code} ${event.reason}`);
-};
-
-ws.onmessage = (event) => {
-    let data = JSON.parse(event.data);
-    console.log("Received:", data);
-    if (!document.querySelector('#divusermessages')) {
-        console.log(document.querySelector('#divusermessages'));
-        let divUserMessages = document.createElement('div');
-        divUserMessages.classList.add('div-user-messages');
-        divUserMessages.setAttribute('id', 'divusermessages');
-        divUserMessages.textContent = `Чат с пользователем ${data.contactNickname}`;
-        MAIN_WINDOW.appendChild(divUserMessages);
-        document.getElementById(`${data.contactId}`).click();
     }
-    let divUserMessages = document.querySelector('#divusermessages');
-    let divMessage = document.createElement('div');
-    divMessage.classList.add('div-accept-message');
-    divMessage.setAttribute('id', 'divacceptmessage');
-    divMessage.textContent = data.textMessage;
-    divUserMessages.appendChild(divMessage);
-};
-
-// обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку)
-document.body.addEventListener('click', (e) => {
-    if (e.target.classList.contains('div-chat-user')) {
-        // console.log(e);
-
-        // добавляем/удаляем выделение элемента border
-        let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
-        e.target.classList.add('div-chat-user-active');
-
-        document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null;
-        let divUserMessages = document.createElement('div');
-        divUserMessages.classList.add('div-user-messages');
-        divUserMessages.setAttribute('id', 'divusermessages');
-        MAIN_WINDOW.appendChild(divUserMessages);
-        divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`;
-        document.querySelector('.div-text-message').style.visibility = 'visible';
-        TEXT_AREA_MESSAGE.focus();
-
-        const MESSAGE_SEND = document.querySelector('#messagesend');
-        MESSAGE_SEND.addEventListener('click', () => {
-            let nickname = document.querySelector('.p-nickname').innerText;
-            let textMessage = TEXT_AREA_MESSAGE.value;
-            TEXT_AREA_MESSAGE.value = '';
-            message = JSON.stringify({
-                'to': `${e.target.id}`,
-                'contactId': USER_ID,
-                'contactNickname': nickname,
-                'textMessage': textMessage
-            });
-            ws.send(message);
-            let divMessage = document.createElement('div');
-            divMessage.classList.add('div-send-message');
-            divMessage.setAttribute('id', 'divsendmessage');
-            divMessage.textContent = textMessage;
-            divUserMessages.appendChild(divMessage);
-        });
-    };
-});
+}
 
 // обрабатываем меню по клику правой кнопки на пользователях чата
 window.oncontextmenu = function (e) {
@@ -279,7 +204,7 @@ window.oncontextmenu = function (e) {
         offNotification.onclick = () => {
             // console.log(e.target.id);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
-            chatUserWithoutNotice.classList.add('chat-user-without-notice');
+            chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
             // здесь будем отключать оповещение
         }
 
@@ -288,7 +213,7 @@ window.oncontextmenu = function (e) {
         onNotification.onclick = () => {
             // console.log(e.target.id);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
-            chatUserWithoutNotice.classList.remove('chat-user-without-notice');
+            chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
             // здесь будем включать оповещение
         }
 
@@ -302,7 +227,7 @@ window.oncontextmenu = function (e) {
                 action: 'deleteContact',
                 'userId': USER_ID,
                 'contactUserId': e.target.id
-            };
+            }
             try {
                 let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
                     method: 'POST',
@@ -318,7 +243,7 @@ window.oncontextmenu = function (e) {
                 let pAlert = document.createElement('p');
                 pAlert.setAttribute('id', 'alert');
                 DIV_ALERT.appendChild(pAlert);
-                pAlert.textContent = `Пользователь ${nickname} успешно удален из списка чатов`;
+                pAlert.textContent = `Пользователь ${nickname} удален из списка чатов`;
 
                 // убираем надпись по таймеру (2 секунды)
                 setTimeout(() =>
@@ -326,8 +251,8 @@ window.oncontextmenu = function (e) {
                 );
             } catch (error) {
                 console.log('Ошибка: ', error);
-            };
-        };
+            }
+        }
 
         // удаляем чаты с пользователем
         let delUserChats = document.querySelector('#deleteuserchats');
@@ -347,7 +272,7 @@ window.oncontextmenu = function (e) {
             if (press.key === 'Escape') {
                 document.querySelector('.ul-chat-user-menu').style.display = 'none';
                 e.target.classList.remove('div-chat-user-active');
-            };
+            }
         });
-    };
-};
+    }
+}

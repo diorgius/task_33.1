@@ -2,89 +2,65 @@
 
 namespace App\core;
 
-use stdClass;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class Messenger implements MessageComponentInterface
 {
-    protected $clients = [];
-    protected $usersId;
-
+    protected $clients;
+    protected $userId;
     public function __construct()
     {
-        // $this->users = new stdClass();
-        // $this->clients = new \SplObjectStorage();
+        $this->clients = new \SplObjectStorage();
         echo "WebSocket Server started\n";
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        // $this->clients->attach($conn);
-        $this->clients[$conn->resourceId] = $conn;
-        $message = json_encode(['onconnection' => $conn->resourceId]);
+        $this->clients->attach($conn);
+        $message = json_encode(['connectId' => $conn->resourceId]);
         $conn->send($message);
-        // $this->usersInfo[$conn->resourceId] = [
-        //     'id' => $userId,
-        //     'connection' => $conn,
-        //     // 'rooms' => [],
-        //     // 'metadata' => []
-        // ];
-
-        // Send welcome message
-        // $conn->send(json_encode([
-        //     'type' => 'welcome',
-        //     'client_id' => $clientId,
-        //     'timestamp' => time()
-        // ]));
-        var_dump($this->clients);
         echo "New connection! ({$conn->resourceId})\n";
     }
 
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $message)
     {
-
-        $data = json_decode($msg, true);
-        // $this->users->usersId;
-
-        if ($data['command'] === 'register') {
-            // добавлять еще и resourceId???
-            $this->usersId['contactsId'][] = $data['userId'];
-            // $conn->send( $message);
-        } elseif ($data['command'] === 'message') {
-            echo $data['to'];
-            echo $data['textMessage'];
+        $data = json_decode($message, true);
+        $this->clients->userId[$from->resourceId] = $data['userId'];
+        switch ($data['command']) {
+            case 'connect':
+                $this->sendGreetingMessage($from, $data);
+                break;
+            case 'message':
+                echo $data['to'];
+                echo $data['textMessage'];
+                //$this->sendPrivateMessage($from, $data['to'] ?? '', $data['textMessage'] ?? '');
+                break;
         }
 
         var_dump($from);
-        var_dump($this->usersId);
         var_dump($this->clients);
-        var_dump($data);
-
-
-        // $this->sendPrivateMessage($from, $data['to'] ?? '', $data['textMessage'] ?? '');
-
-
-        // рассылка всем подключенным клиентам
-        // $this->clients->attach($from);
-        // $numRecv = count($this->clients) - 1;
-        // echo sprintf(
-        //     'Connection %d sending message "%s" to %d other connection%s' . "\n"
-        //     ,
-        //     $from->resourceId,
-        //     $msg,
-        //     $numRecv,
-        //     $numRecv == 1 ? '' : 's'
-        // );
-
-        // foreach ($this->clients as $client) {
-        //     if ($from !== $client) {
-        //         $client->send($msg);
-        //     }
-        // }
     }
 
-    protected function sendPrivateMessage(ConnectionInterface $from, string $toClientId, string $message) {
+    protected function sendGreetingMessage(ConnectionInterface $from, $data)
+    {
+        $connectedUsers = [];
+        foreach ($this->clients as $client) {
+            $connectedUsers[$client->resourceId] = $this->clients->userId[$client->resourceId];
+            // var_dump($client);
+        }
+        $data['connectedUsers'] = $connectedUsers;
+        $data['connectId'] = (string) $from->resourceId;
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            // if ($from !== $client) {
+                $client->send($message);
+            // }
+        }
+    }
+
+    protected function sendPrivateMessage(ConnectionInterface $from, string $toClientId, string $message)
+    {
         $fromInfo = $this->clientInfo[$from->resourceId];
         $toConn = null;
 
@@ -107,7 +83,22 @@ class Messenger implements MessageComponentInterface
     }
 
     public function onClose(ConnectionInterface $conn)
-    {
+    {   
+        
+        $userId = $this->clients->userId[$conn->resourceId];
+        $data = [
+            'command' => 'disconnect',
+            'userId' => $userId,
+            'connectId' => (string) $conn->resourceId
+        ];
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            if ($conn->resourceId !== $client->resourceId) {
+                $client->send($message);
+            }
+        }
+        unset($this->clients->userId[$conn->resourceId]);
+        unset($connectedUsers[$client->resourceId]);
         $this->clients->detach($conn);
         echo "Connection {$conn->resourceId} has disconnected\n";
     }

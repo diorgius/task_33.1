@@ -5,6 +5,7 @@
         <button class="btn-admin-action" onclick="location.href='/admin'">Страница администрирования</button>
         <?php phpinfo(); ?>
     <?php else: ?>
+        <input type="text" id="userid" hidden value="<?= $userId ?>">
 
         <aside class="sidebar-left">
 
@@ -65,8 +66,6 @@
 
         <section class="section-main-window" id="mainwindow">
 
-            <input type="text" id="userid" hidden value="<?= $userId ?>">
-
             <!-- <div class="div-seach-users">
                 <input class="input-search-users" type="text" id="searchusers" name="searchusers" />
             </div> -->
@@ -84,5 +83,7 @@
             </div>
 
         </section>
+        <script defer src="../../js/messenger.js"></script>
     <?php endif; ?>
 <?php endif; ?>
+
