@@ -298,25 +298,6 @@
     outline: none;
 }
 
-
-.img-message-send {
-    margin-top: .5rem;
-    padding: .3rem;
-    cursor: pointer;
-}
-
-.img-message-send:hover {
-    border: .1rem solid #007bff;
-    border-radius: .2rem;
-    outline: none;
-}
-
-.img-message-send:focus {
-    border: .1rem solid #cccccc;
-    border-radius: .2rem;
-    outline: none;
-}
-
 .div-chat-user-without-notice {
     background-color: #eeeeee;
 }
