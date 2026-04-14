@@ -48,16 +48,34 @@ WS.onmessage = (e) => {
             // let userConnectedId = data.connectedUsers[parseInt(data.connectId)];
             // console.log('userConnectedId - ' + userConnectedId);
             // document.getElementById(userConnectedId).classList.add('div-chat-user-onchat');
-            counter = 0;
-            
-            for (let user in data.connectedUsers) {
-                console.log("key - " + user + " value - " + data.connectedUsers[user]);
-                counter++;
-                if (data.connectedUsers[user] !== data.userId) {
-                    document.getElementById(data.connectedUsers[user]).classList.add('div-chat-user-onchat');
+
+            // Object.keys(data.connectedUsers).forEach(key => {
+            //     console.log(`${key}: ${data.connectedUsers[key]}`)
+            // })
+
+            Object.values(data.connectedUsers).forEach(value => {
+                if (value !== USER_ID) {
+                    console.log('Условие выполняется');
+                    console.log(typeof value + ' - ' + value);
+                    console.log(typeof data.userId + ' - ' + data.userId);
+                    console.log(document.getElementById(value));
+                    document.getElementById(value).classList.add('div-chat-user-onchat');
+                } else {
+                    console.log('Условие невыполняется');
+                    console.log(typeof value + ' - ' + value);
+                    console.log(typeof data.userId + ' - ' + data.userId);
                 }
-            }
-            console.log(counter);
+            })
+
+            // counter = 0;
+            // for (let user in data.connectedUsers) {
+            //     console.log("key - " + user + " value - " + data.connectedUsers[user]);
+            //     counter++;
+            //     if (data.connectedUsers[user] !== data.userId) {
+            //         document.getElementById(data.connectedUsers[user]).classList.add('div-chat-user-onchat');
+            //     }
+            // }
+            // console.log(counter);
             break;
         case 'message':
             break;
