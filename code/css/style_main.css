@@ -305,3 +305,7 @@
 .div-chat-user-onchat {
     background-color: #cef1ff;
 }
+
+.div-chat-user-onmessage {
+    background-color: #fcffce;
+}

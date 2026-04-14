@@ -1,6 +1,5 @@
 const USER_ID = document.querySelector('#userid').value;
 const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
-// const OBJECT_CONNECTED_USERS = new Map();
 let connectedUsers = '';
 
 // открываем соединение websocket
@@ -26,12 +25,9 @@ WS.onclose = (e) => {
 
 WS.onmessage = (e) => {
     let data = JSON.parse(e.data);
-    console.log('Received:', data);
+    // console.log('Received:', data);
     switch (data.command) {
         case 'connect':
-            // OBJECT_CONNECTED_USERS.set(data.connectId, data);
-            // OBJECT_CONNECTED_USERS.set(data.userId, data.connectedUsers);
-            // console.log(OBJECT_CONNECTED_USERS);
             if (data.userId !== USER_ID) {
                 let pAlert = document.createElement('p');
                 pAlert.setAttribute('id', 'alert');
@@ -43,7 +39,7 @@ WS.onmessage = (e) => {
                     pAlert.remove(), 3000
                 );
             }
-            console.log(data.connectedUsers);
+            // console.log(data.connectedUsers);
             connectedUsers = data.connectedUsers;
             Object.values(data.connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
@@ -53,30 +49,37 @@ WS.onmessage = (e) => {
             break;
         case 'privateMessage':
             console.log(data);
-
-            if (!document.querySelector('#divusermessages')) {
-                console.log(document.querySelector('#divusermessages'));
+            if (document.querySelector('.div-user-messages')) {
+                if (document.querySelector('.div-user-messages').id === data.sendNickname) {
+                    console.log(document.querySelector('.div-user-messages').id)
+                    let divUserMessages = document.querySelector('#' + data.sendNickname);
+                    let divMessage = document.createElement('div');
+                    divMessage.classList.add('div-accept-message');
+                    divMessage.setAttribute('id', 'divacceptmessage');
+                    divMessage.textContent = data.textMessage;
+                    divUserMessages.appendChild(divMessage);
+                } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
+                    console.log(document.querySelector('.div-user-messages').id);
+                    console.log(data.sendNickname)
+                    document.getElementById(data.sendUserId).classList.add('div-chat-user-onmessage');
+                }
+            } else {
                 let divUserMessages = document.createElement('div');
                 divUserMessages.classList.add('div-user-messages');
-                divUserMessages.setAttribute('id', 'divusermessages');
+                divUserMessages.setAttribute('id', data.sendNickname);
                 divUserMessages.textContent = `Чат с пользователем ${data.sendNickname}`;
                 MAIN_WINDOW.appendChild(divUserMessages);
+                let divMessage = document.createElement('div');
+                divMessage.classList.add('div-accept-message');
+                divMessage.setAttribute('id', 'divacceptmessage');
+                divMessage.textContent = data.textMessage;
+                divUserMessages.appendChild(divMessage);                
                 document.getElementById(data.sendUserId).click();
             }
-
-            let divUserMessages = document.querySelector('#divusermessages');
-            let divMessage = document.createElement('div');
-            divMessage.classList.add('div-accept-message');
-            divMessage.setAttribute('id', 'divacceptmessage');
-            divMessage.textContent = data.textMessage;
-            divUserMessages.appendChild(divMessage);
             break;
         case 'disconnect':
-            // OBJECT_CONNECTED_USERS.delete(data.connectId);
-            // OBJECT_CONNECTED_USERS.delete(data.userId);
-            // console.log(OBJECT_CONNECTED_USERS)
             delete connectedUsers[data.connectId];
-            console.log(connectedUsers)
+            // console.log(connectedUsers);
             let inactiveChatUser = document.getElementById(data.userId);
             inactiveChatUser.classList.remove('div-chat-user-onchat');
             break;
@@ -96,7 +99,7 @@ document.body.addEventListener('click', (e) => {
         e.target.classList.add('div-chat-user-active');
 
         if (!e.target.classList.contains('div-chat-user-onchat')) {
-            document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null;
+            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
             document.querySelector('.div-text-message').style.visibility = 'hidden';
             let pAlert = document.createElement('p');
             pAlert.setAttribute('id', 'alert');
@@ -108,25 +111,29 @@ document.body.addEventListener('click', (e) => {
                 pAlert.remove(), 2000
             );
         } else {
+            // document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
+            console.log(document.querySelector('.div-user-messages'));
+            if (!document.querySelector('.div-user-messages')) {
+                let divUserMessages = document.createElement('div');
+                divUserMessages.classList.add('div-user-messages');
+                divUserMessages.setAttribute('id', e.target.innerText);
+                MAIN_WINDOW.appendChild(divUserMessages);
+                divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`;
+                document.querySelector('.div-text-message').style.visibility = 'visible';
+                TEXT_AREA_MESSAGE.focus();
+            } else {
+                document.querySelector('.div-text-message').style.visibility = 'visible';
+                TEXT_AREA_MESSAGE.focus();
+            }
 
-            document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null;
-            let divUserMessages = document.createElement('div');
-            divUserMessages.classList.add('div-user-messages');
-            divUserMessages.setAttribute('id', 'divusermessages');
-            MAIN_WINDOW.appendChild(divUserMessages);
-            divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`;
-            document.querySelector('.div-text-message').style.visibility = 'visible';
-            TEXT_AREA_MESSAGE.focus();
-
-            console.log(connectedUsers);
+            // console.log(connectedUsers);
 
             const MESSAGE_SEND = document.querySelector('#messagesend');
             MESSAGE_SEND.addEventListener('click', () => {
                 let textMessage = TEXT_AREA_MESSAGE.value;
                 TEXT_AREA_MESSAGE.value = '';
-                // console.log(OBJECT_CONNECTED_USERS.get(e.target.id))
                 to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
-                console.log(to)
+                // console.log(to)
                 message = JSON.stringify({
                     command: 'privateMessage',
                     to: to,

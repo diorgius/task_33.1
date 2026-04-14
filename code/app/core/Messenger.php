@@ -59,13 +59,12 @@ class Messenger implements MessageComponentInterface
         // var_dump($from);
         // var_dump($data);
         // var_dump($this->clients);
-        
         // echo $data['to'];
         // echo $data['textMessage'];
+
         $data['from'] = (string) $from->resourceId;
         $message = json_encode($data);
         foreach ($this->clients as $client) {
-            var_dump($client);
             if ($client->resourceId === intval($data['to'])) {
                 $client->send($message);
             }
