@@ -36,6 +36,8 @@ if (document.querySelector('#userid')) {
 // 7. выдавать звуковое оповещение о приходе сообщения
 //
 // 8. вкл/выкл оповещения и отображение этого
+//
+// 9. проверить выделение бордером при лвом кликом после кликов правой кнопкой
 
 
 // маштабируем текстовую область сообщений
@@ -174,7 +176,7 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
 }
 
 // обрабатываем меню по клику правой кнопки на пользователях чата
-window.oncontextmenu = function (e) {
+window.oncontextmenu = (e) => {
     if (e.target.classList.contains('div-chat-user')) {
         // console.log(e.target.id);
         e.preventDefault();

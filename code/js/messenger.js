@@ -39,8 +39,8 @@ WS.onmessage = (e) => {
                     pAlert.remove(), 3000
                 );
             }
-            // console.log(data.connectedUsers);
             connectedUsers = data.connectedUsers;
+            // console.log(connectedUsers);
             Object.values(data.connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
                     document.getElementById(value).classList.add('div-chat-user-onchat');
@@ -48,10 +48,10 @@ WS.onmessage = (e) => {
             })
             break;
         case 'privateMessage':
-            console.log(data);
+            // console.log(data);
             if (document.querySelector('.div-user-messages')) {
                 if (document.querySelector('.div-user-messages').id === data.sendNickname) {
-                    console.log(document.querySelector('.div-user-messages').id)
+                    // console.log(document.querySelector('.div-user-messages').id)
                     let divUserMessages = document.querySelector('#' + data.sendNickname);
                     let divMessage = document.createElement('div');
                     divMessage.classList.add('div-accept-message');
@@ -59,8 +59,8 @@ WS.onmessage = (e) => {
                     divMessage.textContent = data.textMessage;
                     divUserMessages.appendChild(divMessage);
                 } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
-                    console.log(document.querySelector('.div-user-messages').id);
-                    console.log(data.sendNickname)
+                    // console.log(document.querySelector('.div-user-messages').id);
+                    // console.log(data.sendNickname)
                     document.getElementById(data.sendUserId).classList.add('div-chat-user-onmessage');
                 }
             } else {
@@ -91,7 +91,7 @@ WS.onmessage = (e) => {
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку)
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
-        // console.log(e);
+        console.log(e);
 
         // добавляем/удаляем выделение элемента border
         let divChatUserActive = document.querySelector('.div-chat-user-active');
@@ -111,9 +111,9 @@ document.body.addEventListener('click', (e) => {
                 pAlert.remove(), 2000
             );
         } else {
-            // document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
-            console.log(document.querySelector('.div-user-messages'));
-            if (!document.querySelector('.div-user-messages')) {
+            if (!document.querySelector('.div-user-messages')|| document.querySelector('.div-user-messages').id !== e.target.innerText) {
+                document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
+                console.log(document.querySelector('.div-user-messages'));
                 let divUserMessages = document.createElement('div');
                 divUserMessages.classList.add('div-user-messages');
                 divUserMessages.setAttribute('id', e.target.innerText);
@@ -129,8 +129,10 @@ document.body.addEventListener('click', (e) => {
             // console.log(connectedUsers);
 
             const MESSAGE_SEND = document.querySelector('#messagesend');
-            MESSAGE_SEND.addEventListener('click', () => {
+            console.log(MESSAGE_SEND);
+            MESSAGE_SEND.onclick = () => {
                 let textMessage = TEXT_AREA_MESSAGE.value;
+                // проверить не пусто ли сообщение
                 TEXT_AREA_MESSAGE.value = '';
                 to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
                 // console.log(to)
@@ -143,12 +145,13 @@ document.body.addEventListener('click', (e) => {
                     textMessage: textMessage
                 });
                 WS.send(message);
+                let divUserMessages = document.querySelector('#' + e.target.innerText);
                 let divMessage = document.createElement('div');
                 divMessage.classList.add('div-send-message');
                 divMessage.setAttribute('id', 'divsendmessage');
                 divMessage.textContent = textMessage;
                 divUserMessages.appendChild(divMessage);
-            });
+            }
         }
     }
 });

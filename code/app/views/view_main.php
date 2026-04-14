@@ -79,7 +79,10 @@
             <div class="div-text-message">
                 <textarea class="textarea-text-message" type="text" id="textmessage" name="textmessage"
                     placeholder="Ваше сообщение..."></textarea>&nbsp&nbsp
-                <a class="a-message-send" id="messagesend" href="#"><img class="img-message-send" src="../img/send.png" alt="Отправить"></a>
+                <div id="messagesend">
+                    <img class="img-message-send" src="../img/send.png" alt="Отправить">
+                </div>
+                    <!-- <a class="a-message-send" id="messagesend" href=""><img class="img-message-send" src="../img/send.png" alt="Отправить"></a> -->
             </div>
 
         </section>
