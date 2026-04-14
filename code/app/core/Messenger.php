@@ -9,6 +9,8 @@ class Messenger implements MessageComponentInterface
 {
     protected $clients;
     protected $userId;
+    protected $connectedUsers;
+
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
@@ -17,7 +19,7 @@ class Messenger implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
+        $this->clients->offsetSet($conn);
         $message = json_encode(['connectId' => $conn->resourceId]);
         $conn->send($message);
         echo "New connection! ({$conn->resourceId})\n";
@@ -26,80 +28,77 @@ class Messenger implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $message)
     {
         $data = json_decode($message, true);
-        $this->clients->userId[$from->resourceId] = $data['userId'];
+
         switch ($data['command']) {
             case 'connect':
+                $this->clients->userId[$from->resourceId] = $data['userId'];
                 $this->sendGreetingMessage($from, $data);
                 break;
-            case 'message':
-                echo $data['to'];
-                echo $data['textMessage'];
-                //$this->sendPrivateMessage($from, $data['to'] ?? '', $data['textMessage'] ?? '');
+            case 'privateMessage':
+                $this->sendPrivateMessage($from, $data);
                 break;
         }
-
-        var_dump($from);
-        var_dump($this->clients);
     }
 
     protected function sendGreetingMessage(ConnectionInterface $from, $data)
     {
-        $connectedUsers = [];
+        $this->connectedUsers = [];
         foreach ($this->clients as $client) {
-            $connectedUsers[$client->resourceId] = $this->clients->userId[$client->resourceId];
-            // var_dump($client);
+            $this->connectedUsers[$client->resourceId] = $this->clients->userId[$client->resourceId];
         }
-        $data['connectedUsers'] = $connectedUsers;
+        $data['connectedUsers'] = $this->connectedUsers;
         $data['connectId'] = (string) $from->resourceId;
         $message = json_encode($data);
         foreach ($this->clients as $client) {
-            // if ($from !== $client) {
-                $client->send($message);
-            // }
+            $client->send($message);
         }
     }
 
-    protected function sendPrivateMessage(ConnectionInterface $from, string $toClientId, string $message)
+    protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
-        $fromInfo = $this->clientInfo[$from->resourceId];
-        $toConn = null;
-
-        // Find recipient connection
-        foreach ($this->usersInfo as $info) {
-            if ($info['id'] === $toClientId) {
-                $toConn = $info['connection'];
-                break;
+        // var_dump($from);
+        // var_dump($data);
+        // var_dump($this->clients);
+        
+        // echo $data['to'];
+        // echo $data['textMessage'];
+        $data['from'] = (string) $from->resourceId;
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            var_dump($client);
+            if ($client->resourceId === intval($data['to'])) {
+                $client->send($message);
             }
         }
 
-        $toConn->send(json_encode([
-            'type' => 'private_message',
-            'from' => $fromInfo['id'],
-            'message' => $message,
-            'timestamp' => time()
-        ]));
 
-        echo "Private message from {$fromInfo['id']} to {$toClientId}\n";
+        // делаем запись в базу
+
+
+        echo "Private message from {$from->resourceId} to {$data['to']}\n";
     }
 
     public function onClose(ConnectionInterface $conn)
-    {   
-        
+    {
+
         $userId = $this->clients->userId[$conn->resourceId];
+
         $data = [
             'command' => 'disconnect',
             'userId' => $userId,
-            'connectId' => (string) $conn->resourceId
+            'connectId' => (string) $conn->resourceId,
         ];
         $message = json_encode($data);
+
         foreach ($this->clients as $client) {
             if ($conn->resourceId !== $client->resourceId) {
                 $client->send($message);
             }
         }
+
         unset($this->clients->userId[$conn->resourceId]);
-        unset($connectedUsers[$client->resourceId]);
-        $this->clients->detach($conn);
+        unset($this->connectedUsers[$client->resourceId]);
+        $this->clients->offsetUnset($conn);
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
 

@@ -1,6 +1,7 @@
 const USER_ID = document.querySelector('#userid').value;
-const USER_NICKMAME = document.querySelector('.p-nickname').innerText;
-const OBJECT_CONNECTED_USERS = new Map();
+const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
+// const OBJECT_CONNECTED_USERS = new Map();
+let connectedUsers = '';
 
 // открываем соединение websocket
 const WS = new WebSocket("WS://localhost:8080/");
@@ -11,7 +12,7 @@ WS.onopen = () => {
     WS.send(JSON.stringify({
         command: 'connect',
         userId: USER_ID,
-        nickname: USER_NICKMAME
+        nickname: USER_NICKNAME
     }))
 }
 
@@ -28,8 +29,9 @@ WS.onmessage = (e) => {
     console.log('Received:', data);
     switch (data.command) {
         case 'connect':
-            OBJECT_CONNECTED_USERS.set(data.connectId, data);
-            console.log(OBJECT_CONNECTED_USERS);
+            // OBJECT_CONNECTED_USERS.set(data.connectId, data);
+            // OBJECT_CONNECTED_USERS.set(data.userId, data.connectedUsers);
+            // console.log(OBJECT_CONNECTED_USERS);
             if (data.userId !== USER_ID) {
                 let pAlert = document.createElement('p');
                 pAlert.setAttribute('id', 'alert');
@@ -41,68 +43,44 @@ WS.onmessage = (e) => {
                     pAlert.remove(), 3000
                 );
             }
-            
-            // let activeChatUser = document.getElementById(data.userId);
             console.log(data.connectedUsers);
-            // console.log(data.connectedUsers[parseInt(data.connectId)]);
-            // let userConnectedId = data.connectedUsers[parseInt(data.connectId)];
-            // console.log('userConnectedId - ' + userConnectedId);
-            // document.getElementById(userConnectedId).classList.add('div-chat-user-onchat');
-
-            // Object.keys(data.connectedUsers).forEach(key => {
-            //     console.log(`${key}: ${data.connectedUsers[key]}`)
-            // })
-
+            connectedUsers = data.connectedUsers;
             Object.values(data.connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
-                    console.log('Условие выполняется');
-                    console.log(typeof value + ' - ' + value);
-                    console.log(typeof data.userId + ' - ' + data.userId);
-                    console.log(document.getElementById(value));
                     document.getElementById(value).classList.add('div-chat-user-onchat');
-                } else {
-                    console.log('Условие невыполняется');
-                    console.log(typeof value + ' - ' + value);
-                    console.log(typeof data.userId + ' - ' + data.userId);
                 }
             })
-
-            // counter = 0;
-            // for (let user in data.connectedUsers) {
-            //     console.log("key - " + user + " value - " + data.connectedUsers[user]);
-            //     counter++;
-            //     if (data.connectedUsers[user] !== data.userId) {
-            //         document.getElementById(data.connectedUsers[user]).classList.add('div-chat-user-onchat');
-            //     }
-            // }
-            // console.log(counter);
             break;
-        case 'message':
+        case 'privateMessage':
+            console.log(data);
+
+            if (!document.querySelector('#divusermessages')) {
+                console.log(document.querySelector('#divusermessages'));
+                let divUserMessages = document.createElement('div');
+                divUserMessages.classList.add('div-user-messages');
+                divUserMessages.setAttribute('id', 'divusermessages');
+                divUserMessages.textContent = `Чат с пользователем ${data.sendNickname}`;
+                MAIN_WINDOW.appendChild(divUserMessages);
+                document.getElementById(data.sendUserId).click();
+            }
+
+            let divUserMessages = document.querySelector('#divusermessages');
+            let divMessage = document.createElement('div');
+            divMessage.classList.add('div-accept-message');
+            divMessage.setAttribute('id', 'divacceptmessage');
+            divMessage.textContent = data.textMessage;
+            divUserMessages.appendChild(divMessage);
             break;
         case 'disconnect':
-            OBJECT_CONNECTED_USERS.delete(data.connectId);
+            // OBJECT_CONNECTED_USERS.delete(data.connectId);
+            // OBJECT_CONNECTED_USERS.delete(data.userId);
             // console.log(OBJECT_CONNECTED_USERS)
+            delete connectedUsers[data.connectId];
+            console.log(connectedUsers)
             let inactiveChatUser = document.getElementById(data.userId);
             inactiveChatUser.classList.remove('div-chat-user-onchat');
             break;
     }
-
-    // if (!document.querySelector('#divusermessages')) {
-    //     console.log(document.querySelector('#divusermessages'));
-    //     let divUserMessages = document.createElement('div');
-    //     divUserMessages.classList.add('div-user-messages');
-    //     divUserMessages.setAttribute('id', 'divusermessages');
-    //     divUserMessages.textContent = `Чат с пользователем ${data.contactNickname}`;
-    //     MAIN_WINDOW.appendChild(divUserMessages);
-    //     document.getElementById(`${data.contactId}`).click();
-    // }
-
-    // let divUserMessages = document.querySelector('#divusermessages');
-    // let divMessage = document.createElement('div');
-    // divMessage.classList.add('div-accept-message');
-    // divMessage.setAttribute('id', 'divacceptmessage');
-    // divMessage.textContent = data.textMessage;
-    // divUserMessages.appendChild(divMessage);
 }
 
 
@@ -117,32 +95,53 @@ document.body.addEventListener('click', (e) => {
         divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
         e.target.classList.add('div-chat-user-active');
 
-        document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null;
-        let divUserMessages = document.createElement('div');
-        divUserMessages.classList.add('div-user-messages');
-        divUserMessages.setAttribute('id', 'divusermessages');
-        MAIN_WINDOW.appendChild(divUserMessages);
-        divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`;
-        document.querySelector('.div-text-message').style.visibility = 'visible';
-        TEXT_AREA_MESSAGE.focus();
+        if (!e.target.classList.contains('div-chat-user-onchat')) {
+            document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null;
+            document.querySelector('.div-text-message').style.visibility = 'hidden';
+            let pAlert = document.createElement('p');
+            pAlert.setAttribute('id', 'alert');
+            DIV_ALERT.appendChild(pAlert);
+            pAlert.textContent = `Пользователь не в чате`;
 
-        const MESSAGE_SEND = document.querySelector('#messagesend');
-        MESSAGE_SEND.addEventListener('click', () => {
-            let nickname = document.querySelector('.p-nickname').innerText;
-            let textMessage = TEXT_AREA_MESSAGE.value;
-            TEXT_AREA_MESSAGE.value = '';
-            message = JSON.stringify({
-                'to': `${e.target.id}`,
-                'contactId': USER_ID,
-                'contactNickname': nickname,
-                'textMessage': textMessage
+            // убираем надпись по таймеру (2 секунды)
+            setTimeout(() =>
+                pAlert.remove(), 2000
+            );
+        } else {
+
+            document.querySelector('#divusermessages') ? document.querySelector('#divusermessages').remove() : null;
+            let divUserMessages = document.createElement('div');
+            divUserMessages.classList.add('div-user-messages');
+            divUserMessages.setAttribute('id', 'divusermessages');
+            MAIN_WINDOW.appendChild(divUserMessages);
+            divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`;
+            document.querySelector('.div-text-message').style.visibility = 'visible';
+            TEXT_AREA_MESSAGE.focus();
+
+            console.log(connectedUsers);
+
+            const MESSAGE_SEND = document.querySelector('#messagesend');
+            MESSAGE_SEND.addEventListener('click', () => {
+                let textMessage = TEXT_AREA_MESSAGE.value;
+                TEXT_AREA_MESSAGE.value = '';
+                // console.log(OBJECT_CONNECTED_USERS.get(e.target.id))
+                to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
+                console.log(to)
+                message = JSON.stringify({
+                    command: 'privateMessage',
+                    to: to,
+                    acceptUserId: e.target.id,
+                    sendUserId: USER_ID,
+                    sendNickname: USER_NICKNAME,
+                    textMessage: textMessage
+                });
+                WS.send(message);
+                let divMessage = document.createElement('div');
+                divMessage.classList.add('div-send-message');
+                divMessage.setAttribute('id', 'divsendmessage');
+                divMessage.textContent = textMessage;
+                divUserMessages.appendChild(divMessage);
             });
-            WS.send(message);
-            let divMessage = document.createElement('div');
-            divMessage.classList.add('div-send-message');
-            divMessage.setAttribute('id', 'divsendmessage');
-            divMessage.textContent = textMessage;
-            divUserMessages.appendChild(divMessage);
-        });
+        }
     }
 });
