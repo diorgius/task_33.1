@@ -33,6 +33,9 @@ if (document.querySelector('#userid')) {
 //
 // 6. при активации пользователя загружать из базы ранние сообщения от этого пользователя
 //
+// 6.1 при получение сообщения от другого пользователя когда открыт чат, при активации также загружать 
+// направленные ему сообщения
+//
 // 7. выдавать звуковое оповещение о приходе сообщения
 //
 // 8. вкл/выкл оповещения и отображение этого
@@ -61,6 +64,8 @@ if (BUTTON_ADD_USER) {
             BUTTON_ADD_USER.textContent = 'Добавить пользователей';
             document.querySelector('#divaddusers').remove();
         } else {
+            // если есть открытый чат - убираем его
+            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
             BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
             data = { action: 'getAllUsers' };
             try {
@@ -121,7 +126,6 @@ if (BUTTON_ADD_USER) {
 // добавляем пользователя в список своих контактов
 async function addUser(userId, contactUserId, email, nickname, avatar, hideemail) {
     if (!document.getElementById(contactUserId)) {
-
         // отправляем данные на бэкенд для записи в базу
         data = {
             action: 'createContact',
@@ -166,15 +170,8 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
             console.log('Ошибка: ', error);
         }
     } else {
-        let pAlert = document.createElement('p');
-        pAlert.setAttribute('id', 'alert');
-        DIV_ALERT.appendChild(pAlert);
-        pAlert.textContent = 'Пользователь ' + nickname + ' уже в списке чатов';
-
-        // убираем надпись по таймеру (2 секунды)
-        setTimeout(() =>
-            pAlert.remove(), 2000
-        );
+        // выводим сообщение, что данный пользователь уже в списке чатов
+        alertMessage(`Пользователь ${nickname ? nickname : email}  уже в списке чатов`);
     }
 }
 
@@ -183,7 +180,6 @@ window.oncontextmenu = (e) => {
     if (e.target.classList.contains('div-chat-user')) {
         // console.log(e.target.id);
         e.preventDefault();
-
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-user-menu');
         CHAT_USER_MENU.style.display = 'block';
@@ -225,8 +221,7 @@ window.oncontextmenu = (e) => {
         // удаляем пользователя из списка чатов
         let delChatUser = document.querySelector('#deletechatuser');
         delChatUser.onclick = async () => {
-            // console.log(e.target.id);
-
+            // console.log(e);
             // отправляем данные на бэкенд для удаления из базы
             data = {
                 action: 'deleteContact',
@@ -243,17 +238,10 @@ window.oncontextmenu = (e) => {
                 });
                 let result = await response.text();
                 // console.log('Успех: ', result);
-                let nickname = e.target.lastElementChild.lastElementChild.innerHTML;
+                let nickname = e.target.innerText;
                 document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
-                let pAlert = document.createElement('p');
-                pAlert.setAttribute('id', 'alert');
-                DIV_ALERT.appendChild(pAlert);
-                pAlert.textContent = `Пользователь ${nickname} удален из списка чатов`;
-
-                // убираем надпись по таймеру (2 секунды)
-                setTimeout(() =>
-                    pAlert.remove(), 2000
-                );
+                // выводим сообщение, что данный пользователь удален из списка чатов
+                alertMessage(`Пользователь ${nickname} удален из списка чатов`);
             } catch (error) {
                 console.log('Ошибка: ', error);
             }

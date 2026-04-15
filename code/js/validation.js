@@ -12,42 +12,36 @@ const INPUT_FILE_AVATAR = document.querySelector('#fileavatar');
 
 if (INPUTE_MAIL) {
     INPUTE_MAIL.addEventListener('change', (e) => {
-        if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
 }
 
 if (INPUT_PASSWORD) {
     INPUT_PASSWORD.addEventListener('change', (e) => {
-        if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
 }
 
 if (INPUT_PASSWORD_AGAIN) {
     INPUT_PASSWORD_AGAIN.addEventListener('change', (e) => {
-        if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
 }
 
 if (INPUT_HIDE_EMAIL) {
     INPUT_HIDE_EMAIL.addEventListener('change', (e) => {
-        if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
 }
 
 if (INPUT_NICKNAME) {
     INPUT_NICKNAME.addEventListener('change', (e) => {
-        if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
 }
 
 if (INPUT_FILE_AVATAR) {
     INPUT_FILE_AVATAR.addEventListener('change', (e) => {
-        if (document.querySelector('#alert')) document.querySelector('#alert').remove();
         validation(e);
     });
 }
@@ -60,11 +54,8 @@ async function validation(e) {
         const emailregexp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailregexp.test(email)) {
             INPUTE_MAIL.classList.add('wrong-data');
-            let pAlert = document.createElement('p');
-            pAlert.setAttribute('id', 'alert');
-            BUTTON_SEND.setAttribute('disabled', '');
-            DIV_ALERT.appendChild(pAlert);
-            pAlert.textContent = 'Email не валидный';
+            // выводим сообщение о не соответствии введенных данных
+            alertMessage('Email не валидный');
         } else {
             INPUTE_MAIL.classList.remove('wrong-data');
             BUTTON_SEND.removeAttribute('disabled');
@@ -83,11 +74,8 @@ async function validation(e) {
                 // console.log('Успех: ', result);
                 if (result) {
                     INPUTE_MAIL.classList.add('wrong-data');
-                    pAlert = document.createElement('p');
-                    pAlert.setAttribute('id', 'alert');
-                    BUTTON_SEND.setAttribute('disabled', '');
-                    DIV_ALERT.appendChild(pAlert);
-                    pAlert.textContent = result;
+                    // выводим сообщение о не соответствии введенных данных
+                    alertMessage(result);
                 } else {
                     INPUTE_MAIL.classList.remove('wrong-data');
                     BUTTON_SEND.removeAttribute('disabled');
@@ -103,11 +91,8 @@ async function validation(e) {
         if (pass.length < 8 || pass.length > 20) {
             INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #ff0000');
             // INPUT_PASSWORD.classList.add('wrong-data');
-            let pAlert = document.createElement('p');
-            pAlert.setAttribute('id', 'alert');
-            BUTTON_SEND.setAttribute('disabled', '');
-            DIV_ALERT.appendChild(pAlert);
-            pAlert.textContent = 'Пароль меньше 8 символов или больше 20';
+            // выводим сообщение о не соответствии введенных данных
+            alertMessage('Пароль меньше 8 символов или больше 20');
         } else {
             INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #007bff');
             // INPUT_PASSWORD.classList.remove('wrong-data');
@@ -119,11 +104,8 @@ async function validation(e) {
         // проверяем совпадение пароля
         if (pass !== passagain) {
             INPUT_PASSWORD_AGAIN.classList.add('wrong-data');
-            let pAlert = document.createElement('p');
-            pAlert.setAttribute('id', 'alert');
-            BUTTON_SEND.setAttribute('disabled', '');
-            DIV_ALERT.appendChild(pAlert);
-            pAlert.textContent = 'Пароли не совпадают';
+            // выводим сообщение о не соответствии введенных данных
+            alertMessage('Пароли не совпадают');
         } else {
             INPUT_PASSWORD_AGAIN.classList.remove('wrong-data');
             BUTTON_SEND.removeAttribute('disabled');
@@ -134,11 +116,8 @@ async function validation(e) {
         if (e.target.checked) {
             if (!INPUT_NICKNAME.value) {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
-                let pAlert = document.createElement('p');
-                pAlert.setAttribute('id', 'alert');
-                BUTTON_SEND.setAttribute('disabled', '');
-                DIV_ALERT.appendChild(pAlert);
-                pAlert.textContent = 'Для скрытия email введите nickname';
+                // выводим сообщение о не соответствии введенных данных
+                alertMessage('Для скрытия email введите nickname');
             } else {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff');
                 BUTTON_SEND.removeAttribute('disabled');
@@ -156,11 +135,8 @@ async function validation(e) {
             // проверяем nickname на кириллицу
             if (nickname.match(/[А-яЁё]/)) {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
-                let pAlert = document.createElement('p');
-                pAlert.setAttribute('id', 'alert');
-                BUTTON_SEND.setAttribute('disabled', '');
-                DIV_ALERT.appendChild(pAlert);
-                pAlert.textContent = 'Nickname не должен содержать кириллицу';
+                // выводим сообщение о не соответствии введенных данных
+                alertMessage('Nickname не должен содержать кириллицу');
             } else {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff');
                 BUTTON_SEND.removeAttribute('disabled');
@@ -185,11 +161,8 @@ async function validation(e) {
                         // и на поле ввода пароля тоже пришлось изменить, потому-что на форме редактирования это поле тоже есть,
                         // хотя на форме регистрации все отрабатывается
                         INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
-                        let pAlert = document.createElement('p');
-                        pAlert.setAttribute('id', 'alert');
-                        BUTTON_SEND.setAttribute('disabled', '');
-                        DIV_ALERT.appendChild(pAlert);
-                        pAlert.textContent = result;
+                        // выводим сообщение о не соответствии введенных данных
+                        alertMessage(result);
                     } else {
                         // убираем стиль
                         INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff');
@@ -202,24 +175,16 @@ async function validation(e) {
         }
     } else if (e.target.id === 'fileavatar') {
         fileavatar = e.target.files[0].name;
-
         // проверяем размер файла 
         if (e.target.files[0].size > FILE_SIZE) {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #ff0000');
-            let pAlert = document.createElement('p');
-            pAlert.setAttribute('id', 'alert');
-            BUTTON_SEND.setAttribute('disabled', '');
-            DIV_ALERT.appendChild(pAlert);
-            pAlert.textContent = 'Файл больше возможного для загрузки размера';
-
+            // выводим сообщение о не соответствии введенных данных
+            alertMessage('Файл больше возможного для загрузки размера');
         // проверяем тип файла
         } else if (!FILE_TYPE.includes(e.target.files[0].type)) {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #ff0000');
-            let pAlert = document.createElement('p');
-            pAlert.setAttribute('id', 'alert');
-            BUTTON_SEND.setAttribute('disabled', '');
-            DIV_ALERT.appendChild(pAlert);
-            pAlert.textContent = 'Неподдерживаемый тип изображения';
+            // выводим сообщение о не соответствии введенных данных
+            alertMessage('Неподдерживаемый тип изображения');
         } else {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #007bff');
             BUTTON_SEND.removeAttribute('disabled');

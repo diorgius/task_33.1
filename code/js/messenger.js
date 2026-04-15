@@ -58,15 +58,7 @@ WS.onmessage = (e) => {
             } else {
                 // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
                 createDivUserMessages(data.sendNickname);
-                // let divUserMessages = document.createElement('div');
-                // divUserMessages.classList.add('div-user-messages');
-                // divUserMessages.setAttribute('id', data.sendNickname);
-                // divUserMessages.textContent = `Чат с пользователем ${data.sendNickname}`;
-                // MAIN_WINDOW.appendChild(divUserMessages);
-
-                // ??? если создавать див через функцию, то следующая функция не видит див
-                // надо наверно его найти через queryselector
-
+                let divUserMessages = document.querySelector('#' + data.sendNickname);
                 // выводим принятое сообщение
                 outputMessage(divUserMessages, 'accept', data.textMessage);
                 // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
@@ -97,7 +89,7 @@ document.body.addEventListener('click', (e) => {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
             document.querySelector('.div-text-message').style.visibility = 'hidden';
             // выводим сообщение, что пользователь не в чате
-            alertMessage('Пользователь не в чате');
+            alertMessage(`Пользователь ${e.target.innerText} не в чате`);
         } else {
             // при клике на пользователе проверяем есть ли открытый чат или если это не чат 
             // с пользователем на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
@@ -105,14 +97,9 @@ document.body.addEventListener('click', (e) => {
                 document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
                 // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
                 createDivUserMessages(e.target.innerText);
-                // let divUserMessages = document.createElement('div');
-                // divUserMessages.classList.add('div-user-messages');
-                // divUserMessages.setAttribute('id', e.target.innerText);
-                // MAIN_WINDOW.appendChild(divUserMessages);
-                // divUserMessages.textContent = `Чат с пользователем ${e.target.innerText}`;
                 document.querySelector('.div-text-message').style.visibility = 'visible';
                 TEXT_AREA_MESSAGE.focus();
-                // если это чат тот же просто активируем поле ввода сообщения
+            // если это тот же чат просто активируем поле ввода сообщения
             } else {
                 document.querySelector('.div-text-message').style.visibility = 'visible';
                 TEXT_AREA_MESSAGE.focus();
@@ -144,33 +131,3 @@ document.body.addEventListener('click', (e) => {
         }
     }
 });
-
-// функция вывода сообщений
-function alertMessage(msg) {
-    let pAlert = document.createElement('p');
-    pAlert.setAttribute('id', 'alert');
-    DIV_ALERT.appendChild(pAlert);
-    pAlert.textContent = msg;
-    // убираем надпись по таймеру (2 секунды)
-    setTimeout(() =>
-        pAlert.remove(), 2000
-    );
-}
-
-// функция создания дива для отображения сообщений
-function createDivUserMessages(divId) {
-    let divUserMessages = document.createElement('div');
-    divUserMessages.classList.add('div-user-messages');
-    divUserMessages.setAttribute('id', divId);
-    MAIN_WINDOW.appendChild(divUserMessages);
-    divUserMessages.textContent = `Чат с пользователем ${divId}`;
-}
-
-// функция вывода сообщений
-function outputMessage(location, type, msg) {
-    let divMessage = document.createElement('div');
-    divMessage.classList.add(`div-${type}-message`);
-    divMessage.setAttribute('id', 'divsendmessage');
-    divMessage.textContent = msg;
-    location.appendChild(divMessage);
-}
