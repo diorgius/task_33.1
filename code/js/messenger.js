@@ -34,44 +34,57 @@ WS.onmessage = (e) => {
             // получаем список активных пользователей 
             connectedUsers = data.connectedUsers;
             // console.log(connectedUsers);
-            // выделяем присоединившегося пользователя цветом и даем возможность отправки сообщений этому пользователю
-            Object.values(data.connectedUsers).forEach(value => {
+            // проверяем есть ли у пользователя привоединившийся контакт и выделяем присоединившегося пользователя цветом 
+            // и даем возможность отправки сообщений этому пользователю
+            Object.values(connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
-                    document.getElementById(value).classList.add('div-chat-user-onchat');
+                    document.getElementById(value) ? document.getElementById(value).classList.add('div-chat-user-onchat') : null;
                 }
             })
             break;
         case 'privateMessage':
             // console.log(data);
-            // если есть открытый чат
-            if (document.querySelector('.div-user-messages')) {
-                // если открытый чат с пользователем от которого пришло сообщение, то выводим сообщение
-                if (document.querySelector('.div-user-messages').id === data.sendNickname) {
-                    let divUserMessages = document.querySelector('#' + data.sendNickname);
-                    // выводим принятое сообщение
-                    outputMessage(divUserMessages, 'accept', data.textMessage);
-                // если у пользователя открыт чат и приходит сообщение от другого пользователя, то выделяем пользователя цветом
-                } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
+            // проверяем отключено или нет оповещение для этого пользователя
+            if (!document.getElementById(data.sendUserId).classList.contains('div-chat-user-without-notice')) {
+                // если открыт список добавления пользователей, то выделяем пользователя цветом 
+                // (сообщаем, что от этого пользователя пришло сообщение)
+                if (document.querySelector('#divaddusers')) {
                     document.getElementById(data.sendUserId).classList.add('div-chat-user-onmessage');
+                } else {
+                    // проверяем если есть открытый чат
+                    if (document.querySelector('.div-user-messages')) {
+                        // проверяем если открытый чат с пользователем от которого пришло сообщение, то выводим сообщение
+                        if (document.querySelector('.div-user-messages').id === data.sendNickname) {
+                            let divUserMessages = document.getElementById(data.sendNickname);
+                            // выводим принятое сообщение
+                            outputMessage(divUserMessages, 'accept', data.textMessage);
+                        // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
+                        // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
+                        } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
+                            document.getElementById(data.sendUserId).classList.add('div-chat-user-onmessage');
+                        }
+                    // если нет открытых чатов, то создаем его с тем от кого пришло сообщение и выводим текст
+                    } else {
+                        // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
+                        createDivUserMessages(data.sendNickname);
+                        let divUserMessages = document.getElementById(data.sendNickname);
+                        // выводим принятое сообщение
+                        outputMessage(divUserMessages, 'accept', data.textMessage);
+                        // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
+                        document.getElementById(data.sendUserId).click();
+                    }
                 }
-                // если нет открытых чатов, то создаем его с тем от кого пришло сообщение и выводим текст
-            } else {
-                // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
-                createDivUserMessages(data.sendNickname);
-                let divUserMessages = document.querySelector('#' + data.sendNickname);
-                // выводим принятое сообщение
-                outputMessage(divUserMessages, 'accept', data.textMessage);
-                // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
-                document.getElementById(data.sendUserId).click();
             }
             break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
             delete connectedUsers[data.connectId];
             // console.log(connectedUsers);
-            // убираем отметку об активности пользователя
-            let inactiveChatUser = document.getElementById(data.userId);
-            inactiveChatUser.classList.remove('div-chat-user-onchat');
+            // проверяем есть ли у пользователя такой контакт и убираем отметку об активности пользователя
+            if (document.getElementById(data.userId)) {
+                let inactiveChatUser = document.getElementById(data.userId);
+                inactiveChatUser.classList.remove('div-chat-user-onchat');
+            }
             break;
     }
 }
@@ -95,8 +108,18 @@ document.body.addEventListener('click', (e) => {
             // с пользователем на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
             if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
                 document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
+
+                // если у пользователя есть полученные и непрочитанные сообщения от других пользователей
+                document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
+                document.getElementById(e.target.id).classList.add('div-chat-user-onchat');
+                
+                // !!! далее должна идти загрузка прошлых и вновь полученых сообщений из базы
+
                 // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
                 createDivUserMessages(e.target.innerText);
+
+                // !!! далее должна идти загрузка прошлых сообщений из базы
+
                 document.querySelector('.div-text-message').style.visibility = 'visible';
                 TEXT_AREA_MESSAGE.focus();
             // если это тот же чат просто активируем поле ввода сообщения
@@ -123,7 +146,7 @@ document.body.addEventListener('click', (e) => {
                         textMessage: textMessage
                     });
                     WS.send(message);
-                    let divUserMessages = document.querySelector('#' + e.target.innerText);
+                    let divUserMessages = document.getElementById(e.target.innerText);
                     // выводим отправляемое сообщение
                     outputMessage(divUserMessages, 'send', textMessage);
                 }
