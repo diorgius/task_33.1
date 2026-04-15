@@ -37,7 +37,7 @@ if (document.querySelector('#userid')) {
 // 6.1 при получение сообщения от другого пользователя когда открыт чат, при активации также загружать 
 // направленные ему сообщения
 //
-// 7. выдавать звуковое оповещение о приходе сообщения
+// !!! СДЕЛАНО 7. выдавать звуковое оповещение о приходе сообщения
 //
 // !!! СДЕЛАНО 8. вкл/выкл оповещения и отображение этого
 //
@@ -188,12 +188,12 @@ window.oncontextmenu = (e) => {
         CHAT_USER_MENU.style.display = 'block';
         positionY = e.pageY - CHAT_USER_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
         CHAT_USER_MENU.style.top = positionY + 'px';
-        // CHAT_USER_MENU.top = `${e.pageY}px`;
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
 
-        // добавляем/удаляем выделение элемента border 
+        // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
+        console.log(divChatUserActive);
+        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
         e.target.classList.add('div-chat-user-active');
 
         // добавляем пользователя в групповой чат

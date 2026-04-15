@@ -17,16 +17,19 @@ function createDivUserMessages(divId) {
     divUserMessages.classList.add('div-user-messages');
     divUserMessages.setAttribute('id', divId);
     MAIN_WINDOW.appendChild(divUserMessages);
+    let divUserMessagesHeader = document.createElement('div');
+    divUserMessagesHeader.classList.add('div-user-messages-header');
+    divUserMessages.appendChild(divUserMessagesHeader);
     let spanChatName = document.createElement('span');
     spanChatName.classList.add('span-chat-name');
     spanChatName.setAttribute('id', 'spanchatname');
     spanChatName.textContent = `Чат с пользователем ${divId}`;
-    divUserMessages.appendChild(spanChatName);
+    divUserMessagesHeader.appendChild(spanChatName);
     let spanChatClose = document.createElement('span');
     spanChatClose.classList.add('span-chat-close');
     spanChatClose.setAttribute('id', 'spanchatclose');
-    spanChatClose.textContent = 'test';
-    divUserMessages.appendChild(spanChatClose);
+    spanChatClose.setAttribute('title', 'Закрыть чат');
+    divUserMessagesHeader.appendChild(spanChatClose);
 }
 
 // функция вывода сообщений

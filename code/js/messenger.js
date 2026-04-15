@@ -1,5 +1,6 @@
 const USER_ID = document.querySelector('#userid').value;
 const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
+const notice = new Audio('../../img/notice.mp3');
 let connectedUsers = '';
 
 // открываем соединение websocket
@@ -58,6 +59,8 @@ WS.onmessage = (e) => {
                             let divUserMessages = document.getElementById(data.sendNickname);
                             // выводим принятое сообщение
                             outputMessage(divUserMessages, 'accept', data.textMessage);
+                            // воспроизводим звук
+                            notice.play();
                         // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
                         // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
                         } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
@@ -70,6 +73,8 @@ WS.onmessage = (e) => {
                         let divUserMessages = document.getElementById(data.sendNickname);
                         // выводим принятое сообщение
                         outputMessage(divUserMessages, 'accept', data.textMessage);
+                        // воспроизводим звук
+                        notice.play();
                         // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
                         document.getElementById(data.sendUserId).click();
                     }
@@ -93,10 +98,14 @@ WS.onmessage = (e) => {
 document.body.addEventListener('click', (e) => {
     if (e.target.classList.contains('div-chat-user')) {
         // console.log(e);
-        // добавляем/удаляем выделение элемента border
+
+        // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive != null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
+        console.log(divChatUserActive);
+        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
+        console.log(e.target);
         e.target.classList.add('div-chat-user-active');
+
         // если пользователь не в чате, блокируем отправку сообщения
         if (!e.target.classList.contains('div-chat-user-onchat')) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
@@ -153,4 +162,6 @@ document.body.addEventListener('click', (e) => {
             }
         }
     }
+    // если клик по крестику в хидере чата
+    e.target.id === 'spanchatclose' ? document.querySelector('.div-user-messages').remove() : null;
 });
