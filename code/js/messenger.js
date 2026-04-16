@@ -27,7 +27,7 @@ WS.onclose = (e) => {
 
 WS.onmessage = (e) => {
     let data = JSON.parse(e.data);
-    console.log('Received:', data);
+    // console.log('Received:', data);
     switch (data.command) {
         case 'connect':
             // сообщение, о том что пользователь присоединился к чату
@@ -43,12 +43,6 @@ WS.onmessage = (e) => {
                 }
             })
             break;
-        case 'replay':
-            console.log(data);
-
-            // здесь будем вызывать функцию вывода сообщения отправителю
-
-        break;
         case 'privateMessage':
             // console.log(data);
             // проверяем отключено или нет оповещение для этого пользователя
@@ -67,7 +61,7 @@ WS.onmessage = (e) => {
                             outputMessage(divUserMessages, 'accept', data);
                             // воспроизводим звук
                             notice.autoplay = true;
-                            // notice.play();
+                            notice.play();
                         // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
                         // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
                         } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
@@ -82,12 +76,23 @@ WS.onmessage = (e) => {
                         outputMessage(divUserMessages, 'accept', data);
                         // воспроизводим звук
                         notice.autoplay = true;
-                        // notice.play();
+                        notice.play();
                         // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
                         document.getElementById(data.sendUserId).click();
                     }
                 }
             }
+            break;
+        case 'replay':
+            // console.log(data);
+            // добавлена отправка сообщения самому себе после отправки сообщения адресату
+            // для того чтобы получить message_id из БД и дату и время сообщения
+            // для присвоения div id для однозначной идентификации
+            // сообщения и вывода даты и времени
+
+            // вызываем функцию для вывода себе сообщения, отправленного адресату
+            let divUserMessages = document.querySelector('.div-user-messages');
+            outputMessage(divUserMessages, 'send', data);
             break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
@@ -115,7 +120,7 @@ document.body.addEventListener('click', (e) => {
         // если пользователь не в чате, блокируем отправку сообщения
         if (!e.target.classList.contains('div-chat-user-onchat')) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
-            document.querySelector('.div-text-message').style.visibility = 'hidden';
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
             // выводим сообщение, что пользователь не в чате
             alertMessage(`Пользователь ${e.target.innerText} не в чате`);
         } else {
@@ -135,20 +140,20 @@ document.body.addEventListener('click', (e) => {
 
                 // !!! далее должна идти загрузка прошлых сообщений из базы
 
-                document.querySelector('.div-text-message').style.visibility = 'visible';
+                document.querySelector('.div-text-send-message').style.visibility = 'visible';
                 TEXT_AREA_MESSAGE.focus();
             // если это тот же чат просто активируем поле ввода сообщения
             } else {
-                document.querySelector('.div-text-message').style.visibility = 'visible';
+                document.querySelector('.div-text-send-message').style.visibility = 'visible';
                 TEXT_AREA_MESSAGE.focus();
             }
 
             // отправка сообщения
-            const MESSAGE_SEND = document.querySelector('#messagesend');
+            const MESSAGE_SEND = document.querySelector('#sendmessage');
             MESSAGE_SEND.onclick = () => {
-                let textMessage = TEXT_AREA_MESSAGE.value;
+                let textSendMessage = TEXT_AREA_MESSAGE.value;
                 // проверить не пусто ли сообщение
-                if (textMessage === '') {
+                if (textSendMessage === '') {
                     alertMessage('Введите текст сообщения');
                 } else {
                     TEXT_AREA_MESSAGE.value = '';
@@ -159,12 +164,12 @@ document.body.addEventListener('click', (e) => {
                         acceptUserId: e.target.id,
                         sendUserId: USER_ID,
                         sendNickname: USER_NICKNAME,
-                        textMessage: textMessage
+                        textMessage: textSendMessage
                     });
                     WS.send(message);
-                    let divUserMessages = document.getElementById(e.target.innerText);
+                    // let divUserMessages = document.getElementById(e.target.innerText);
                     // выводим отправляемое сообщение
-                    outputMessage(divUserMessages, 'send', textMessage);
+                    // outputMessage(divUserMessages, 'send', textMessage);
                 }
             }
         }
@@ -172,6 +177,6 @@ document.body.addEventListener('click', (e) => {
     // если клик по крестику в хидере чата
     if (e.target.id === 'spanchatclose') {
         document.querySelector('.div-user-messages').remove();
-        document.querySelector('.div-text-message').style.visibility = 'hidden';
+        document.querySelector('.div-text-send-message').style.visibility = 'hidden';
     }
 });

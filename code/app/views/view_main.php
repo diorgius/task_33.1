@@ -76,10 +76,10 @@
 
         <section class="section-message">
 
-            <div class="div-text-message">
-                <textarea class="textarea-text-message" type="text" id="textmessage" name="textmessage"
+            <div class="div-text-send-message">
+                <textarea class="textarea-text-send-message" type="text" id="textsendmessage" name="textsendmessage"
                     placeholder="Ваше сообщение..."></textarea>&nbsp&nbsp
-                <a class="a-message-send" href="#" id="messagesend"><img src="../img/send.png" alt="Отправить"></a>
+                <a class="a-send-message" href="#" id="sendmessage"><img src="../img/send.png" alt="Отправить"></a>
             </div>
 
         </section>

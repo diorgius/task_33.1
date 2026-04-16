@@ -59,8 +59,7 @@ class Messenger implements MessageComponentInterface
 
     protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
-        var_dump($data);
-
+        
         // делаем запись сообщения в базу
         DB::dbconnect();
 
@@ -79,16 +78,19 @@ class Messenger implements MessageComponentInterface
 
         if ($result) {
             $data['message_id'] = $result;
+            $data['from'] = (string) $from->resourceId;
             $data['created'] = $created;
         }
 
         $replay = [
             'command' => 'replay',
             'messageId' => $result,
+            'acceptUserId'=> $data['acceptUserId'],
+            'textMessage' => $data['textMessage'],
             'created' => $created
         ];
 
-        $data['from'] = (string) $from->resourceId;
+        var_dump($data);
 
         $message = json_encode($data);
         $replay = json_encode($replay);
@@ -96,6 +98,12 @@ class Messenger implements MessageComponentInterface
             if ($client->resourceId === intval($data['to'])) {
                 $client->send($message);
             }
+
+            // добавлена отправка сообщения самому себе после отправки сообщения адресату
+            // для того чтобы получить message_id из БД и дату и время сообщения
+            // для присвоения div id для однозначной идентификации
+            // сообщения и вывода даты и времени
+
             if ($client->resourceId === intval($data['from'])) {
                 $client->send($replay);
             }

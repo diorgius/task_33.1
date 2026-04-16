@@ -34,16 +34,17 @@ function createDivUserMessages(divId) {
 
 // функция вывода сообщений
 function outputMessage(location, type, msg) {
-    console.log(msg);
+    // console.log(msg);
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
-    if (type === 'accept') {
-        divMessage.setAttribute('id', msg.message_id);
-        divMessage.textContent = msg.textMessage + msg.created;
-    } else {
-
-        divMessage.setAttribute('id', 'divsendmessage');
-        divMessage.textContent = msg;
-    }
-    location.appendChild(divMessage);
+    divMessage.setAttribute('id', msg.message_id);
+    let divTextMessage = document.createElement('div');
+    divTextMessage.classList.add(`div-text-message`);
+    let divDateTimeMessage = document.createElement('div');
+    divDateTimeMessage.classList.add(`div-datetime-message`);
+    divTextMessage.textContent = msg.textMessage;
+    dateTimeCreate = new Date(msg.created);
+    divDateTimeMessage.textContent = dateTimeCreate.toLocaleTimeString("ru-RU") + ' ' + dateTimeCreate.toLocaleDateString("ru-RU");
+    location.appendChild( divMessage);
+    divMessage.append(divTextMessage, divDateTimeMessage);
 }
