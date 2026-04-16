@@ -4,6 +4,9 @@ namespace App\core;
 
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use App\data\DB;
+use DateTime;
+use DateTimeZone;
 
 class Messenger implements MessageComponentInterface
 {
@@ -56,23 +59,47 @@ class Messenger implements MessageComponentInterface
 
     protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
-        // var_dump($from);
-        // var_dump($data);
-        // var_dump($this->clients);
-        // echo $data['to'];
-        // echo $data['textMessage'];
+        var_dump($data);
+
+        // делаем запись сообщения в базу
+        DB::dbconnect();
+
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+
+        $value = [ 
+            'send_user_Id' => $data['sendUserId'],
+            'accept_user_id' => $data['acceptUserId'],
+            'text_message' => $data['textMessage'],
+            'created' => $created
+        ];
+
+        $result = DB::create('messages', $value);
+
+        if ($result) {
+            $data['message_id'] = $result;
+            $data['created'] = $created;
+        }
+
+        $replay = [
+            'command' => 'replay',
+            'messageId' => $result,
+            'created' => $created
+        ];
 
         $data['from'] = (string) $from->resourceId;
+
         $message = json_encode($data);
+        $replay = json_encode($replay);
         foreach ($this->clients as $client) {
             if ($client->resourceId === intval($data['to'])) {
                 $client->send($message);
             }
+            if ($client->resourceId === intval($data['from'])) {
+                $client->send($replay);
+            }
         }
-
-
-        // делаем запись в базу
-
 
         echo "Private message from {$from->resourceId} to {$data['to']}\n";
     }

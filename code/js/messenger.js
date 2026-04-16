@@ -27,7 +27,7 @@ WS.onclose = (e) => {
 
 WS.onmessage = (e) => {
     let data = JSON.parse(e.data);
-    // console.log('Received:', data);
+    console.log('Received:', data);
     switch (data.command) {
         case 'connect':
             // сообщение, о том что пользователь присоединился к чату
@@ -43,6 +43,12 @@ WS.onmessage = (e) => {
                 }
             })
             break;
+        case 'replay':
+            console.log(data);
+
+            // здесь будем вызывать функцию вывода сообщения отправителю
+
+        break;
         case 'privateMessage':
             // console.log(data);
             // проверяем отключено или нет оповещение для этого пользователя
@@ -58,9 +64,10 @@ WS.onmessage = (e) => {
                         if (document.querySelector('.div-user-messages').id === data.sendNickname) {
                             let divUserMessages = document.getElementById(data.sendNickname);
                             // выводим принятое сообщение
-                            outputMessage(divUserMessages, 'accept', data.textMessage);
+                            outputMessage(divUserMessages, 'accept', data);
                             // воспроизводим звук
-                            notice.play();
+                            notice.autoplay = true;
+                            // notice.play();
                         // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
                         // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
                         } else if (document.querySelector('.div-user-messages').id !== data.sendNickname) {
@@ -72,9 +79,10 @@ WS.onmessage = (e) => {
                         createDivUserMessages(data.sendNickname);
                         let divUserMessages = document.getElementById(data.sendNickname);
                         // выводим принятое сообщение
-                        outputMessage(divUserMessages, 'accept', data.textMessage);
+                        outputMessage(divUserMessages, 'accept', data);
                         // воспроизводим звук
-                        notice.play();
+                        notice.autoplay = true;
+                        // notice.play();
                         // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
                         document.getElementById(data.sendUserId).click();
                     }
@@ -101,9 +109,7 @@ document.body.addEventListener('click', (e) => {
 
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        console.log(divChatUserActive);
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
-        console.log(e.target);
         e.target.classList.add('div-chat-user-active');
 
         // если пользователь не в чате, блокируем отправку сообщения
@@ -137,6 +143,7 @@ document.body.addEventListener('click', (e) => {
                 TEXT_AREA_MESSAGE.focus();
             }
 
+            // отправка сообщения
             const MESSAGE_SEND = document.querySelector('#messagesend');
             MESSAGE_SEND.onclick = () => {
                 let textMessage = TEXT_AREA_MESSAGE.value;
@@ -163,5 +170,8 @@ document.body.addEventListener('click', (e) => {
         }
     }
     // если клик по крестику в хидере чата
-    e.target.id === 'spanchatclose' ? document.querySelector('.div-user-messages').remove() : null;
+    if (e.target.id === 'spanchatclose') {
+        document.querySelector('.div-user-messages').remove();
+        document.querySelector('.div-text-message').style.visibility = 'hidden';
+    }
 });

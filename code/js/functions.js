@@ -34,9 +34,16 @@ function createDivUserMessages(divId) {
 
 // функция вывода сообщений
 function outputMessage(location, type, msg) {
+    console.log(msg);
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
-    divMessage.setAttribute('id', 'divsendmessage');
-    divMessage.textContent = msg;
+    if (type === 'accept') {
+        divMessage.setAttribute('id', msg.message_id);
+        divMessage.textContent = msg.textMessage + msg.created;
+    } else {
+
+        divMessage.setAttribute('id', 'divsendmessage');
+        divMessage.textContent = msg;
+    }
     location.appendChild(divMessage);
 }
