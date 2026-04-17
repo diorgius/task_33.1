@@ -325,6 +325,7 @@ window.oncontextmenu = (e) => {
         // убираем меню по клику в любом месте документа
         window.addEventListener('click', () => {
             document.querySelector('.ul-chat-user-menu').style.display = 'none';
+            document.querySelector('.ul-message-menu').style.display = 'none';
             // !!! если здесь убирать выделение кликнутого пользователя рамкой,
             // то потом при клике левой кнопкой пользователь не выделяется
             // пока не понял почему
@@ -335,9 +336,20 @@ window.oncontextmenu = (e) => {
         window.addEventListener('keydown', (press) => {
             if (press.key === 'Escape') {
                 document.querySelector('.ul-chat-user-menu').style.display = 'none';
+                document.querySelector('.ul-message-menu').style.display = 'none';
                 // аналогично
                 // e.target.classList.remove('div-chat-user-active');
             }
         });
+    }
+    if (e.target.classList.contains('div-send-message') || e.target.classList.contains('div-accept-message')) {
+        // console.log(e.target.id);
+        e.preventDefault();
+        // выводим меню
+        const CHAT_MESSAGE_MENU = document.querySelector('.ul-message-menu');
+        CHAT_MESSAGE_MENU.style.display = 'block';
+        positionY = e.pageY - CHAT_MESSAGE_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
+        CHAT_MESSAGE_MENU.style.top = positionY + 'px';
+        CHAT_MESSAGE_MENU.style.left = `${e.pageX}px`;
     }
 }

@@ -72,6 +72,12 @@
 
             <div class="div-list-users" id="divlistusers"></div>
 
+            <ul class="ul-message-menu">
+                <li id="deletemessage">Удалить сообщение</li>
+                <li id="editmessage">Редактировать сообщение</li>
+                <li id="forwardmessage">Переслать сообщение</li>
+            </ul>
+
         </section>
 
         <section class="section-message">

@@ -14,7 +14,6 @@ function alertMessage(msg) {
 // функция создания дива для отображения сообщений
 function createDivUserMessages(divId) {
     let divUserMessages = document.createElement('div');
-
     divUserMessages.classList.add('div-user-messages');
     divUserMessages.setAttribute('id', divId);
     MAIN_WINDOW.appendChild(divUserMessages);
