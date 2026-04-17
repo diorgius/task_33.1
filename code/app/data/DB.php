@@ -87,62 +87,6 @@ class DB
         }
     }
 
-    public static function getAll(string $table)
-    {
-        $stmt = self::$pdo->query("SELECT * FROM $table");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public static function getByProp(string $table, string $prop, string $value)
-    {
-        $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value");
-        $stmt->execute(['value' => $value]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public static function getByCondition(string $table, string $prop_1, string $prop_2, array $conditions)
-    {
-
-        $stmt = self::$pdo->prepare(
-            "SELECT * FROM $table WHERE 
-            $prop_1 {$conditions['comparison']} :value_1 
-            {$conditions['logic']} 
-            $prop_2 {$conditions['comparison']} :value_2
-            {$conditions['sort']}");
-        $stmt->execute([
-            'value_1' => $conditions['value_1'],
-            'value_2' => $conditions['value_2']
-        ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public static function getContacts(string $table, string $prop, string $value)
-    {
-        $id = $value;
-        $stmt = self::$pdo->prepare("
-            SELECT contact_user_id, email, nickname, avatar 
-            FROM $table AS c LEFT JOIN users AS u ON 
-            u.id = (SELECT contact_user_id FROM contacts 
-            WHERE 
-            contact_user_id = c.contact_user_id AND $prop = :value_2)
-            WHERE $prop = :value_1
-        ");
-        $stmt->execute([
-            'value_1' => $value,
-            'value_2' => $value
-        ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public static function deleteContact(string $table, string $userId, string $contactUserId): void
-    {
-        $stmt = self::$pdo->prepare("DELETE FROM $table WHERE user_id = :userId AND contact_user_id = :contactUserId");
-        $stmt->execute([
-            'userId' => $userId,
-            'contactUserId' => $contactUserId
-        ]);
-    }
-
     public static function create(string $table, array $values)
     {
         $colums = implode(', ', array_keys($values));
@@ -171,5 +115,81 @@ class DB
     {
         $stmt = self::$pdo->prepare("DELETE FROM $table WHERE id = :id");
         $stmt->execute(['id' => $id]);
+    }
+
+    public static function getAll(string $table)
+    {
+        $stmt = self::$pdo->query("SELECT * FROM $table");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getByProp(string $table, string $prop, string $value)
+    {
+        $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value");
+        $stmt->execute(['value' => $value]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // public static function getByCondition(string $table, string $prop_1, string $prop_2, array $conditions)
+    // {
+
+    //     $stmt = self::$pdo->prepare(
+    //         "SELECT * FROM $table WHERE 
+    //         $prop_1 {$conditions['comparison']} :value_1 
+    //         {$conditions['logic']} 
+    //         $prop_2 {$conditions['comparison']} :value_2
+    //         {$conditions['sort']}");
+    //     $stmt->execute([
+    //         'value_1' => $conditions['value_1'],
+    //         'value_2' => $conditions['value_2']
+    //     ]);
+    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // }
+
+    public static function getContacts(string $table, string $prop, string $value)
+    {
+        $stmt = self::$pdo->prepare("
+            SELECT contact_user_id, email, nickname, avatar 
+            FROM $table AS c LEFT JOIN users AS u ON 
+            u.id = (SELECT contact_user_id FROM contacts 
+            WHERE 
+            contact_user_id = c.contact_user_id AND $prop = :value_2)
+            WHERE $prop = :value_1
+        ");
+        $stmt->execute([
+            'value_1' => $value,
+            'value_2' => $value
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function deleteContact(string $table, string $userId, string $contactUserId): void
+    {
+        $stmt = self::$pdo->prepare("DELETE FROM $table WHERE user_id = :userId AND contact_user_id = :contactUserId");
+        $stmt->execute([
+            'userId' => $userId,
+            'contactUserId' => $contactUserId
+        ]);
+    }
+
+    public static function getUserMessages(string $table, string $prop_1, string $prop_2, array $conditions)
+    {
+        $stmt = self::$pdo->prepare(
+            "SELECT * FROM $table WHERE 
+            ($prop_1 = :value_1 
+            AND 
+            $prop_2 = :value_2)
+            OR
+            ($prop_1 = :value_4
+            AND 
+            $prop_2 = :value_3) 
+            {$conditions['sort']}");
+        $stmt->execute([
+            'value_1' => $conditions['value_1'],
+            'value_2' => $conditions['value_2'],
+            'value_3' => $conditions['value_1'],
+            'value_4' => $conditions['value_2']
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

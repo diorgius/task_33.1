@@ -48,15 +48,14 @@ class ActionsWithUsers
     public function getUserMessages()
     {
         $conditions = [
-            'logic' => 'OR',
-            'comparison' => '=',
             'value_1' => $this->data['sendUserId'],
             'value_2' => $this->data['acceptUserId'],
             'sort' => 'ORDER BY created'
         ];
 
         DB::dbconnect();
-        $result = DB::getByCondition('messages', 'send_user_id', 'send_user_id', $conditions);
+        // $result = DB::getByCondition('messages', 'send_user_id', 'send_user_id', $conditions);
+        $result = DB::getUserMessages('messages', 'send_user_id', 'accept_user_id', $conditions);
         echo json_encode($result);
     }  
 }

@@ -63,7 +63,7 @@ async function getUserMessages(data) {
         });
         let result = await response.json();
         // console.log('Успех: ', result);
-
+        
         // выводим ранние сообщения пользователя
         result.forEach((item) => {
             let divUserMessages = document.querySelector('.div-user-messages');

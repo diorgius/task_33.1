@@ -70,7 +70,7 @@ class Messenger implements MessageComponentInterface
         $value = [ 
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
-            'text_message' => $data['text_message'],
+            'text_message' => htmlspecialchars($data['text_message']),
             'created' => $created
         ];
 
