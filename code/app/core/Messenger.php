@@ -68,9 +68,9 @@ class Messenger implements MessageComponentInterface
         $created = $date->format('Y-m-d H:i:s');
 
         $value = [ 
-            'send_user_Id' => $data['sendUserId'],
-            'accept_user_id' => $data['acceptUserId'],
-            'text_message' => $data['textMessage'],
+            'send_user_Id' => $data['send_user_id'],
+            'accept_user_id' => $data['accept_user_id'],
+            'text_message' => $data['text_message'],
             'created' => $created
         ];
 
@@ -84,9 +84,10 @@ class Messenger implements MessageComponentInterface
 
         $replay = [
             'command' => 'replay',
-            'messageId' => $result,
-            'acceptUserId'=> $data['acceptUserId'],
-            'textMessage' => $data['textMessage'],
+            'message_id' => $result,
+            'send_user_id'=> $data['send_user_id'],
+            'accept_user_id'=> $data['accept_user_d'],
+            'text_message' => $data['text_message'],
             'created' => $created
         ];
 

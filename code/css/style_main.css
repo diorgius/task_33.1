@@ -301,6 +301,7 @@
     border-top-left-radius: .6rem;
     border-top-right-radius: .6rem;
     border-bottom-left-radius: .6rem;
+    overflow-y: auto;
 }
 
 .div-send-message {

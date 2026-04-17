@@ -44,6 +44,21 @@ class ActionsWithUsers
         DB::dbconnect();
         DB::deleteContact('contacts', $this->data['userId'], $this->data['contactUserId']);
     }
+
+    public function getUserMessages()
+    {
+        $conditions = [
+            'logic' => 'OR',
+            'comparison' => '=',
+            'value_1' => $this->data['sendUserId'],
+            'value_2' => $this->data['acceptUserId'],
+            'sort' => 'ORDER BY created'
+        ];
+
+        DB::dbconnect();
+        $result = DB::getByCondition('messages', 'send_user_id', 'send_user_id', $conditions);
+        echo json_encode($result);
+    }  
 }
 
 new ActionsWithUsers();
