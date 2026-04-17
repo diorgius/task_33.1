@@ -126,7 +126,7 @@ document.body.addEventListener('click', async (e) => {
         if (document.querySelector('#divaddusers')) {
             document.querySelector('#divaddusers').remove();
             BUTTON_ADD_USER.textContent = 'Добавить пользователей';
-        } 
+        }
         // если пользователь не в чате, блокируем отправку сообщения
         if (!e.target.classList.contains('div-chat-user-onchat')) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;

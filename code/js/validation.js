@@ -46,10 +46,22 @@ if (INPUT_FILE_AVATAR) {
     });
 }
 
+// на форме редактирования профиля (и проверки поля ввода пароля на форме регистрации, т.к. используется одна проверка)
+// пришлось добавлять стиль таким способом:
+// INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
+// и убирать таким:
+// INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #007bff');
+// хотя на форме регистрации работает работает добавление класса:
+// INPUT_EMAIL.classList.add('wrong-data');
+// и удаление класса:
+// INPUT_EMAIL.classList.remove('wrong-data');
+// если на форме регистрации он добавляется перед основным классом,
+// то на форме редактирования профиля этот класс добавляется после основного класса и поэтому не срабатывает
+// почему так происходит я пока не разобрался
+
 async function validation(e) {
     if (e.target.id === 'email') {
         email = e.target.value;
-
         // проверяем валидность email
         const emailregexp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailregexp.test(email)) {
@@ -59,11 +71,13 @@ async function validation(e) {
         } else {
             INPUTE_MAIL.classList.remove('wrong-data');
             BUTTON_SEND.removeAttribute('disabled');
-
             // посылаем email на бэкенд и проверяем на есть ли уже такой в базе
-            data = { email: email }
+            data = {
+                action: 'checkUserData',
+                email: email
+            };
             try {
-                let response = await fetch(URL + '/app/core/CheckData.php', {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/jsoncharset=utf-8'
@@ -86,7 +100,6 @@ async function validation(e) {
         }
     } else if (e.target.id === 'password') {
         pass = e.target.value;
-
         // проверяем длинну пароля
         if (pass.length < 8 || pass.length > 20) {
             INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #ff0000');
@@ -100,7 +113,6 @@ async function validation(e) {
         }
     } else if (e.target.id === 'passwordagain') {
         passagain = e.target.value;
-
         // проверяем совпадение пароля
         if (pass !== passagain) {
             INPUT_PASSWORD_AGAIN.classList.add('wrong-data');
@@ -111,7 +123,6 @@ async function validation(e) {
             BUTTON_SEND.removeAttribute('disabled');
         }
     } else if (e.target.id === 'hideemail') {
-        
         // проверяем nickname если хотим скрыть email 
         if (e.target.checked) {
             if (!INPUT_NICKNAME.value) {
@@ -131,7 +142,6 @@ async function validation(e) {
         if (!INPUT_NICKNAME.value) {
             INPUT_HIDE_EMAIL.checked = false;
         } else {
-
             // проверяем nickname на кириллицу
             if (nickname.match(/[А-яЁё]/)) {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
@@ -140,11 +150,13 @@ async function validation(e) {
             } else {
                 INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #007bff');
                 BUTTON_SEND.removeAttribute('disabled');
-                
                 // посылаем nickname на бэкенд и проверяем на есть ли уже такой в базе
-                data = { nickname: nickname }
+                data = {
+                    action: 'checkUserData',
+                    nickname: nickname
+                };
                 try {
-                    let response = await fetch(URL + '/app/core/CheckData.php', {
+                    let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/jsoncharset=utf-8'
@@ -153,13 +165,6 @@ async function validation(e) {
                     });
                     let result = await response.text();
                     if (result) {
-                        // здесь и далее пришлось добавлять стиль таким способом
-                        // почему-то если на форме регистрации работает добавление стиля через добавление класса
-                        // INPUT_EMAIL.classList.add('wrong-data') и он добавляется перед основным классом,
-                        // то на форме редактирования профиля этот класс добавляется после основного класса и не работает???
-                        // почему так происходит я пока не разобрался
-                        // и на поле ввода пароля тоже пришлось изменить, потому-что на форме редактирования это поле тоже есть,
-                        // хотя на форме регистрации все отрабатывается
                         INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
                         // выводим сообщение о не соответствии введенных данных
                         alertMessage(result);
@@ -180,7 +185,7 @@ async function validation(e) {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #ff0000');
             // выводим сообщение о не соответствии введенных данных
             alertMessage('Файл больше возможного для загрузки размера');
-        // проверяем тип файла
+            // проверяем тип файла
         } else if (!FILE_TYPE.includes(e.target.files[0].type)) {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #ff0000');
             // выводим сообщение о не соответствии введенных данных

@@ -22,7 +22,18 @@ class ActionsWithUsers
         }
     }
 
-    
+    public function checkUserData()
+    {
+        DB::dbconnect();
+        $prop = array_keys($this->data)[1];
+        $value = htmlspecialchars(trim($this->data[$prop]));
+        $result = DB::getByProp('users', $prop, $value);
+
+        if ($result) {
+            echo "Пользователь с таким {$prop} уже существует";
+        }
+    }
+
     public function getAllUsers()
     {
         DB::dbconnect();
@@ -54,17 +65,11 @@ class ActionsWithUsers
 
     public function getUserMessages()
     {
-        // $conditions = [
-        //     'value_1' => $this->data['sendUserId'],
-        //     'value_2' => $this->data['acceptUserId'],
-        //     'sort' => 'ORDER BY created'
-        // ];
-
         DB::dbconnect();
         $result = DB::getUserMessages('messages', $this->data['sendUserId'], $this->data['acceptUserId']);
         // $result = DB::getUserMessages('messages', 'send_user_id', 'accept_user_id', $conditions);
         echo json_encode($result);
-    }  
+    }
 }
 
 new ActionsWithUsers();
