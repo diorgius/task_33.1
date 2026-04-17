@@ -72,20 +72,16 @@ WS.onmessage = (e) => {
                         // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
                         createDivUserMessages(data.send_nickname);
                         let divUserMessages = document.getElementById(data.send_nickname);
-                        console.log(data);
-
+                        // console.log(data);
                         // выводим ранние сообщения из базы
-
-                        // отправляем запрос в бэкенд для загрузки ранних сообщений пользователя
+                        // готовим данные для отправки на бэкенд
                         data = {
                             action: 'getUserMessages',
                             sendUserId: USER_ID,
                             acceptUserId: data.send_user_id
                         };
+                        // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
                         getUserMessages(data);
-
-                        // выводим принятое сообщение
-                        // outputMessage(divUserMessages, data);
                         // воспроизводим звук
                         notice.autoplay = true;
                         notice.play();
@@ -101,7 +97,6 @@ WS.onmessage = (e) => {
             // для того чтобы получить message_id из БД, дату и время сообщения
             // для присвоения div id для однозначной идентификации и возможности удалять, редактировать, персылать
             // сообщения и вывода даты и времени
-
             // вызываем функцию для вывода себе сообщения, отправленного адресату
             let divUserMessages = document.querySelector('.div-user-messages');
             outputMessage(divUserMessages, data);
@@ -123,12 +118,15 @@ WS.onmessage = (e) => {
 document.body.addEventListener('click', async (e) => {
     if (e.target.classList.contains('div-chat-user')) {
         // console.log(e);
-
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
         e.target.classList.add('div-chat-user-active');
-
+        // если открыто окно добавления пользователей убираем его
+        if (document.querySelector('#divaddusers')) {
+            document.querySelector('#divaddusers').remove();
+            BUTTON_ADD_USER.textContent = 'Добавить пользователей';
+        } 
         // если пользователь не в чате, блокируем отправку сообщения
         if (!e.target.classList.contains('div-chat-user-onchat')) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
@@ -140,21 +138,20 @@ document.body.addEventListener('click', async (e) => {
             // с пользователем на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
             if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
                 document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
-
                 // если у пользователя есть полученные и непрочитанные сообщения от других пользователей
                 document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
                 document.getElementById(e.target.id).classList.add('div-chat-user-onchat');
                 // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
                 createDivUserMessages(e.target.innerText);
-
-                // отправляем запрос в бэкенд для загрузки ранних сообщений пользователя
+                // выводим ранние сообщения из базы
+                // готовим данные для отправки на бэкенд
                 data = {
                     action: 'getUserMessages',
                     sendUserId: USER_ID,
                     acceptUserId: e.target.id
                 };
+                // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения               
                 getUserMessages(data);
-
                 document.querySelector('.div-text-send-message').style.visibility = 'visible';
                 TEXT_AREA_MESSAGE.focus();
                 // если это тот же чат просто активируем поле ввода сообщения
@@ -182,9 +179,6 @@ document.body.addEventListener('click', async (e) => {
                         text_message: textSendMessage
                     });
                     WS.send(message);
-                    // let divUserMessages = document.getElementById(e.target.innerText);
-                    // выводим отправляемое сообщение
-                    // outputMessage(divUserMessages, 'send', textMessage);
                 }
             }
         }

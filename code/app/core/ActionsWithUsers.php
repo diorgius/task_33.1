@@ -22,6 +22,7 @@ class ActionsWithUsers
         }
     }
 
+    
     public function getAllUsers()
     {
         DB::dbconnect();
@@ -45,17 +46,23 @@ class ActionsWithUsers
         DB::deleteContact('contacts', $this->data['userId'], $this->data['contactUserId']);
     }
 
+    public function deleteUserMessages()
+    {
+        DB::dbconnect();
+        DB::deleteUserMessages('messages', $this->data['send_user_id'], $this->data['accept_user_id']);
+    }
+
     public function getUserMessages()
     {
-        $conditions = [
-            'value_1' => $this->data['sendUserId'],
-            'value_2' => $this->data['acceptUserId'],
-            'sort' => 'ORDER BY created'
-        ];
+        // $conditions = [
+        //     'value_1' => $this->data['sendUserId'],
+        //     'value_2' => $this->data['acceptUserId'],
+        //     'sort' => 'ORDER BY created'
+        // ];
 
         DB::dbconnect();
-        // $result = DB::getByCondition('messages', 'send_user_id', 'send_user_id', $conditions);
-        $result = DB::getUserMessages('messages', 'send_user_id', 'accept_user_id', $conditions);
+        $result = DB::getUserMessages('messages', $this->data['sendUserId'], $this->data['acceptUserId']);
+        // $result = DB::getUserMessages('messages', 'send_user_id', 'accept_user_id', $conditions);
         echo json_encode($result);
     }  
 }

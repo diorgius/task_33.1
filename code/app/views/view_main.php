@@ -48,7 +48,7 @@
                 <li id="offnotification">Отключить оповещение</li>
                 <li id="onnotification">Включить оповещение</li>
                 <li id="deletechatuser">Удалить пользователя из списка чатов</li>
-                <li id="deleteuserchats">Удалить чаты с пользователем</li>
+                <li id="deleteuserchats">Удалить переписку с пользователем</li>
             </ul>
 
         </aside>

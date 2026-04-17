@@ -32,9 +32,9 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 5. запись сообщений в базу
 //
-// 6. при активации пользователя загружать из базы ранние сообщения от этого пользователя
+// !!! СДЕЛАНО 6. при активации пользователя загружать из базы ранние сообщения от этого пользователя
 //
-// 6.1 при получение сообщения от другого пользователя когда открыт чат, при активации также загружать 
+// !!! СДЕЛАНО 6.1 при получение сообщения от другого пользователя когда открыт чат, при активации также загружать 
 // направленные ему сообщения
 //
 // !!! СДЕЛАНО 7. выдавать звуковое оповещение о приходе сообщения 
@@ -62,6 +62,23 @@ if (document.querySelector('#userid')) {
 // уже с уникальным id, а на стороне отправителя??? id нет и как потом его идентифицировать
 // если пользователь захочет его переслать???
 // при открытии чата сообщения будут загружены из базы и тут проблем нет т.к. id будет
+//
+// !!! СДЕЛАНО 14. сделать удаление всей переписки с пользователем
+// 14.1 при удалении пользователя из списка контактов ???надо ли удалять переписку с ним
+//
+// 15. удаление конкретного сообщения
+//
+// 16. редактирование сообщения
+//
+// 17. пересылка сообщения
+//
+// 18. создание группы и добавление пользователей в группу
+// 
+// 19. рассылка групповых сообщений
+//
+// 20. удаление пользователя из группы
+// 
+// 21. удаление группы ???только ее создателем
 
 
 // маштабируем текстовую область сообщений
@@ -183,7 +200,13 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
             let pChatUser = document.createElement('p');
             divChatUserNickname.appendChild(pChatUser);
             nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
-
+            // если пользователь соединен с сервером выделяем его
+            Object.values(connectedUsers).forEach(value => {
+                console.log(value);
+                if (parseInt(value) === parseInt(contactUserId)) {
+                    document.getElementById(value).classList.add('div-chat-user-onchat');
+                }
+            })
         } catch (error) {
             console.log('Ошибка: ', error);
         }
@@ -207,7 +230,7 @@ window.oncontextmenu = (e) => {
 
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        console.log(divChatUserActive);
+        // console.log(divChatUserActive);
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
         e.target.classList.add('div-chat-user-active');
 
@@ -261,20 +284,42 @@ window.oncontextmenu = (e) => {
                 });
                 let result = await response.text();
                 // console.log('Успех: ', result);
-                let nickname = e.target.innerText;
-                document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
+
                 // выводим сообщение, что данный пользователь удален из списка чатов
-                alertMessage(`Пользователь ${nickname} удален из списка чатов`);
+                alertMessage(`Пользователь ${e.target.innerText} удален из списка чатов`);
+                document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
             } catch (error) {
                 console.log('Ошибка: ', error);
             }
         }
 
-        // удаляем чаты с пользователем
+        // удаляем переписку с пользователем
         let delUserChats = document.querySelector('#deleteuserchats');
-        delUserChats.onclick = () => {
+        delUserChats.onclick = async () => {
             // console.log(e.target.id);
-            // здесь будем удалять чаты пользователя
+            // отправляем данные на бэкенд для удаления из базы
+            data = {
+                action: 'deleteUserMessages',
+                'send_user_id': USER_ID,
+                'accept_user_id': e.target.id
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.text();
+                // console.log('Успех: ', result);
+
+                // выводим сообщение, что переписка с пользователем удалена
+                document.getElementById(`${e.target.innerText}`) ? document.getElementById(`${e.target.innerText}`).remove() : null;
+                alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }    
         }
 
         // убираем меню по клику в любом месте документа

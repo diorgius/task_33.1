@@ -130,32 +130,15 @@ class DB
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // public static function getByCondition(string $table, string $prop_1, string $prop_2, array $conditions)
-    // {
-
-    //     $stmt = self::$pdo->prepare(
-    //         "SELECT * FROM $table WHERE 
-    //         $prop_1 {$conditions['comparison']} :value_1 
-    //         {$conditions['logic']} 
-    //         $prop_2 {$conditions['comparison']} :value_2
-    //         {$conditions['sort']}");
-    //     $stmt->execute([
-    //         'value_1' => $conditions['value_1'],
-    //         'value_2' => $conditions['value_2']
-    //     ]);
-    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    // }
-
     public static function getContacts(string $table, string $prop, string $value)
     {
-        $stmt = self::$pdo->prepare("
-            SELECT contact_user_id, email, nickname, avatar 
+        $stmt = self::$pdo->prepare(
+            "SELECT contact_user_id, email, nickname, avatar 
             FROM $table AS c LEFT JOIN users AS u ON 
             u.id = (SELECT contact_user_id FROM contacts 
             WHERE 
             contact_user_id = c.contact_user_id AND $prop = :value_2)
-            WHERE $prop = :value_1
-        ");
+            WHERE $prop = :value_1");
         $stmt->execute([
             'value_1' => $value,
             'value_2' => $value
@@ -172,23 +155,42 @@ class DB
         ]);
     }
 
-    public static function getUserMessages(string $table, string $prop_1, string $prop_2, array $conditions)
+    public static function deleteUserMessages(string $table, string $send_user_id, string $accept_user_id): void
     {
         $stmt = self::$pdo->prepare(
-            "SELECT * FROM $table WHERE 
-            ($prop_1 = :value_1 
-            AND 
-            $prop_2 = :value_2)
-            OR
-            ($prop_1 = :value_4
-            AND 
-            $prop_2 = :value_3) 
-            {$conditions['sort']}");
+        "DELETE FROM $table WHERE 
+        (send_user_id = :value_1 
+        AND 
+        accept_user_id = :value_2)
+        OR
+        (send_user_id = :value_4 
+        AND 
+        accept_user_id = :value_3)");
         $stmt->execute([
-            'value_1' => $conditions['value_1'],
-            'value_2' => $conditions['value_2'],
-            'value_3' => $conditions['value_1'],
-            'value_4' => $conditions['value_2']
+            'value_1' => $send_user_id,
+            'value_2' => $accept_user_id,
+            'value_3' => $send_user_id,
+            'value_4' => $accept_user_id
+        ]);
+    }
+
+    public static function getUserMessages(string $table, string $send_user_id, string $accept_user_id): array
+    {
+        $stmt = self::$pdo->prepare(
+        "SELECT * FROM $table WHERE 
+        (send_user_id = :value_1 
+        AND 
+        accept_user_id = :value_2)
+        OR
+        (send_user_id = :value_4 
+        AND 
+        accept_user_id = :value_3)
+        ORDER BY created");
+        $stmt->execute([
+            'value_1' => $send_user_id,
+            'value_2' => $accept_user_id,
+            'value_3' => $send_user_id,
+            'value_4' => $accept_user_id
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
