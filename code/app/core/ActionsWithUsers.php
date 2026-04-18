@@ -13,6 +13,7 @@ class ActionsWithUsers
 {
 
     protected $data;
+    
     public function __construct()
     {
         if (isset($_POST)) {
@@ -67,8 +68,14 @@ class ActionsWithUsers
     {
         DB::dbconnect();
         $result = DB::getUserMessages('messages', $this->data['sendUserId'], $this->data['acceptUserId']);
-        // $result = DB::getUserMessages('messages', 'send_user_id', 'accept_user_id', $conditions);
         echo json_encode($result);
+    }
+
+    public function deleteMessage()
+    {
+        var_dump($this->data);
+        DB::dbconnect();
+        DB::delete('messages', $this->data['message_id']);
     }
 }
 

@@ -55,7 +55,7 @@ class DB
 
             $sql = 
                 "CREATE TABLE IF NOT EXISTS `messenger`.`contacts` (
-	            `contact_id` INT NOT NULL AUTO_INCREMENT,
+	            `id` INT NOT NULL AUTO_INCREMENT,
 	            `user_id` INT NOT NULL,
 	            `contact_user_id` INT NOT NULL,
 	            `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -67,7 +67,7 @@ class DB
             self::$pdo->exec($sql);
 
              $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
-                `message_id` INT NOT NULL AUTO_INCREMENT,
+                `id` INT NOT NULL AUTO_INCREMENT,
                 `send_user_id` INT NOT NULL,
                 `accept_user_id` INT NOT NULL,
                 `text_message` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
@@ -155,25 +155,6 @@ class DB
         ]);
     }
 
-    public static function deleteUserMessages(string $table, string $send_user_id, string $accept_user_id): void
-    {
-        $stmt = self::$pdo->prepare(
-        "DELETE FROM $table WHERE 
-        (send_user_id = :value_1 
-        AND 
-        accept_user_id = :value_2)
-        OR
-        (send_user_id = :value_4 
-        AND 
-        accept_user_id = :value_3)");
-        $stmt->execute([
-            'value_1' => $send_user_id,
-            'value_2' => $accept_user_id,
-            'value_3' => $send_user_id,
-            'value_4' => $accept_user_id
-        ]);
-    }
-
     public static function getUserMessages(string $table, string $send_user_id, string $accept_user_id): array
     {
         $stmt = self::$pdo->prepare(
@@ -194,4 +175,24 @@ class DB
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public static function deleteUserMessages(string $table, string $send_user_id, string $accept_user_id): void
+    {
+        $stmt = self::$pdo->prepare(
+        "DELETE FROM $table WHERE 
+        (send_user_id = :value_1 
+        AND 
+        accept_user_id = :value_2)
+        OR
+        (send_user_id = :value_4 
+        AND 
+        accept_user_id = :value_3)");
+        $stmt->execute([
+            'value_1' => $send_user_id,
+            'value_2' => $accept_user_id,
+            'value_3' => $send_user_id,
+            'value_4' => $accept_user_id
+        ]);
+    }
+
 }

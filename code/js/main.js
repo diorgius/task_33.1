@@ -120,7 +120,7 @@ if (BUTTON_ADD_USER) {
 
                 result.forEach((item) => {
                     if (`${item.id}` !== USER_ID) {
-
+                        // console.log(item);
                         let divUser = document.createElement('div');
                         divUser.classList.add('div-user');
                         divUser.setAttribute('id', 'divuser_' + `${item.id}`);
@@ -202,7 +202,7 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
             nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
             // если пользователь соединен с сервером выделяем его
             Object.values(connectedUsers).forEach(value => {
-                console.log(value);
+                // console.log(value);
                 if (parseInt(value) === parseInt(contactUserId)) {
                     document.getElementById(value).classList.add('div-chat-user-onchat');
                 }
@@ -216,8 +216,9 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
     }
 }
 
-// обрабатываем меню по клику правой кнопки на пользователях чата
+// обрабатываем меню по клику правой кнопки 
 window.oncontextmenu = (e) => {
+    // выводим контекстное меню на пользователях чата
     if (e.target.classList.contains('div-chat-user')) {
         // console.log(e.target.id);
         e.preventDefault();
@@ -227,7 +228,6 @@ window.oncontextmenu = (e) => {
         positionY = e.pageY - CHAT_USER_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
         CHAT_USER_MENU.style.top = positionY + 'px';
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
-
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
         // console.log(divChatUserActive);
@@ -265,8 +265,8 @@ window.oncontextmenu = (e) => {
         }
 
         // удаляем пользователя из списка чатов
-        let delChatUser = document.querySelector('#deletechatuser');
-        delChatUser.onclick = async () => {
+        let deleteChatUser = document.querySelector('#deletechatuser');
+        deleteChatUser.onclick = async () => {
             // console.log(e);
             // отправляем данные на бэкенд для удаления из базы
             data = {
@@ -294,8 +294,8 @@ window.oncontextmenu = (e) => {
         }
 
         // удаляем переписку с пользователем
-        let delUserChats = document.querySelector('#deleteuserchats');
-        delUserChats.onclick = async () => {
+        let deleteUserChats = document.querySelector('#deleteuserchats');
+        deleteUserChats.onclick = async () => {
             // console.log(e.target.id);
             // отправляем данные на бэкенд для удаления из базы
             data = {
@@ -319,30 +319,16 @@ window.oncontextmenu = (e) => {
                 alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
             } catch (error) {
                 console.log('Ошибка: ', error);
-            }    
-        }
-
-        // убираем меню по клику в любом месте документа
-        window.addEventListener('click', () => {
-            document.querySelector('.ul-chat-user-menu').style.display = 'none';
-            document.querySelector('.ul-message-menu').style.display = 'none';
-            // !!! если здесь убирать выделение кликнутого пользователя рамкой,
-            // то потом при клике левой кнопкой пользователь не выделяется
-            // пока не понял почему
-            // e.target.classList.remove('div-chat-user-active');
-        });
-
-        // убираем меню по клавише escape
-        window.addEventListener('keydown', (press) => {
-            if (press.key === 'Escape') {
-                document.querySelector('.ul-chat-user-menu').style.display = 'none';
-                document.querySelector('.ul-message-menu').style.display = 'none';
-                // аналогично
-                // e.target.classList.remove('div-chat-user-active');
             }
-        });
+        }
     }
-    if (e.target.classList.contains('div-send-message') || e.target.classList.contains('div-accept-message')) {
+
+    // выводим контекстное меню на сообщении
+    if (e.target.classList.contains('div-send-message')
+        || e.target.classList.contains('div-accept-message')
+        // || e.target.classList.contains('div-text-message')
+        // || e.target.classList.contains('div-datetime-message')
+    ) {
         // console.log(e.target.id);
         e.preventDefault();
         // выводим меню
@@ -351,5 +337,120 @@ window.oncontextmenu = (e) => {
         positionY = e.pageY - CHAT_MESSAGE_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
         CHAT_MESSAGE_MENU.style.top = positionY + 'px';
         CHAT_MESSAGE_MENU.style.left = `${e.pageX}px`;
+        // добавляем/удаляем выделение элемента border на кликнутом сообщении
+        let divMessageActive = document.querySelector('.div-message-active');
+        divMessageActive !== null ? divMessageActive.classList.remove('div-message-active') : null;
+        e.target.classList.add('div-message-active');
+
+        // удаляем выбранное сообщение
+        let deleteMessage = document.querySelector('#deletemessage');
+        deleteMessage.onclick = async () => {
+            // console.log(e.target.id);
+            // отправляем данные на бэкенд для удаления из базы
+            data = {
+                action: 'deleteMessage',
+                'message_id': e.target.id
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.text();
+                // console.log('Успех: ', result);
+
+                // отравляем сообщение пользователю, для удаления у него удаленного сообщения
+                chatUser = document.querySelector('.div-chat-user-active').id
+                to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
+                WS.send(JSON.stringify({
+                    command: 'deleteMessage',
+                    id: e.target.id,
+                    to: to,
+                    nickname: USER_NICKNAME
+                }))
+                // выводим сообщение, что сообщение удалено
+                document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
+                e.target.classList.remove('div-message-active');
+                DELETEMESSAGE.play();
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }
+        }
+
+        // редактируем выбранное сообщение
+        let editMessage = document.querySelector('#editmessage');
+        editMessage.onclick = async () => {
+            console.log(e.target.id);
+            
+            // отправляем данные на бэкенд для изменения в базе
+            data = {
+                action: 'editMessage',
+                'message_id': e.target.id
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.text();
+                console.log('Успех: ', result);
+
+
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }
+        }
+
+        // пересылаем выбранное сообщение
+        let forwardMessage = document.querySelector('#editmessage');
+        forwardMessage.onclick = async () => {
+            console.log(e.target.id);
+            // отправляем данные на бэкенд для изменения в базе
+            data = {
+                action: 'forwardMessage',
+                'message_id': e.target.id
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.text();
+                console.log('Успех: ', result);
+
+
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }
+        }
     }
+
+    // убираем меню по клику в любом месте документа
+    window.addEventListener('click', () => {
+        document.querySelector('.ul-chat-user-menu').style.display = 'none';
+        document.querySelector('.ul-message-menu').style.display = 'none';
+        // !!! если здесь убирать выделение кликнутого пользователя рамкой,
+        // то потом при клике левой кнопкой пользователь не выделяется
+        // пока не понял почему
+        // e.target.classList.remove('div-chat-user-active');
+    });
+
+    // убираем меню по клавише escape
+    window.addEventListener('keydown', (press) => {
+        if (press.key === 'Escape') {
+            document.querySelector('.ul-chat-user-menu').style.display = 'none';
+            document.querySelector('.ul-message-menu').style.display = 'none';
+            // аналогично
+            // e.target.classList.remove('div-chat-user-active');
+        }
+    });
 }

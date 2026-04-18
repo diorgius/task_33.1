@@ -38,7 +38,7 @@ function outputMessage(location, msg) {
     parseInt(msg.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
-    divMessage.setAttribute('id', msg.message_id);
+    divMessage.setAttribute('id', msg.id);
     let divTextMessage = document.createElement('div');
     divTextMessage.classList.add(`div-text-message`);
     let divDateTimeMessage = document.createElement('div');

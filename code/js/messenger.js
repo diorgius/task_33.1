@@ -1,6 +1,7 @@
 const USER_ID = document.querySelector('#userid').value;
 const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
-const notice = new Audio('../../img/notice.mp3');
+const NOTICE = new Audio('../../img/notice.mp3');
+const DELETEMESSAGE = new Audio('../../img/deletemessage.mp3');
 let connectedUsers = '';
 
 // открываем соединение websocket
@@ -46,7 +47,7 @@ WS.onmessage = (e) => {
         case 'privateMessage':
             // console.log(data);
             // проверяем отключено или нет оповещение для этого пользователя
-            if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-notice')) {
+            if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-NOTICE')) {
                 // если открыт список добавления пользователей, то выделяем пользователя цветом 
                 // (сообщаем, что от этого пользователя пришло сообщение)
                 if (document.querySelector('#divaddusers')) {
@@ -60,8 +61,8 @@ WS.onmessage = (e) => {
                             // выводим принятое сообщение
                             outputMessage(divUserMessages, data);
                             // воспроизводим звук
-                            notice.autoplay = true;
-                            notice.play();
+                            NOTICE.autoplay = true;
+                            NOTICE.play();
                             // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
                             // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
                         } else if (document.querySelector('.div-user-messages').id !== data.send_nickname) {
@@ -83,8 +84,8 @@ WS.onmessage = (e) => {
                         // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
                         getUserMessages(data);
                         // воспроизводим звук
-                        notice.autoplay = true;
-                        notice.play();
+                        NOTICE.autoplay = true;
+                        NOTICE.play();
                         // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
                         document.getElementById(data.acceptUserId).click();
                     }
@@ -100,6 +101,16 @@ WS.onmessage = (e) => {
             // вызываем функцию для вывода себе сообщения, отправленного адресату
             let divUserMessages = document.querySelector('.div-user-messages');
             outputMessage(divUserMessages, data);
+            break;
+        case 'deleteMessage':
+            // console.log(data);
+            // удаляем сообщение
+            // проверяем открыт ли чат с пользователем удалившим сообщение
+            if (document.getElementById(data.nickname)) {
+                // удаляем текст удаленного сообщения
+                document.getElementById(data.id).textContent = 'Сообщение удалено';
+            }
+            DELETEMESSAGE.play();
             break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
@@ -179,6 +190,7 @@ document.body.addEventListener('click', async (e) => {
                         text_message: textSendMessage
                     });
                     WS.send(message);
+                    TEXT_AREA_MESSAGE.focus();
                 }
             }
         }
@@ -186,6 +198,7 @@ document.body.addEventListener('click', async (e) => {
     // если клик по крестику в хидере чата
     if (e.target.id === 'spanchatclose') {
         document.querySelector('.div-user-messages').remove();
+        document.querySelector('.div-chat-user-active').classList.remove('div-chat-user-active');
         document.querySelector('.div-text-send-message').style.visibility = 'hidden';
     }
 });

@@ -19,7 +19,7 @@
     height: 90%;
     transition: all 0.5s ease;
     padding-top: 1rem;
-    z-index: 99;
+    z-index: 100;
 }
 
 .div-user-avatar {
@@ -55,6 +55,7 @@
     display: flex;
     align-items: center;
     cursor: pointer;
+    user-select: none;
 }
 
 .div-chat-user-nickname {
@@ -78,7 +79,7 @@
     height: 90%;
     transition: all 0.5s ease;
     padding-top: 1rem;
-    z-index: 99;
+    z-index: 98;
 }
 
 .div-btn-right-group {
@@ -127,11 +128,11 @@
     position: fixed;
     top: 5.2rem;
     left: 20%;
-    width: 65%;
-    height: 75%;
+    width: 64.3%;
+    height: 74.3%;
     transition: all 0.5s ease;
     overflow-y: auto;
-    z-index: 100;
+    z-index: 99;
 }
 
 /* .div-seach-users {
@@ -210,6 +211,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 97;
 }
 
 .div-text-send-message {
@@ -382,4 +384,8 @@
 
 .ul-message-menu li:hover{
     color: #007bff;
+}
+
+.div-message-active {
+    border: .1rem solid #009900;
 }

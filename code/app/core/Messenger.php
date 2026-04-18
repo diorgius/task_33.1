@@ -33,12 +33,20 @@ class Messenger implements MessageComponentInterface
         $data = json_decode($message, true);
 
         switch ($data['command']) {
+            // проверяем пришедшее сообщение на действие которое надо произвести
             case 'connect':
+                // записываем id пользователя
                 $this->clients->userId[$from->resourceId] = $data['userId'];
+                // функция отправки сообщения всем пользователям о своем присоединении к серверу
                 $this->sendGreetingMessage($from, $data);
                 break;
             case 'privateMessage':
+                // функция отправки приватного сообщения
                 $this->sendPrivateMessage($from, $data);
+                break;
+            case 'deleteMessage';
+                // функция отправки сообщения об удалении сообщения
+                $this->deleteMessage($from, $data);
                 break;
         }
     }
@@ -59,58 +67,65 @@ class Messenger implements MessageComponentInterface
 
     protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
-        
         // делаем запись сообщения в базу
         DB::dbconnect();
-
+        // формируем метку времени
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
-
-        $value = [ 
+        // формируем массив для записи в базу
+        $value = [
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
             'text_message' => htmlspecialchars($data['text_message']),
             'created' => $created
         ];
-
+        // записываем в базу
         $result = DB::create('messages', $value);
-
+        // дополняем сообщение для отправки пользователю
         if ($result) {
-            $data['message_id'] = $result;
+            $data['id'] = $result;
             $data['from'] = (string) $from->resourceId;
             $data['created'] = $created;
-        }
-
+        } // возможно надо сделать проверку записи на ошибки и вывод ошибок
+        // формируем ответ отправителю сообщения, для вывода сообщения у него
         $replay = [
             'command' => 'replay',
-            'message_id' => $result,
-            'send_user_id'=> $data['send_user_id'],
-            'accept_user_id'=> $data['accept_user_d'],
+            'id' => $result,
+            'send_user_id' => $data['send_user_id'],
+            'accept_user_id' => $data['accept_user_d'],
             'text_message' => $data['text_message'],
             'created' => $created
         ];
-
-        var_dump($data);
-
+        // var_dump($data);
         $message = json_encode($data);
         $replay = json_encode($replay);
         foreach ($this->clients as $client) {
             if ($client->resourceId === intval($data['to'])) {
                 $client->send($message);
             }
-
             // добавлена отправка сообщения самому себе после отправки сообщения адресату
             // для того чтобы получить message_id из БД и дату и время сообщения
             // для присвоения div id для однозначной идентификации
             // сообщения и вывода даты и времени
-
             if ($client->resourceId === intval($data['from'])) {
                 $client->send($replay);
             }
         }
 
         echo "Private message from {$from->resourceId} to {$data['to']}\n";
+    }
+
+    protected function deleteMessage(ConnectionInterface $from, $data)
+    {
+        // var_dump($data);
+        // отправляем сообщение пользователю для удаления сообщения у него
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            if ($client->resourceId === intval($data['to'])) {
+                $client->send($message);
+            }
+        }
     }
 
     public function onClose(ConnectionInterface $conn)
