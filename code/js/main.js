@@ -383,32 +383,38 @@ window.oncontextmenu = (e) => {
         // редактируем выбранное сообщение
         let editMessage = document.querySelector('#editmessage');
         editMessage.onclick = async () => {
-            console.log(e.target.id);
-            
+            console.log(e);
+            console.log(e.target.firstChild.innerText);
+            TEXT_AREA_MESSAGE.value = e.target.firstChild.innerText;
+            // изменяем сообщение при клике на отправку (как-то надо определить, что это редактированное сообщение)
+            // получаем id сообщения, отправляем сообщение на бэкенд через сокет,
+            // там его переписываем в базе (update), и пересылаем пользователю,
+            // заменяем у него исходное сообщение, у себя и у получателя делаем пометку на сообщении "изменено"
+            // 
             // отправляем данные на бэкенд для изменения в базе
-            data = {
-                action: 'editMessage',
-                'message_id': e.target.id
-            }
-            try {
-                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(data)
-                });
-                let result = await response.text();
-                console.log('Успех: ', result);
+        //     data = {
+        //         action: 'editMessage',
+        //         'message_id': e.target.id
+        //     }
+        //     try {
+        //         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json;charset=utf-8'
+        //             },
+        //             body: JSON.stringify(data)
+        //         });
+        //         let result = await response.text();
+        //         console.log('Успех: ', result);
 
 
-            } catch (error) {
-                console.log('Ошибка: ', error);
-            }
+        //     } catch (error) {
+        //         console.log('Ошибка: ', error);
+        //     }
         }
 
         // пересылаем выбранное сообщение
-        let forwardMessage = document.querySelector('#editmessage');
+        let forwardMessage = document.querySelector('#forwardmessage');
         forwardMessage.onclick = async () => {
             console.log(e.target.id);
             // отправляем данные на бэкенд для изменения в базе
