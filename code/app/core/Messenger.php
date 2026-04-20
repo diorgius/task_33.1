@@ -37,19 +37,19 @@ class Messenger implements MessageComponentInterface
             case 'connect':
                 // записываем id пользователя
                 $this->clients->userId[$from->resourceId] = $data['userId'];
-                // функция отправки сообщения всем пользователям о своем присоединении к серверу
+                // метод отправки сообщения всем пользователям о своем присоединении к серверу
                 $this->sendGreetingMessage($from, $data);
                 break;
             case 'privateMessage':
-                // функция отправки приватного сообщения
+                // метод отправки приватного сообщения
                 $this->sendPrivateMessage($from, $data);
                 break;
             case 'deleteMessage';
-                // функция отправки сообщения об удалении сообщения
+                // метод отправки сообщения об удалении сообщения
                 $this->deleteMessage($from, $data);
                 break;
             case 'editMessage';
-                // функция отправки отредактированного сообщения
+                // метод отправки отредактированного сообщения
                 $this->editMessage($from, $data);
                 break;
         }

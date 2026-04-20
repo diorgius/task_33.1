@@ -66,9 +66,9 @@ if (document.querySelector('#userid')) {
 // !!! СДЕЛАНО 14. сделать удаление всей переписки с пользователем
 // 14.1 при удалении пользователя из списка контактов ???надо ли удалять переписку с ним
 //
-// 15. удаление конкретного сообщения
+// !!! СДЕЛАНО 15. удаление конкретного сообщения
 //
-// 16. редактирование сообщения
+// !!! СДЕЛАНО 16. редактирование сообщения
 //
 // 17. пересылка сообщения
 //
@@ -344,7 +344,7 @@ window.oncontextmenu = (e) => {
 
         // удаляем выбранное сообщение
         let deleteMessage = document.querySelector('#deletemessage');
-        deleteMessage.onclick = async () => {
+        deleteMessage.onclick = () => {
             // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из базы
             let chatUser = document.querySelector('.div-chat-user-active').id
             to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
@@ -362,7 +362,7 @@ window.oncontextmenu = (e) => {
 
         // редактируем выбранное сообщение
         let editMessage = document.querySelector('#editmessage');
-        editMessage.onclick = async () => {
+        editMessage.onclick = () => {
             // console.log(e);
             // выводим текст сообщения в текстовую область для редактирования
             TEXT_AREA_MESSAGE.value = e.target.firstChild.innerText;
@@ -400,12 +400,12 @@ window.oncontextmenu = (e) => {
 
         // пересылаем выбранное сообщение
         let forwardMessage = document.querySelector('#forwardmessage');
-        forwardMessage.onclick = async () => {
-            console.log(e.target.id);
-            // отправляем данные на бэкенд для изменения в базе
+        forwardMessage.onclick = async (event) => {
+            // console.log(event);
+            // получаем список пользователей из своих контактов для пересылки сообщения
             data = {
-                action: 'forwardMessage',
-                'message_id': e.target.id
+                action: 'getUserContacts',
+                'user_id': USER_ID
             }
             try {
                 let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
@@ -415,8 +415,66 @@ window.oncontextmenu = (e) => {
                     },
                     body: JSON.stringify(data)
                 });
-                let result = await response.text();
-                console.log('Успех: ', result);
+                let result = await response.json();
+                // console.log('Успех: ', result);
+
+                // выводим список контактов
+                // CHAT_MESSAGE_MENU.style.display = 'block';
+                let sectionMain = document.querySelector('#mainwindow');
+                let ulChatUsers = document.createElement('ul');
+                ulChatUsers.classList.add('ul-users-menu');
+                ulChatUsers.setAttribute('id', 'ulusersmenu')
+                result.forEach((item) => {
+                    let liChatUser = document.createElement('li');
+                    // liChatUser.setAttribute('id', item.id);
+                    liChatUser.classList.add('li-users-menu');
+                    let spanUserNickname = document.createElement('span');
+                    spanUserNickname.classList.add('span-forward-user');
+                    item.nickname !== '' ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
+                    let spanCheckbox = document.createElement('span');
+                    spanCheckbox.classList.add('span-forward-user');
+                    let checkbox = document.createElement('input');
+                    checkbox.setAttribute('type', 'checkbox');
+                    checkbox.classList.add('checkbox-forward-user');
+                    checkbox.setAttribute('id', item.id);
+                    spanCheckbox.appendChild(checkbox);
+                    liChatUser.append(spanUserNickname, spanCheckbox);
+                    ulChatUsers.appendChild(liChatUser);
+                })
+                // добавляем кнопку пересылки
+                let btnForwardMessage = document.createElement('button');
+                btnForwardMessage.setAttribute('id', 'btnforwardmessage');
+                btnForwardMessage.classList.add('btn-forward-message');
+                btnForwardMessage.textContent = 'Переслать';
+                ulChatUsers.append(btnForwardMessage);
+                // выводим меню
+                sectionMain.append(ulChatUsers);
+                ulChatUsers.style.display = 'block';
+                // если позиция на эране меньше половины экрана, то выводим меню вниз
+                if (event.clientY < 500) {
+                    ulChatUsers.style.top = `${event.clientY}px`;
+                    // иначе выводим меню вверх
+                } else {
+                    positionY = event.clientY - ulChatUsers.offsetHeight;
+                    ulChatUsers.style.top = positionY + 'px';
+                }
+                ulChatUsers.style.left = `${event.clientX}px`;
+
+                // обрабатываем пересылку сообщения
+                btnForwardMessage.onclick = () => {
+                    let checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                    console.log(checkedCheckboxes);
+                    let userToForward = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
+                    console.log(userToForward);
+                    // liChatUser.forEach((elem) => {
+                            
+                    //         console.log(elem);
+                        
+                    // });
+                    document.querySelector('.ul-message-menu').style.display = 'none';
+                    document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
+                }
+
 
 
             } catch (error) {
@@ -426,22 +484,34 @@ window.oncontextmenu = (e) => {
     }
 
     // убираем меню по клику в любом месте документа
-    window.addEventListener('click', () => {
+    window.addEventListener('click', (elem) => {
         document.querySelector('.ul-chat-user-menu').style.display = 'none';
-        document.querySelector('.ul-message-menu').style.display = 'none';
         // !!! если здесь убирать выделение кликнутого пользователя рамкой,
         // то потом при клике левой кнопкой пользователь не выделяется
         // пока не понял почему
         // e.target.classList.remove('div-chat-user-active');
+
+        // если клики не на пункте меню или пользователе или чекбоксе, то убираем меню
+        // console.log(elem.target);
+        if (!elem.target.classList.contains('li-users-menu') 
+            && !elem.target.classList.contains('span-forward-user')
+            && !elem.target.classList.contains('checkbox-forward-user')
+            // && !document.querySelector('#forwardmessage')
+            ) {
+            document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
+            document.querySelector('.ul-message-menu').style.display = 'none';
+        }
     });
 
     // убираем меню по клавише escape
     window.addEventListener('keydown', (press) => {
         if (press.key === 'Escape') {
             document.querySelector('.ul-chat-user-menu').style.display = 'none';
-            document.querySelector('.ul-message-menu').style.display = 'none';
             // аналогично
             // e.target.classList.remove('div-chat-user-active');
+            // по клавише убираем все меню
+            document.querySelector('.ul-message-menu').style.display = 'none';
+            document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
         }
     });
 }

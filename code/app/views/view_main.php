@@ -75,7 +75,7 @@
             <ul class="ul-message-menu">
                 <li id="deletemessage">Удалить сообщение</li>
                 <li id="editmessage">Редактировать сообщение</li>
-                <li id="forwardmessage">Переслать сообщение</li>
+                <li class="span-forward-user">Переслать сообщение&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="forwardmessage">&gt;</span></li>
             </ul>
 
         </section>

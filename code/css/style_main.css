@@ -396,3 +396,68 @@
     font-size: .7rem;
     color: #007bff;
 }
+
+/* #forwardmessage {
+    font-size: 1rem;
+    font-weight: bold;
+} */
+
+.ul-users-menu {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    min-width: max-content;
+    height: auto;
+    border: .1rem solid #cccccc;
+    border-radius: .2rem;
+    background-color: #ffffff;
+    color: #666666;
+    font-size: .8rem;
+    list-style: none;
+    box-shadow: .1rem .1rem .7rem .1rem #cccccc;
+}
+
+.ul-users-menu li {
+    padding: .5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.ul-users-menu li:hover{
+    color: #007bff;
+}
+
+.checkbox-forward-user {
+    margin-left: 2rem;
+}
+
+.btn-forward-message {
+    height: 1.5rem;
+    width: 6rem;
+    background-color: #ffffff;
+    border: .1rem solid #007bff;
+    border-radius: .2rem;
+    font-size: .8rem;
+    color: #007bff;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin: .3rem;
+    display: flex;
+    justify-self: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-forward-message:hover {    
+    background-color: #ffffff;
+    border: .1rem solid #a5cbf3;
+    color: #a5cbf3;
+}
+
+.btn-forward-message:active {
+    background-color: #ffffff;
+    border: .1rem solid #007bff;
+    color: #007bff;
+}

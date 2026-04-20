@@ -23,6 +23,7 @@ class ActionsWithUsers
         }
     }
 
+    // метод проверки email при регистрации и nickname в профиле
     public function checkUserData()
     {
         DB::dbconnect();
@@ -35,6 +36,7 @@ class ActionsWithUsers
         }
     }
 
+    // метод получения всех пользователей
     public function getAllUsers()
     {
         DB::dbconnect();
@@ -42,6 +44,7 @@ class ActionsWithUsers
         echo json_encode($result);
     }
 
+    // метод создания контакта
     public function createContact()
     {
         DB::dbconnect();
@@ -52,18 +55,21 @@ class ActionsWithUsers
         DB::create('contacts', $value);
     }
 
+    // метод удаления контакта
     public function deleteContact()
     {
         DB::dbconnect();
         DB::deleteContact('contacts', $this->data['userId'], $this->data['contactUserId']);
     }
 
+    // метод удаления всех сообщений с контактом
     public function deleteUserMessages()
     {
         DB::dbconnect();
         DB::deleteUserMessages('messages', $this->data['send_user_id'], $this->data['accept_user_id']);
     }
 
+    // метод получения всех сообщений с контактом
     public function getUserMessages()
     {
         DB::dbconnect();
@@ -71,6 +77,13 @@ class ActionsWithUsers
         echo json_encode($result);
     }
 
+    // метод получения всех контактов пользователя
+    public function getUserContacts()
+    {
+        DB::dbconnect();
+        $result = DB::getContacts('contacts', 'user_id', $this->data['user_id']);
+        echo json_encode($result);
+    }
 }
 
 new ActionsWithUsers();

@@ -134,7 +134,7 @@ class DB
     public static function getContacts(string $table, string $prop, string $value)
     {
         $stmt = self::$pdo->prepare(
-            "SELECT contact_user_id, email, nickname, avatar 
+            "SELECT c.id, contact_user_id, email, nickname, avatar 
             FROM $table AS c LEFT JOIN users AS u ON 
             u.id = (SELECT contact_user_id FROM contacts 
             WHERE 
