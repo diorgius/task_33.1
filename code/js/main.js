@@ -70,7 +70,9 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 16. редактирование сообщения
 //
-// 17. пересылка сообщения
+// 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕПЕСЫЛКЕ ???
+//
+// !!! ??? ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта 
 //
 // 18. создание группы и добавление пользователей в группу
 // 
@@ -424,23 +426,26 @@ window.oncontextmenu = (e) => {
                 let ulChatUsers = document.createElement('ul');
                 ulChatUsers.classList.add('ul-users-menu');
                 ulChatUsers.setAttribute('id', 'ulusersmenu')
+                let divUserMessages = document.querySelector('.div-user-messages');
                 result.forEach((item) => {
-                    let liChatUser = document.createElement('li');
-                    // liChatUser.setAttribute('id', item.id);
-                    liChatUser.classList.add('li-users-menu');
-                    let spanUserNickname = document.createElement('span');
-                    spanUserNickname.classList.add('span-forward-user');
-                    item.nickname !== '' ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
-                    let spanCheckbox = document.createElement('span');
-                    spanCheckbox.classList.add('span-forward-user');
-                    let checkbox = document.createElement('input');
-                    checkbox.setAttribute('type', 'checkbox');
-                    checkbox.classList.add('checkbox-forward-user');
-                    checkbox.setAttribute('id', item.id);
-                    spanCheckbox.appendChild(checkbox);
-                    liChatUser.append(spanUserNickname, spanCheckbox);
-                    ulChatUsers.appendChild(liChatUser);
-                })
+                    // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
+                    if (divUserMessages.id !== item.nickname && divUserMessages.id !== item.email) {
+                        let liChatUser = document.createElement('li');
+                        liChatUser.classList.add('li-users-menu');
+                        let spanUserNickname = document.createElement('span');
+                        spanUserNickname.classList.add('span-forward-user');
+                        item.nickname !== '' ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
+                        let spanCheckbox = document.createElement('span');
+                        spanCheckbox.classList.add('span-forward-user');
+                        let checkbox = document.createElement('input');
+                        checkbox.setAttribute('type', 'checkbox');
+                        checkbox.classList.add('checkbox-forward-user');
+                        checkbox.setAttribute('id', item.contact_user_id);
+                        spanCheckbox.appendChild(checkbox);
+                        liChatUser.append(spanUserNickname, spanCheckbox);
+                        ulChatUsers.appendChild(liChatUser);
+                    }
+                });
                 // добавляем кнопку пересылки
                 let btnForwardMessage = document.createElement('button');
                 btnForwardMessage.setAttribute('id', 'btnforwardmessage');
@@ -461,16 +466,72 @@ window.oncontextmenu = (e) => {
                 ulChatUsers.style.left = `${event.clientX}px`;
 
                 // обрабатываем пересылку сообщения
-                btnForwardMessage.onclick = () => {
+                btnForwardMessage.onclick = async () => {
                     let checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-                    console.log(checkedCheckboxes);
                     let userToForward = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
                     console.log(userToForward);
-                    // liChatUser.forEach((elem) => {
-                            
-                    //         console.log(elem);
-                        
-                    // });
+                    // console.log(e.target.id);
+
+                    // записываем в БД сообщение для всех пользователей которым его переслали
+                    // если делать запись через сокет, то там запишем только тем кто акттивен
+                    // ??? надо подумать как передать данные через сокет что бы записывалось для всех адресатов
+                    data = {
+                        action: 'forwardMessage',
+                        'id': e.target.id,
+                        'send_user_id': USER_ID,
+                        'usersId': userToForward,
+                        'text_message': e.target.firstChild.innerText
+                    }
+                    try {
+                        let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json;charset=utf-8'
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        let result = await response.text();
+                        // console.log('Успех: ', result);
+
+                        // выводим сообщение о пересылке
+                        alertMessage(result);
+
+                        // отсылаем сообщение пользователям которым оно пересылается и которые активны 
+                        // что бы оно у них появилось без перезагрузки страницы
+                        console.log(connectedUsers);
+
+
+                        // можно делать запись в базу и здесь, но тогда оно будет записано
+                        // только для тех пользователей, которые активны в настоящий момент,
+                        // а тем кому пересылали, но они не активны оно не запишитеся в БД
+                        // ??? надо подумать как передать данные через сокет что бы записывалось для всех адресатов
+                        // !!!??? вывод даты !!! она пустая
+                        userToForward.forEach((elem) => {
+                            console.log(elem);
+                            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === elem);
+                            console.log(to)
+                            if (to) {
+                                message = JSON.stringify({
+                                    command: 'forwardMessage',
+                                    id: e.target.id,
+                                    to: to,
+                                    send_user_id: USER_ID,
+                                    accept_user_id: elem,
+                                    nickname: USER_NICKNAME,
+                                    text_message: e.target.firstChild.innerText,
+                                    status_message: 'forwarded'
+                                });
+                                WS.send(message);
+                            }
+
+                        })
+                        TEXT_AREA_MESSAGE.focus();
+
+
+
+                    } catch (error) {
+                        console.log('Ошибка: ', error);
+                    }
                     document.querySelector('.ul-message-menu').style.display = 'none';
                     document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
                 }
@@ -493,11 +554,9 @@ window.oncontextmenu = (e) => {
 
         // если клики не на пункте меню или пользователе или чекбоксе, то убираем меню
         // console.log(elem.target);
-        if (!elem.target.classList.contains('li-users-menu') 
+        if (!elem.target.classList.contains('li-users-menu')
             && !elem.target.classList.contains('span-forward-user')
-            && !elem.target.classList.contains('checkbox-forward-user')
-            // && !document.querySelector('#forwardmessage')
-            ) {
+            && !elem.target.classList.contains('checkbox-forward-user')) {
             document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
             document.querySelector('.ul-message-menu').style.display = 'none';
         }

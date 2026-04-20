@@ -52,6 +52,10 @@ class Messenger implements MessageComponentInterface
                 // метод отправки отредактированного сообщения
                 $this->editMessage($from, $data);
                 break;
+            case 'forwardMessage';
+                // метод отправки персланного сообщения
+                $this->forwardMessage($from, $data);
+                break;
         }
     }
 
@@ -131,6 +135,7 @@ class Messenger implements MessageComponentInterface
         foreach ($this->clients as $client) {
             if ($client->resourceId === intval($data['to'])) {
                 $client->send($message);
+                break;
             }
         }
     }
@@ -159,6 +164,37 @@ class Messenger implements MessageComponentInterface
         foreach ($this->clients as $client) {
             if ($client->resourceId === intval($data['to'])) {
                 $client->send($message);
+                break;
+            }
+        }
+    }
+
+    public function forwardMessage(ConnectionInterface $from, $data)
+    {
+        var_dump($data);
+
+        // можно делать запись в базу и здесь, но тогда оно будет записано
+        // только для тех пользователей, которые активны в настоящий момент,
+        // а тем кому пересылали, но они не активны оно не запишитеся в БД
+        // ??? надо подумать как передать данные через сокет что бы записывалось для всех адресатов
+        // $date = new DateTime();
+        // $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        // $created = $date->format('Y-m-d H:i:s');
+        // $values = [
+        //     'send_user_id' => $data['send_user_id'],
+        //     'accept_user_id' => $data['usersId'],
+        //     'text_message' => $data['text_message'],
+        //     'status_message' => 'forwarded',
+        //     'created' => $created
+        // ];
+        // // var_dump($values);
+        // DB::create('messages', $values);
+
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            if ($client->resourceId === intval($data['to'])) {
+                $client->send($message);
+                break;
             }
         }
     }

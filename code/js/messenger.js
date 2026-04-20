@@ -121,6 +121,20 @@ WS.onmessage = (e) => {
                 divUserMessage.lastChild.textContent = 'edited';
             }
             break;
+        case 'forwardMessage':
+            console.log(data);
+            // выводим пересланное сообщение
+            // проверяем открыт ли чат с пользователем переславшим сообщение, если открыт, то выводим сообщение
+            if (document.getElementById(data.nickname)) {
+                let divUserMessages = document.getElementById(data.nickname);
+                
+                // !!!??? вывод даты !!! она пустая
+                outputMessage(divUserMessages, data)
+            // если не открыт, то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
+            } else {
+                document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage')
+            }
+            break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
             delete connectedUsers[data.connectId];
