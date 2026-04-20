@@ -345,72 +345,57 @@ window.oncontextmenu = (e) => {
         // удаляем выбранное сообщение
         let deleteMessage = document.querySelector('#deletemessage');
         deleteMessage.onclick = async () => {
-            // console.log(e.target.id);
-            // отправляем данные на бэкенд для удаления из базы
-            data = {
-                action: 'deleteMessage',
-                'message_id': e.target.id
-            }
-            try {
-                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(data)
-                });
-                let result = await response.text();
-                // console.log('Успех: ', result);
-
-                // отравляем сообщение пользователю, для удаления у него удаленного сообщения
-                chatUser = document.querySelector('.div-chat-user-active').id
-                to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
-                WS.send(JSON.stringify({
-                    command: 'deleteMessage',
-                    id: e.target.id,
-                    to: to,
-                    nickname: USER_NICKNAME
-                }))
-                // выводим сообщение, что сообщение удалено
-                document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
-                e.target.classList.remove('div-message-active');
-                DELETEMESSAGE.play();
-            } catch (error) {
-                console.log('Ошибка: ', error);
-            }
+            // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из базы
+            let chatUser = document.querySelector('.div-chat-user-active').id
+            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
+            WS.send(JSON.stringify({
+                command: 'deleteMessage',
+                id: e.target.id,
+                to: to,
+                nickname: USER_NICKNAME
+            }))
+            // выводим сообщение, что сообщение удалено
+            document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
+            e.target.classList.remove('div-message-active');
+            DELETEMESSAGE.play();
         }
 
         // редактируем выбранное сообщение
         let editMessage = document.querySelector('#editmessage');
         editMessage.onclick = async () => {
-            console.log(e);
-            console.log(e.target.firstChild.innerText);
+            // console.log(e);
+            // выводим текст сообщения в текстовую область для редактирования
             TEXT_AREA_MESSAGE.value = e.target.firstChild.innerText;
-            // изменяем сообщение при клике на отправку (как-то надо определить, что это редактированное сообщение)
-            // получаем id сообщения, отправляем сообщение на бэкенд через сокет,
-            // там его переписываем в базе (update), и пересылаем пользователю,
-            // заменяем у него исходное сообщение, у себя и у получателя делаем пометку на сообщении "изменено"
-            // 
-            // отправляем данные на бэкенд для изменения в базе
-        //     data = {
-        //         action: 'editMessage',
-        //         'message_id': e.target.id
-        //     }
-        //     try {
-        //         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json;charset=utf-8'
-        //             },
-        //             body: JSON.stringify(data)
-        //         });
-        //         let result = await response.text();
-        //         console.log('Успех: ', result);
-
-
-        //     } catch (error) {
-        //         console.log('Ошибка: ', error);
-        //     }
+            // убираем выделение сообщения
+            document.getElementById(e.target.id).classList.remove('div-message-active');
+            // отправка измененного сообщения
+            const MESSAGE_SEND = document.querySelector('#sendmessage');
+            let chatUser = document.querySelector('.div-chat-user-active').id
+            MESSAGE_SEND.onclick = () => {
+                let textSendMessage = TEXT_AREA_MESSAGE.value;
+                // проверить не пусто ли сообщение
+                if (textSendMessage === '') {
+                    alertMessage('Введите текст сообщения');
+                } else {
+                    TEXT_AREA_MESSAGE.value = '';
+                    to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
+                    message = JSON.stringify({
+                        command: 'editMessage',
+                        id: e.target.id,
+                        to: to,
+                        send_user_id: USER_ID,
+                        accept_user_id: chatUser,
+                        nickname: USER_NICKNAME,
+                        text_message: textSendMessage
+                    });
+                    WS.send(message);
+                    TEXT_AREA_MESSAGE.focus();
+                    // выводим текст измененного сообщение
+                    e.target.firstChild.textContent = textSendMessage;
+                    // делаем пометку на сообщении
+                    e.target.lastChild.textContent = 'edited';
+                }
+            }
         }
 
         // пересылаем выбранное сообщение

@@ -71,12 +71,6 @@ class ActionsWithUsers
         echo json_encode($result);
     }
 
-    public function deleteMessage()
-    {
-        var_dump($this->data);
-        DB::dbconnect();
-        DB::delete('messages', $this->data['message_id']);
-    }
 }
 
 new ActionsWithUsers();

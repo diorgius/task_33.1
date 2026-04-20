@@ -48,6 +48,10 @@ class Messenger implements MessageComponentInterface
                 // функция отправки сообщения об удалении сообщения
                 $this->deleteMessage($from, $data);
                 break;
+            case 'editMessage';
+                // функция отправки отредактированного сообщения
+                $this->editMessage($from, $data);
+                break;
         }
     }
 
@@ -78,6 +82,7 @@ class Messenger implements MessageComponentInterface
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
             'text_message' => htmlspecialchars($data['text_message']),
+            // 'status_message' => '',
             'created' => $created
         ];
         // записываем в базу
@@ -112,14 +117,44 @@ class Messenger implements MessageComponentInterface
                 $client->send($replay);
             }
         }
-
         echo "Private message from {$from->resourceId} to {$data['to']}\n";
     }
 
     protected function deleteMessage(ConnectionInterface $from, $data)
     {
-        // var_dump($data);
+        // делаем удаление сообщения из базы
+        DB::dbconnect();
+        // удаляем сообщение в базе
+        DB::delete('messages', $data['id']);
         // отправляем сообщение пользователю для удаления сообщения у него
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            if ($client->resourceId === intval($data['to'])) {
+                $client->send($message);
+            }
+        }
+    }
+
+    protected function editMessage(ConnectionInterface $from, $data)
+    {
+        // делаем изменение сообщения в базе
+        DB::dbconnect();
+        // формируем метку времени
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+        // формируем массив для записи в базу
+        $value = [
+            'id' => $data['id'],
+            'send_user_Id' => $data['send_user_id'],
+            'accept_user_id' => $data['accept_user_id'],
+            'text_message' => htmlspecialchars($data['text_message']),
+            'status_message' => 'edited',
+            'created' => $created
+        ];
+        // записываем изменения в базу
+        $result = DB::update('messages', $value);
+        // отправляем сообщение пользователю для изменения сообщения у него
         $message = json_encode($data);
         foreach ($this->clients as $client) {
             if ($client->resourceId === intval($data['to'])) {

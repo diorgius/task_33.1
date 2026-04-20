@@ -71,6 +71,7 @@ class DB
                 `send_user_id` INT NOT NULL,
                 `accept_user_id` INT NOT NULL,
                 `text_message` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+                `status_message` VARCHAR(10) NULL COLLATE 'utf8mb4_0900_ai_ci',
                 `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`message_id`) USING BTREE,
                 INDEX `FK_messages_users` (`send_user_id`) USING BTREE,

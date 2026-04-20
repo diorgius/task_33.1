@@ -61,7 +61,6 @@ WS.onmessage = (e) => {
                             // выводим принятое сообщение
                             outputMessage(divUserMessages, data);
                             // воспроизводим звук
-                            NOTICE.autoplay = true;
                             NOTICE.play();
                             // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
                             // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
@@ -84,7 +83,6 @@ WS.onmessage = (e) => {
                         // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
                         getUserMessages(data);
                         // воспроизводим звук
-                        NOTICE.autoplay = true;
                         NOTICE.play();
                         // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
                         document.getElementById(data.acceptUserId).click();
@@ -109,8 +107,19 @@ WS.onmessage = (e) => {
             if (document.getElementById(data.nickname)) {
                 // удаляем текст удаленного сообщения
                 document.getElementById(data.id).textContent = 'Сообщение удалено';
+                DELETEMESSAGE.play();
             }
-            DELETEMESSAGE.play();
+            break;
+        case 'editMessage':
+            // console.log(data);
+            // изменяем сообщение
+            // проверяем открыт ли чат с пользователем изменившим сообщение
+            if (document.getElementById(data.nickname)) {
+                let divUserMessage = document.getElementById(data.id);
+                // изменяем сообщение
+                divUserMessage.firstChild.textContent = data.text_message;
+                divUserMessage.lastChild.textContent = 'edited';
+            }
             break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей

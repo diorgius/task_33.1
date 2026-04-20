@@ -46,8 +46,11 @@ function outputMessage(location, msg) {
     divTextMessage.textContent = msg.text_message;
     dateTimeCreate = new Date(msg.created);
     divDateTimeMessage.textContent = dateTimeCreate.toLocaleTimeString("ru-RU") + ' ' + dateTimeCreate.toLocaleDateString("ru-RU");
+    let divInfoMessage = document.createElement('div')
+    divInfoMessage.classList.add(`div-info-message`);
+    divInfoMessage.textContent = msg.status_message;
     location.appendChild(divMessage);
-    divMessage.append(divTextMessage, divDateTimeMessage);
+    divMessage.append(divTextMessage, divDateTimeMessage,  divInfoMessage);
     location.scrollIntoView({ block: 'end', behavior: 'smooth' });
 }
 
