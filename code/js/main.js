@@ -30,9 +30,9 @@ if (document.querySelector('#userid')) {
 // выдать сообщение о приходе сообщения от другого пользователя (этот пользователь выделяется желтым цветом)
 // ??? или просто делать оповещение в любом случае, а чат пусть пользователь открывает сам
 //
-// !!! СДЕЛАНО 5. запись сообщений в базу
+// !!! СДЕЛАНО 5. запись сообщений в БД
 //
-// !!! СДЕЛАНО 6. при активации пользователя загружать из базы ранние сообщения от этого пользователя
+// !!! СДЕЛАНО 6. при активации пользователя загружать из БД ранние сообщения от этого пользователя
 //
 // !!! СДЕЛАНО 6.1 при получение сообщения от другого пользователя когда открыт чат, при активации также загружать 
 // направленные ему сообщения
@@ -58,19 +58,20 @@ if (document.querySelector('#userid')) {
 //            // сообщения и вывода даты и времени
 //          )
 //  как идентифицировать сообщение на стороне отправителя??? в момент его отправки???
-// на стороне получателя мы при записе в базу получаем message_id и пересылаем его адресату
+// на стороне получателя мы при записе в БД получаем message_id и пересылаем его адресату
 // уже с уникальным id, а на стороне отправителя??? id нет и как потом его идентифицировать
 // если пользователь захочет его переслать???
-// при открытии чата сообщения будут загружены из базы и тут проблем нет т.к. id будет
+// при открытии чата сообщения будут загружены из БД и тут проблем нет т.к. id будет
 //
 // !!! СДЕЛАНО 14. сделать удаление всей переписки с пользователем
-// 14.1 при удалении пользователя из списка контактов ???надо ли удалять переписку с ним
+//
+// 14.1 при удалении пользователя из списка контактов ??? НАДО ЛИ удалять переписку с ним
 //
 // !!! СДЕЛАНО 15. удаление конкретного сообщения
 //
 // !!! СДЕЛАНО 16. редактирование сообщения
 //
-// 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕРЕСЫЛКЕ ???
+// !!! СДЕЛАНО 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕРЕСЫЛКЕ ???
 //
 // !!! ??? ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта !!!
 //
@@ -86,6 +87,10 @@ if (document.querySelector('#userid')) {
 // добавлять себя в список его контактов с отправкой ему сообщения об этом
 //
 // 23. правый клик не только на див сообщения, а на всей области сообщения
+//
+// 24. !!! ??? НАДО ПОДУМАТЬ о статусе сообщения прочитано/непрочитано, чтобы пользователь
+// при входе мог видеть, что ему поступили новые сообщения и от кого, пока он был неактивен
+
 
 
 
@@ -133,8 +138,7 @@ if (BUTTON_ADD_USER) {
                         divUser.classList.add('div-user');
                         divUser.setAttribute('id', 'divuser_' + `${item.id}`);
                         divAddUsers.appendChild(divUser);
-                        divUser.onclick = () => { addUser(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail); };
-
+                        
                         let divUserAvatar = document.createElement('div');
                         divUser.appendChild(divUserAvatar);
                         let imgUserAvatar = document.createElement('img');
@@ -143,7 +147,7 @@ if (BUTTON_ADD_USER) {
                         imgUserAvatar.alt = 'Аватар';
                         imgUserAvatar.width = '40';
                         divUserAvatar.appendChild(imgUserAvatar);
-
+                        
                         let divUserNickname = document.createElement('div');
                         divUserNickname.classList.add('div-user-nickname');
                         divUser.appendChild(divUserNickname);
@@ -157,6 +161,9 @@ if (BUTTON_ADD_USER) {
                             divUserNickname.appendChild(pUserEmail);
                             pUserEmail.textContent = item.email;
                         }
+
+                        // при клике на пользователе вызываем функцию добавления пользователя в список своих контактов
+                        divUser.onclick = () => { addUser(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
                     }
                 });
             } catch (error) {
@@ -164,64 +171,6 @@ if (BUTTON_ADD_USER) {
             }
         }
     });
-}
-
-// добавляем пользователя в список своих контактов
-async function addUser(userId, contactUserId, email, nickname, avatar, hideemail) {
-    if (!document.getElementById(contactUserId)) {
-        // отправляем данные на бэкенд для записи в базу
-        data = {
-            action: 'createContact',
-            'userId': userId,
-            'contactUserId': contactUserId
-        };
-        try {
-            let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify(data)
-            });
-            let result = await response.text();
-            // console.log('Успех: ', result);
-
-            // добавляем пользователя в боковую панель
-            let divChatUser = document.createElement('div');
-            divChatUser.classList.add('div-chat-user');
-            divChatUser.setAttribute('id', contactUserId);
-            DIV_USER_CHATS.appendChild(divChatUser);
-
-            let divChatUserAvatar = document.createElement('div');
-            divChatUser.appendChild(divChatUserAvatar);
-            let imgChatUserAvatar = document.createElement('img');
-            let image = avatar !== null ? URL + '/avatars/' + avatar : URL + '/img/avatar_0.jpg';
-            imgChatUserAvatar.src = image;
-            imgChatUserAvatar.alt = 'Аватар';
-            imgChatUserAvatar.width = '35';
-            divChatUserAvatar.appendChild(imgChatUserAvatar);
-
-            let divChatUserNickname = document.createElement('div');
-            divChatUserNickname.classList.add('div-user-nickname');
-            divChatUser.appendChild(divChatUserNickname);
-
-            let pChatUser = document.createElement('p');
-            divChatUserNickname.appendChild(pChatUser);
-            nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
-            // если пользователь соединен с сервером выделяем его
-            Object.values(connectedUsers).forEach(value => {
-                // console.log(value);
-                if (parseInt(value) === parseInt(contactUserId)) {
-                    document.getElementById(value).classList.add('div-chat-user-onchat');
-                }
-            })
-        } catch (error) {
-            console.log('Ошибка: ', error);
-        }
-    } else {
-        // выводим сообщение, что данный пользователь уже в списке чатов
-        alertMessage(`Пользователь ${nickname ? nickname : email}  уже в списке чатов`);
-    }
 }
 
 // обрабатываем меню по клику правой кнопки 
@@ -272,11 +221,11 @@ window.oncontextmenu = (e) => {
             })
         }
 
-        // удаляем пользователя из списка чатов
+        // удаляем пользователя из списка контактов
         let deleteChatUser = document.querySelector('#deletechatuser');
         deleteChatUser.onclick = async () => {
             // console.log(e);
-            // отправляем данные на бэкенд для удаления из базы
+            // отправляем данные на бэкенд для удаления из БД
             data = {
                 action: 'deleteContact',
                 'userId': USER_ID,
@@ -293,8 +242,8 @@ window.oncontextmenu = (e) => {
                 let result = await response.text();
                 // console.log('Успех: ', result);
 
-                // выводим сообщение, что данный пользователь удален из списка чатов
-                alertMessage(`Пользователь ${e.target.innerText} удален из списка чатов`);
+                // выводим сообщение, что данный пользователь удален из списка контактов
+                alertMessage(`Пользователь ${e.target.innerText} удален из списка контактов`);
                 document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
             } catch (error) {
                 console.log('Ошибка: ', error);
@@ -305,7 +254,7 @@ window.oncontextmenu = (e) => {
         let deleteUserChats = document.querySelector('#deleteuserchats');
         deleteUserChats.onclick = async () => {
             // console.log(e.target.id);
-            // отправляем данные на бэкенд для удаления из базы
+            // отправляем данные на бэкенд для удаления из БД
             data = {
                 action: 'deleteUserMessages',
                 'send_user_id': USER_ID,
@@ -353,7 +302,7 @@ window.oncontextmenu = (e) => {
         // удаляем выбранное сообщение
         let deleteMessage = document.querySelector('#deletemessage');
         deleteMessage.onclick = () => {
-            // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из базы
+            // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
             let chatUser = document.querySelector('.div-chat-user-active').id
             to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
             WS.send(JSON.stringify({

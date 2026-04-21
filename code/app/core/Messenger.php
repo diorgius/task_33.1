@@ -40,6 +40,9 @@ class Messenger implements MessageComponentInterface
                 // метод отправки сообщения всем пользователям о своем присоединении к серверу
                 $this->sendGreetingMessage($from, $data);
                 break;
+            case 'addedToContacts':
+                $this->addedToContacts($from, $data);
+                break;
             case 'privateMessage':
                 // метод отправки приватного сообщения
                 $this->sendPrivateMessage($from, $data);
@@ -73,6 +76,30 @@ class Messenger implements MessageComponentInterface
         }
     }
 
+    protected function addedToContacts(ConnectionInterface $from, $data)
+    {
+        var_dump($data);
+        
+        // делаем запрос в БД для получения сведений о добавившем пользователе
+        DB::dbconnect();
+        $user = DB::getByProp('users', 'id', $data['send_user_id']);
+        // дополняем ответ
+        if ($user) {
+            $data['email'] = $user['email'];
+            $data['nickname'] = $user['nickname'];
+            $data['avatar'] = $user['avatar'];
+            $data['hideemail'] = $user['hideemail'];
+        }
+        // отправляем данные
+        $message = json_encode($data);
+        foreach ($this->clients as $client) {
+            if ($client->resourceId === intval($data['to'])) {
+                $client->send($message);
+            }
+        }
+    }
+
+
     protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
         // делаем запись сообщения в БД
@@ -86,7 +113,6 @@ class Messenger implements MessageComponentInterface
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
             'text_message' => htmlspecialchars($data['text_message']),
-            // 'status_message' => '',
             'created' => $created
         ];
         // записываем в БД

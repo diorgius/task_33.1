@@ -36,13 +36,19 @@ WS.onmessage = (e) => {
             // получаем список активных пользователей 
             connectedUsers = data.connectedUsers;
             // console.log(connectedUsers);
-            // проверяем есть ли у пользователя привоединившийся контакт и выделяем присоединившегося пользователя цветом 
+            // проверяем есть ли у пользователя присоединившийся контакт и выделяем присоединившегося пользователя цветом 
             // и даем возможность отправки сообщений этому пользователю
             Object.values(connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
                     document.getElementById(value) ? document.getElementById(value).classList.add('div-chat-user-onchat') : null;
                 }
             })
+            break;
+        case 'addedToContacts':
+            // console.log(data);
+            // после получения сообщения о внешнем добавлении в чей-то контакт, запускаем функцию
+            // добавления этого пользователя в контакты добавленного пользователя
+            addUser(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar, data.hideemail, false);
             break;
         case 'privateMessage':
             // console.log(data);

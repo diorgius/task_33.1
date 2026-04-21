@@ -195,15 +195,4 @@ class DB
             'value_4' => $accept_user_id
         ]);
     }
-
-    // public static function forwardMessage(string $table, array $values) 
-    // {
-    //     var_dump($values);
-    //     $colums = implode(', ', array_keys($values));
-    //     $placeholders = ':' . implode(', :', array_keys($values));
-    //     $stmt = self::$pdo->prepare("INSERT INTO $table ($colums) VALUES ($placeholders)");
-    //     $stmt->execute($values);
-    //     return self::$pdo->lastInsertId();
-    // }
-
 }

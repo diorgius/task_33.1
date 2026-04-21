@@ -50,11 +50,20 @@ class ActionsWithUsers
     public function createContact()
     {
         DB::dbconnect();
+
+        // создаем контакт у себя
         $value = [
             'user_id' => $this->data['userId'],
             'contact_user_id' => $this->data['contactUserId'],
         ];
         DB::create('contacts', $value);
+
+        // // создаем контакт у добавленного пользователя
+        // $value = [
+        //     'user_id' => $this->data['contactUserId'],
+        //     'contact_user_id' => $this->data['userId'],
+        // ];
+        // DB::create('contacts', $value);
     }
 
     // метод удаления контакта
@@ -85,32 +94,6 @@ class ActionsWithUsers
         DB::dbconnect();
         $result = DB::getContacts('contacts', 'user_id', $this->data['user_id']);
         echo json_encode($result);
-    }
-
-    // метод пересылки сообщений
-    public function forwardMessage()
-    {
-        // var_dump($this->data);
-        DB::dbconnect();
-        // формируем метку времени
-        $date = new DateTime();
-        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
-        $created = $date->format('Y-m-d H:i:s');
-        
-        foreach ($this->data['usersId'] as $key => $value) {
-            $values = [
-                // 'id' => $this->data['id'],
-                'send_user_id' => intVal($this->data['send_user_id']),
-                'accept_user_id' => intVal($this->data['usersId'][$key]),
-                'text_message' => $this->data['text_message'],
-                'status_message' => 'forwarded',
-                'created' => $created
-            ];
-            // var_dump($values);
-            $result = DB::create('messages', $values);
-        }
-
-        echo 'Сообщение переслано';
     }
 }
 

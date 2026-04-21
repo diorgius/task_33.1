@@ -47,7 +47,7 @@
                 <li id="addgroupchat">Добавить в групповой чат</li>
                 <li id="offnotification">Отключить оповещение</li>
                 <li id="onnotification">Включить оповещение</li>
-                <li id="deletechatuser">Удалить пользователя из списка чатов</li>
+                <li id="deletechatuser">Удалить пользователя из списка контактов</li>
                 <li id="deleteuserchats">Удалить переписку с пользователем</li>
             </ul>
 
@@ -75,7 +75,6 @@
             <ul class="ul-message-menu">
                 <li id="deletemessage">Удалить сообщение</li>
                 <li id="editmessage">Редактировать сообщение</li>
-                <!-- <li class="span-forward-user">Переслать сообщение&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="forwardmessage">&gt;</span></li> -->
                 <li class="span-forward-user" id="forwardmessage">Переслать сообщение</li>
             </ul>
 
