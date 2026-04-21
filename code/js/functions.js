@@ -16,16 +16,25 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
             'contactUserId': contactUserId
         };
         try {
-            let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify(data)
-            });
-            let result = await response.text();
-            // console.log('Успех: ', result);
-
+            // отправляем запрос на создание записей в БД только один раз,
+            // но методе создания производим сразу две записи и для своего контакта и у него 
+            // записываем себя, если делать так, то и сообщение активному пользователю отправляеся 
+            // сразу, т.к. в таблице контактов уже есть запись, а то если отправлять сначала сообщение,
+            // а потом вызывать функцию, то сообщение уже отправлено, записи контактов еще нет
+            // !!! КРУГОМ СПЛОШНЫЕ КОСТЫЛИ
+            // !!! НАДО еще разобраться с отправкой сообщения неактивному пользователю
+            // !!! и изменение цвета активного пользователя, что у него есть сообщение
+            if (contactAddition) {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.text();
+                // console.log('Успех: ', result);
+            }
             // добавляем пользователя в боковую панель
             let divChatUser = document.createElement('div');
             divChatUser.classList.add('div-chat-user');
@@ -49,43 +58,66 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
             divChatUserNickname.appendChild(pChatUser);
             nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
 
-
-            // если пользователь соединен с сервером выделяем его
-            Object.values(connectedUsers).forEach(value => {
+            // проверяем активен ли сейчас добавленный пользователь
+            Object.values(connectedUsers).forEach(async value => {
                 // console.log(value);
+                // если пользователь соединен с сервером выделяем его и отправляем сообщение
+                // о добавлении его в контакты
                 if (parseInt(value) === parseInt(contactUserId)) {
                     document.getElementById(value).classList.add('div-chat-user-onchat');
+
+                    // при добавлении контакта вместе с записью в БД о своем новом контакте
+                    // делаем запись и себя в его контакты,
+                    // теперь надо проверить если добавленный контакт активен,
+                    // то у него также добавить себя в список контактов и отправить ему
+                    // информационное сообщение об этом, если не активен, то просто в БД
+                    // создаем сообщение о добавлении его в контакты, которое он увидит при подключении к чату
+
+                    // проверяем, что признак инициации добавления контакта ПОЛЬЗОВАТЕЛЕМ (через клик), а не автоматическое добавление
+                    // инициированное добавлением контакта, что бы не запускалось добавление контактов по кругу
+                    // при вызове из main.js по клику ставим contactAddition = true, а при вызове из messenger.js
+                    // когда функция addUser запускается после отпраки нижеидущего сообщения, то ставим false 
+
+                    if (contactAddition) {
+                        // console.log(connectedUsers);
+                        // console.log(contactUserId);
+
+                        // готовим и отправляем сообщение пользователю о том, что его присоединили
+                        to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contactUserId.toString());
+                        textSendMessage = `Вас добавил(а) в свои контакты пользователь ${USER_NICKNAME}`;
+                        message = JSON.stringify({
+                            command: 'addedToContacts',
+                            to: to,
+                            accept_user_id: contactUserId,
+                            send_user_id: userId,
+                            text_message: textSendMessage
+                        });
+                        WS.send(message);
+                    }
                     return;
-                }
-
-                // при добавлении контакта вместе с записью в БД о своем новом контакте
-                // делаем запись и себя в его контакты,
-                // теперь надо проверить если добавленный контакт активен,
-                // то у него также добавить себя в список контактов и отправить ему
-                // информационное сообщение об этом, если не активен, то просто в БД
-                // создаем сообщение о добавлении его в контакты, которое он увидит при подключении к чату
-
-                // проверяем, что признак инициации добавления контакта ПОЛЬЗОВАТЕЛЕМ (через клик), а не автоматическое добавление
-                // инициированное добавлением контакта, что бы не запускалось добавление контактов по кругу
-                // при вызове из main.js по клику ставим contactAddition = true, а при вызове из messenger.js
-                // когда функция addUser запускается после отпраки нижеидущего сообщения, то ставим false 
-                if (contactAddition) {
-                    // console.log(connectedUsers);
-                    // console.log(contactUserId);
-                    
-                    // готовим и отправляем сообщение пользователю о том, что его присоединили
-                    to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contactUserId.toString());
-                    console.log(to);
-                    // textSendMessage = `Вас добавил(а) в свои контакты пользователь ${USER_NICKNAME}`;
-                    message = JSON.stringify({
-                        command: 'addedToContacts',
-                        to: to,
-                        accept_user_id: contactUserId,
-                        send_user_id: userId,
-                        // send_nickname: USER_NICKNAME,
-                        // text_message: textSendMessage
-                    });
-                    WS.send(message);
+                    // если пользователь не активен, то делаем запись в БД, что его добавили и у него тоже
+                    // появился новый контакт 
+                // } else {
+                //     data = {
+                //         action: 'createContact',
+                //         // меняем местами id контактов
+                //         'userId': contactUserId,
+                //         'contactUserId': userId
+                //     };
+                //     try {
+                //         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                //             method: 'POST',
+                //             headers: {
+                //                 'Content-Type': 'application/json;charset=utf-8'
+                //             },
+                //             body: JSON.stringify(data)
+                //         });
+                //         let result = await response.text();
+                //         console.log('Успех: ', result);
+                //     } catch (error) {
+                //         console.log('Ошибка: ', error);
+                //     }
+                //     return;
                 }
             })
 

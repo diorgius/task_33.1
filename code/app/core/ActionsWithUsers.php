@@ -58,12 +58,12 @@ class ActionsWithUsers
         ];
         DB::create('contacts', $value);
 
-        // // создаем контакт у добавленного пользователя
-        // $value = [
-        //     'user_id' => $this->data['contactUserId'],
-        //     'contact_user_id' => $this->data['userId'],
-        // ];
-        // DB::create('contacts', $value);
+        // создаем контакт у добавленного пользователя
+        $value = [
+            'user_id' => $this->data['contactUserId'],
+            'contact_user_id' => $this->data['userId'],
+        ];
+        DB::create('contacts', $value);
     }
 
     // метод удаления контакта

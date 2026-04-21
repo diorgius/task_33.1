@@ -49,6 +49,8 @@ WS.onmessage = (e) => {
             // после получения сообщения о внешнем добавлении в чей-то контакт, запускаем функцию
             // добавления этого пользователя в контакты добавленного пользователя
             addUser(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar, data.hideemail, false);
+            document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
+
             break;
         case 'privateMessage':
             // console.log(data);

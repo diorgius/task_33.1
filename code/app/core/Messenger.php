@@ -90,6 +90,21 @@ class Messenger implements MessageComponentInterface
             $data['avatar'] = $user['avatar'];
             $data['hideemail'] = $user['hideemail'];
         }
+        // записываем в БД сообщение
+        // формируем метку времени
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+        // формируем массив для записи в БД
+        $value = [
+            'send_user_Id' => $data['send_user_id'],
+            'accept_user_id' => $data['accept_user_id'],
+            'text_message' => htmlspecialchars($data['text_message']),
+            'created' => $created
+        ];
+        // записываем в БД
+        $result = DB::create('messages', $value);
+
         // отправляем данные
         $message = json_encode($data);
         foreach ($this->clients as $client) {
