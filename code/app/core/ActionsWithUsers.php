@@ -50,27 +50,40 @@ class ActionsWithUsers
     public function createContact()
     {
         DB::dbconnect();
-
         // создаем контакт у себя
         $value = [
-            'user_id' => $this->data['userId'],
-            'contact_user_id' => $this->data['contactUserId'],
+            'user_id' => $this->data['user_id'],
+            'contact_user_id' => $this->data['contact_user_id'],
         ];
         DB::create('contacts', $value);
-
         // создаем контакт у добавленного пользователя
         $value = [
-            'user_id' => $this->data['contactUserId'],
-            'contact_user_id' => $this->data['userId'],
+            'user_id' => $this->data['contact_user_id'],
+            'contact_user_id' => $this->data['user_id'],
         ];
         DB::create('contacts', $value);
+        // записываем в БД сообщение
+        // формируем метку времени
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+        // формируем массив для записи в БД
+        $value = [
+            'send_user_id' => $this->data['user_id'],
+            'accept_user_id' => $this->data['contact_user_id'],
+            'text_message' => htmlspecialchars($this->data['text_message']),
+            'created' => $created
+        ];
+        // записываем в БД сообщение
+        DB::create('messages', $value);
     }
 
-    // метод удаления контакта
+    // метод удаления контакта и всей переписки с ним
     public function deleteContact()
     {
         DB::dbconnect();
         DB::deleteContact('contacts', $this->data['userId'], $this->data['contactUserId']);
+        DB::deleteUserMessages('messages', $this->data['userId'], $this->data['contactUserId']);
     }
 
     // метод удаления всех сообщений с контактом

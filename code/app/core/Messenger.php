@@ -47,6 +47,10 @@ class Messenger implements MessageComponentInterface
                 // метод отправки приватного сообщения
                 $this->sendPrivateMessage($from, $data);
                 break;
+            case 'deleteContact';
+                // метод удаления контакта
+                $this->deleteContact($from, $data);
+                break;
             case 'deleteMessage';
                 // метод отправки сообщения об удалении сообщения
                 $this->deleteMessage($from, $data);
@@ -78,8 +82,6 @@ class Messenger implements MessageComponentInterface
 
     protected function addedToContacts(ConnectionInterface $from, $data)
     {
-        var_dump($data);
-        
         // делаем запрос в БД для получения сведений о добавившем пользователе
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $data['send_user_id']);
@@ -90,21 +92,6 @@ class Messenger implements MessageComponentInterface
             $data['avatar'] = $user['avatar'];
             $data['hideemail'] = $user['hideemail'];
         }
-        // записываем в БД сообщение
-        // формируем метку времени
-        $date = new DateTime();
-        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
-        $created = $date->format('Y-m-d H:i:s');
-        // формируем массив для записи в БД
-        $value = [
-            'send_user_Id' => $data['send_user_id'],
-            'accept_user_id' => $data['accept_user_id'],
-            'text_message' => htmlspecialchars($data['text_message']),
-            'created' => $created
-        ];
-        // записываем в БД
-        $result = DB::create('messages', $value);
-
         // отправляем данные
         $message = json_encode($data);
         foreach ($this->clients as $client) {
@@ -113,7 +100,6 @@ class Messenger implements MessageComponentInterface
             }
         }
     }
-
 
     protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
@@ -137,7 +123,7 @@ class Messenger implements MessageComponentInterface
             $data['id'] = $result;
             $data['from'] = (string) $from->resourceId;
             $data['created'] = $created;
-        } // возможно надо сделать проверку записи на ошибки и вывод ошибок
+        }
         // формируем ответ отправителю сообщения, для вывода сообщения у него
         $replay = [
             'command' => 'replay',
@@ -147,7 +133,6 @@ class Messenger implements MessageComponentInterface
             'text_message' => $data['text_message'],
             'created' => $created
         ];
-        // var_dump($data);
         $message = json_encode($data);
         $replay = json_encode($replay);
         foreach ($this->clients as $client) {
@@ -163,6 +148,11 @@ class Messenger implements MessageComponentInterface
             }
         }
         echo "Private message from {$from->resourceId} to {$data['to']}\n";
+    }
+
+    protected function deleteContact(ConnectionInterface $from, $data)
+    {
+        
     }
 
     protected function deleteMessage(ConnectionInterface $from, $data)
@@ -199,7 +189,7 @@ class Messenger implements MessageComponentInterface
             'created' => $created
         ];
         // записываем изменения в БД
-        $result = DB::update('messages', $value);
+        DB::update('messages', $value);
         // отправляем сообщение пользователю для изменения сообщения у него
         $message = json_encode($data);
         foreach ($this->clients as $client) {
@@ -212,21 +202,20 @@ class Messenger implements MessageComponentInterface
 
     public function forwardMessage(ConnectionInterface $from, $data)
     {
-        var_dump($data);
+        // делаем запись в БД перенаправленного сообщения
         DB::dbconnect();
         // формируем метку времени
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
         // в цикле проходим по адресатам пересылки
-        foreach ($data['acceptUsersId'] as $key => $value) {
+        foreach ($data['usersToForward'] as $key => $value) {
             // формируем массив для записи в БД
             $values = [
-                // 'id' => $this->data['id'],
                 'send_user_id' => intVal($data['send_user_id']),
-                'accept_user_id' => intVal($data['acceptUsersId'][$key]),
+                'accept_user_id' => intVal($data['usersToForward'][$key]),
                 'text_message' => $data['text_message'],
-                'status_message' => 'forwarded',
+                'status_message' => $data['status_message'],
                 'created' => $created
             ];
             // записываем в БД
@@ -234,14 +223,14 @@ class Messenger implements MessageComponentInterface
             // ищем среди активных пользователей тех кому адресована пересылка
             // для отображения пересланного сообщения без перезагрузки страницы
             // получаем id подключения
-            $to = array_search($data['acceptUsersId'][$key], $this->connectedUsers);
+            $to = array_search($data['usersToForward'][$key], $this->connectedUsers);
             // если есть подключеные пользователи из тех кому пересылается сообщение
             // то отправляем его им
             if ($to) {
                 // дополняем сообщение для отправки пользователю
                 if ($result) {
                     // ставим ему статус privateMessage для того что бы на стороне
-                    // клиента оно выводилось с теми же условиями как обычное сообщение
+                    // клиента отрабатывались те же условиями как и у обычного сообщения
                     // что бы не дублировать код
                     $data['command'] = 'privateMessage';
                     $data['accept_user_id'] = $data['acceptUsersId'][$key];

@@ -83,7 +83,7 @@ if (document.querySelector('#userid')) {
 // 
 // 21. удаление группы ???только ее создателем
 //
-// 22. при добавлении пользователя в список своих контактов
+// !!! СДЕЛАНО 22. при добавлении пользователя в список своих контактов
 // добавлять себя в список его контактов с отправкой ему сообщения об этом
 //
 // 23. правый клик не только на див сообщения, а на всей области сообщения
@@ -133,7 +133,6 @@ if (BUTTON_ADD_USER) {
                 let divAddUsers = document.createElement('div');
                 DIV_LIST_USERS.appendChild(divAddUsers);
                 divAddUsers.setAttribute('id', 'divaddusers');
-
                 result.forEach((item) => {
                     if (`${item.id}` !== USER_ID) {
                         // console.log(item);
@@ -141,7 +140,6 @@ if (BUTTON_ADD_USER) {
                         divUser.classList.add('div-user');
                         divUser.setAttribute('id', 'divuser_' + `${item.id}`);
                         divAddUsers.appendChild(divUser);
-                        
                         let divUserAvatar = document.createElement('div');
                         divUser.appendChild(divUserAvatar);
                         let imgUserAvatar = document.createElement('img');
@@ -150,21 +148,17 @@ if (BUTTON_ADD_USER) {
                         imgUserAvatar.alt = 'Аватар';
                         imgUserAvatar.width = '40';
                         divUserAvatar.appendChild(imgUserAvatar);
-                        
                         let divUserNickname = document.createElement('div');
                         divUserNickname.classList.add('div-user-nickname');
                         divUser.appendChild(divUserNickname);
-
                         let pUserNickname = document.createElement('p');
                         divUserNickname.appendChild(pUserNickname);
                         pUserNickname.textContent = item.nickname;
-
                         if (item.hideemail === 0) {
                             let pUserEmail = document.createElement('p');
                             divUserNickname.appendChild(pUserEmail);
                             pUserEmail.textContent = item.email;
                         }
-
                         // при клике на пользователе вызываем функцию добавления пользователя в список своих контактов
                         divUser.onclick = () => { addUser(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
                     }
@@ -190,7 +184,6 @@ window.oncontextmenu = (e) => {
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
-        // console.log(divChatUserActive);
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
         e.target.classList.add('div-chat-user-active');
 
@@ -224,7 +217,7 @@ window.oncontextmenu = (e) => {
             })
         }
 
-        // удаляем пользователя из списка контактов
+        // удаляем пользователя из списка контактов с удаление всей переписки и удаляем у него свой контакт
         let deleteChatUser = document.querySelector('#deletechatuser');
         deleteChatUser.onclick = async () => {
             // console.log(e);
@@ -244,6 +237,18 @@ window.oncontextmenu = (e) => {
                 });
                 let result = await response.text();
                 // console.log('Успех: ', result);
+
+                // если пользователь активен отправляем сообщение пользователю, что его контакт удален
+                // и удаляем контакт из списка
+                to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
+                WS.send(JSON.stringify({
+                    command: 'deleteContact',
+                    id: e.target.id,
+                    to: to,
+                    send_user_id = USER_ID,
+                    nickname: USER_NICKNAME
+                }))
+
 
                 // выводим сообщение, что данный пользователь удален из списка контактов
                 alertMessage(`Пользователь ${e.target.innerText} удален из списка контактов`);
@@ -275,6 +280,9 @@ window.oncontextmenu = (e) => {
                 // console.log('Успех: ', result);
 
                 // выводим сообщение, что переписка с пользователем удалена
+
+                // !!!надо выводить еще и сообщение пользователю с которым удалена переписка
+
                 document.getElementById(`${e.target.innerText}`) ? document.getElementById(`${e.target.innerText}`).remove() : null;
                 alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
             } catch (error) {
@@ -387,6 +395,7 @@ window.oncontextmenu = (e) => {
                 result.forEach((item) => {
                     // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
                     if (divUserMessages.id !== item.nickname && divUserMessages.id !== item.email) {
+                        // выводим список пользователей
                         let liChatUser = document.createElement('li');
                         liChatUser.classList.add('li-users-menu');
                         let spanUserNickname = document.createElement('span');
@@ -426,19 +435,22 @@ window.oncontextmenu = (e) => {
                     // получаем отмеченные чекбоксы
                     let checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
                     // записываем их в массив
-                    let userToForward = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
+                    let usersToForward = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
                     // console.log(userToForward);
-                    // console.log(e.target.id);
                     // отправляем данные в сокет для записи в БД и отправки сообщения
                     // активным пользователям из числа тех кому пересылается сообщение
+                    // определяем от кого пересылаем
+                    e.target.classList.contains('div-accept-message') ?
+                        forwardUser = document.querySelector('.div-chat-user-active').lastElementChild.innerText :
+                        forwardUser = USER_NICKNAME;
                     message = JSON.stringify({
                         command: 'forwardMessage',
                         id: e.target.id,
                         send_user_id: USER_ID,
-                        acceptUsersId: userToForward,
+                        usersToForward: usersToForward,
                         send_nickname: USER_NICKNAME,
                         text_message: e.target.firstChild.innerText,
-                        status_message: 'forwarded'
+                        status_message: `forwarded from ${forwardUser}`
                     });
                     WS.send(message);
                     // убираем контекстное меню

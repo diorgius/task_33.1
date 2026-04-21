@@ -71,7 +71,7 @@ class DB
                 `send_user_id` INT NOT NULL,
                 `accept_user_id` INT NOT NULL,
                 `text_message` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
-                `status_message` VARCHAR(10) NULL COLLATE 'utf8mb4_0900_ai_ci',
+                `status_message` VARCHAR(60) NULL COLLATE 'utf8mb4_0900_ai_ci',
                 `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`message_id`) USING BTREE,
                 INDEX `FK_messages_users` (`send_user_id`) USING BTREE,
@@ -149,10 +149,21 @@ class DB
 
     public static function deleteContact(string $table, string $userId, string $contactUserId): void
     {
-        $stmt = self::$pdo->prepare("DELETE FROM $table WHERE user_id = :userId AND contact_user_id = :contactUserId");
+        // удаляем контакт у себя и себя у него
+        $stmt = self::$pdo->prepare(
+        "DELETE FROM $table WHERE 
+        (user_id = :value_1 
+        AND 
+        contact_user_id = :value_2)
+        OR
+        (user_id = :value_4
+        AND 
+        contact_user_id = :value_3)");
         $stmt->execute([
-            'userId' => $userId,
-            'contactUserId' => $contactUserId
+            'value_1' => $userId,
+            'value_2' => $contactUserId,
+            'value_3' => $userId,
+            'value_4' => $contactUserId
         ]);
     }
 
