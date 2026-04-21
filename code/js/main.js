@@ -70,9 +70,9 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 16. редактирование сообщения
 //
-// 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕПЕСЫЛКЕ ???
+// 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕРЕСЫЛКЕ ???
 //
-// !!! ??? ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта 
+// !!! ??? ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта !!!
 //
 // 18. создание группы и добавление пользователей в группу
 // 
@@ -81,6 +81,12 @@ if (document.querySelector('#userid')) {
 // 20. удаление пользователя из группы
 // 
 // 21. удаление группы ???только ее создателем
+//
+// 22. при добавлении пользователя в список своих контактов
+// добавлять себя в список его контактов с отправкой ему сообщения об этом
+//
+// 23. правый клик не только на див сообщения, а на всей области сообщения
+
 
 
 // маштабируем текстовую область сообщений
@@ -421,7 +427,6 @@ window.oncontextmenu = (e) => {
                 // console.log('Успех: ', result);
 
                 // выводим список контактов
-                // CHAT_MESSAGE_MENU.style.display = 'block';
                 let sectionMain = document.querySelector('#mainwindow');
                 let ulChatUsers = document.createElement('ul');
                 ulChatUsers.classList.add('ul-users-menu');
@@ -464,79 +469,30 @@ window.oncontextmenu = (e) => {
                     ulChatUsers.style.top = positionY + 'px';
                 }
                 ulChatUsers.style.left = `${event.clientX}px`;
-
                 // обрабатываем пересылку сообщения
                 btnForwardMessage.onclick = async () => {
+                    // получаем отмеченные чекбоксы
                     let checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                    // записываем их в массив
                     let userToForward = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
-                    console.log(userToForward);
+                    // console.log(userToForward);
                     // console.log(e.target.id);
-
-                    // записываем в БД сообщение для всех пользователей которым его переслали
-                    // если делать запись через сокет, то там запишем только тем кто акттивен
-                    // ??? надо подумать как передать данные через сокет что бы записывалось для всех адресатов
-                    data = {
-                        action: 'forwardMessage',
-                        'id': e.target.id,
-                        'send_user_id': USER_ID,
-                        'usersId': userToForward,
-                        'text_message': e.target.firstChild.innerText
-                    }
-                    try {
-                        let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json;charset=utf-8'
-                            },
-                            body: JSON.stringify(data)
-                        });
-                        let result = await response.text();
-                        // console.log('Успех: ', result);
-
-                        // выводим сообщение о пересылке
-                        alertMessage(result);
-
-                        // отсылаем сообщение пользователям которым оно пересылается и которые активны 
-                        // что бы оно у них появилось без перезагрузки страницы
-                        console.log(connectedUsers);
-
-
-                        // можно делать запись в базу и здесь, но тогда оно будет записано
-                        // только для тех пользователей, которые активны в настоящий момент,
-                        // а тем кому пересылали, но они не активны оно не запишитеся в БД
-                        // ??? надо подумать как передать данные через сокет что бы записывалось для всех адресатов
-                        // !!!??? вывод даты !!! она пустая
-                        userToForward.forEach((elem) => {
-                            console.log(elem);
-                            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === elem);
-                            console.log(to)
-                            if (to) {
-                                message = JSON.stringify({
-                                    command: 'forwardMessage',
-                                    id: e.target.id,
-                                    to: to,
-                                    send_user_id: USER_ID,
-                                    accept_user_id: elem,
-                                    nickname: USER_NICKNAME,
-                                    text_message: e.target.firstChild.innerText,
-                                    status_message: 'forwarded'
-                                });
-                                WS.send(message);
-                            }
-
-                        })
-                        TEXT_AREA_MESSAGE.focus();
-
-
-
-                    } catch (error) {
-                        console.log('Ошибка: ', error);
-                    }
+                    // отправляем данные в сокет для записи в БД и отправки сообщения
+                    // активным пользователям из числа тех кому пересылается сообщение
+                    message = JSON.stringify({
+                        command: 'forwardMessage',
+                        id: e.target.id,
+                        send_user_id: USER_ID,
+                        acceptUsersId: userToForward,
+                        send_nickname: USER_NICKNAME,
+                        text_message: e.target.firstChild.innerText,
+                        status_message: 'forwarded'
+                    });
+                    WS.send(message);
+                    // убираем контекстное меню
                     document.querySelector('.ul-message-menu').style.display = 'none';
                     document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
                 }
-
-
 
             } catch (error) {
                 console.log('Ошибка: ', error);
@@ -552,8 +508,8 @@ window.oncontextmenu = (e) => {
         // пока не понял почему
         // e.target.classList.remove('div-chat-user-active');
 
-        // если клики не на пункте меню или пользователе или чекбоксе, то убираем меню
         // console.log(elem.target);
+        // если клики не на пункте меню или пользователе или чекбоксе, то убираем меню
         if (!elem.target.classList.contains('li-users-menu')
             && !elem.target.classList.contains('span-forward-user')
             && !elem.target.classList.contains('checkbox-forward-user')) {

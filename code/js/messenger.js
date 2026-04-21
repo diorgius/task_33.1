@@ -46,8 +46,9 @@ WS.onmessage = (e) => {
             break;
         case 'privateMessage':
             // console.log(data);
+            // сюда прилетают обычные сообщения и пересланные
             // проверяем отключено или нет оповещение для этого пользователя
-            if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-NOTICE')) {
+            if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-notice')) {
                 // если открыт список добавления пользователей, то выделяем пользователя цветом 
                 // (сообщаем, что от этого пользователя пришло сообщение)
                 if (document.querySelector('#divaddusers')) {
@@ -119,20 +120,6 @@ WS.onmessage = (e) => {
                 // изменяем сообщение
                 divUserMessage.firstChild.textContent = data.text_message;
                 divUserMessage.lastChild.textContent = 'edited';
-            }
-            break;
-        case 'forwardMessage':
-            console.log(data);
-            // выводим пересланное сообщение
-            // проверяем открыт ли чат с пользователем переславшим сообщение, если открыт, то выводим сообщение
-            if (document.getElementById(data.nickname)) {
-                let divUserMessages = document.getElementById(data.nickname);
-                
-                // !!!??? вывод даты !!! она пустая
-                outputMessage(divUserMessages, data)
-            // если не открыт, то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
-            } else {
-                document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage')
             }
             break;
         case 'disconnect':

@@ -53,7 +53,7 @@ class Messenger implements MessageComponentInterface
                 $this->editMessage($from, $data);
                 break;
             case 'forwardMessage';
-                // метод отправки персланного сообщения
+                // метод записи в БД и отправки пересылаемого сообщения
                 $this->forwardMessage($from, $data);
                 break;
         }
@@ -75,13 +75,13 @@ class Messenger implements MessageComponentInterface
 
     protected function sendPrivateMessage(ConnectionInterface $from, $data)
     {
-        // делаем запись сообщения в базу
+        // делаем запись сообщения в БД
         DB::dbconnect();
         // формируем метку времени
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
-        // формируем массив для записи в базу
+        // формируем массив для записи в БД
         $value = [
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
@@ -89,7 +89,7 @@ class Messenger implements MessageComponentInterface
             // 'status_message' => '',
             'created' => $created
         ];
-        // записываем в базу
+        // записываем в БД
         $result = DB::create('messages', $value);
         // дополняем сообщение для отправки пользователю
         if ($result) {
@@ -114,7 +114,7 @@ class Messenger implements MessageComponentInterface
                 $client->send($message);
             }
             // добавлена отправка сообщения самому себе после отправки сообщения адресату
-            // для того чтобы получить message_id из БД и дату и время сообщения
+            // для того чтобы получить message_id из БД, дату и время сообщения
             // для присвоения div id для однозначной идентификации
             // сообщения и вывода даты и времени
             if ($client->resourceId === intval($data['from'])) {
@@ -128,7 +128,7 @@ class Messenger implements MessageComponentInterface
     {
         // делаем удаление сообщения из базы
         DB::dbconnect();
-        // удаляем сообщение в базе
+        // удаляем сообщение в БД
         DB::delete('messages', $data['id']);
         // отправляем сообщение пользователю для удаления сообщения у него
         $message = json_encode($data);
@@ -142,13 +142,13 @@ class Messenger implements MessageComponentInterface
 
     protected function editMessage(ConnectionInterface $from, $data)
     {
-        // делаем изменение сообщения в базе
+        // делаем изменение сообщения в БД
         DB::dbconnect();
         // формируем метку времени
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
-        // формируем массив для записи в базу
+        // формируем массив для записи в БД
         $value = [
             'id' => $data['id'],
             'send_user_Id' => $data['send_user_id'],
@@ -157,7 +157,7 @@ class Messenger implements MessageComponentInterface
             'status_message' => 'edited',
             'created' => $created
         ];
-        // записываем изменения в базу
+        // записываем изменения в БД
         $result = DB::update('messages', $value);
         // отправляем сообщение пользователю для изменения сообщения у него
         $message = json_encode($data);
@@ -172,29 +172,50 @@ class Messenger implements MessageComponentInterface
     public function forwardMessage(ConnectionInterface $from, $data)
     {
         var_dump($data);
-
-        // можно делать запись в базу и здесь, но тогда оно будет записано
-        // только для тех пользователей, которые активны в настоящий момент,
-        // а тем кому пересылали, но они не активны оно не запишитеся в БД
-        // ??? надо подумать как передать данные через сокет что бы записывалось для всех адресатов
-        // $date = new DateTime();
-        // $date->setTimezone(new DateTimeZone('Europe/Moscow'));
-        // $created = $date->format('Y-m-d H:i:s');
-        // $values = [
-        //     'send_user_id' => $data['send_user_id'],
-        //     'accept_user_id' => $data['usersId'],
-        //     'text_message' => $data['text_message'],
-        //     'status_message' => 'forwarded',
-        //     'created' => $created
-        // ];
-        // // var_dump($values);
-        // DB::create('messages', $values);
-
-        $message = json_encode($data);
-        foreach ($this->clients as $client) {
-            if ($client->resourceId === intval($data['to'])) {
-                $client->send($message);
-                break;
+        DB::dbconnect();
+        // формируем метку времени
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+        // в цикле проходим по адресатам пересылки
+        foreach ($data['acceptUsersId'] as $key => $value) {
+            // формируем массив для записи в БД
+            $values = [
+                // 'id' => $this->data['id'],
+                'send_user_id' => intVal($data['send_user_id']),
+                'accept_user_id' => intVal($data['acceptUsersId'][$key]),
+                'text_message' => $data['text_message'],
+                'status_message' => 'forwarded',
+                'created' => $created
+            ];
+            // записываем в БД
+            $result = DB::create('messages', $values);
+            // ищем среди активных пользователей тех кому адресована пересылка
+            // для отображения пересланного сообщения без перезагрузки страницы
+            // получаем id подключения
+            $to = array_search($data['acceptUsersId'][$key], $this->connectedUsers);
+            // если есть подключеные пользователи из тех кому пересылается сообщение
+            // то отправляем его им
+            if ($to) {
+                // дополняем сообщение для отправки пользователю
+                if ($result) {
+                    // ставим ему статус privateMessage для того что бы на стороне
+                    // клиента оно выводилось с теми же условиями как обычное сообщение
+                    // что бы не дублировать код
+                    $data['command'] = 'privateMessage';
+                    $data['accept_user_id'] = $data['acceptUsersId'][$key];
+                    $data['id'] = $result;
+                    $data['from'] = (string) $from->resourceId;
+                    $data['created'] = $created;
+                }
+                $message = json_encode($data);
+                // отправляем сообщение
+                foreach ($this->clients as $client) {
+                    if ($client->resourceId === intval($to)) {
+                        $client->send($message);
+                        break;
+                    }
+                }
             }
         }
     }
