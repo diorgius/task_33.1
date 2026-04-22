@@ -205,6 +205,9 @@ if (BUTTON_CREATE_GROUP) {
                 <input class="input-group-name" type="text" id="inputgroupname" name="inputgroupname" />
                 <button class="btn-add" id="btnaddgroup" name="btnaddgroup">Создать</button>
             </div>`;
+            let inputGroupName = document.querySelector('#inputgroupname');
+            // проверяем уникальность имени группы
+            inputGroupName.onchange = (e) => { validation(e) }
             const BUTTON_ADD_GROUP = document.querySelector('#btnaddgroup');
             // ловим нажатие кнопки создания группы
             BUTTON_ADD_GROUP.onclick = async () => {
@@ -228,9 +231,16 @@ if (BUTTON_CREATE_GROUP) {
                         let result = await response.text();
                         console.log('Успех: ', result);
 
-                        if (result) {
-                            console.log(result);
-                        }
+                        DIV_USER_CHATS.style.height = '40%';
+
+                        const DIV_USER_GROUPS = document.createElement('div');
+                        DIV_USER_GROUPS.classList.add('div-user-groups');
+                        document.querySelector('#sidebarleft').appendChild(DIV_USER_GROUPS);
+                        let divUserGroup = document.createElement('div');
+                        divUserGroup.classList.add('div-chat-user');
+                        divUserGroup.textContent = inputGroupName.value;
+                        DIV_USER_GROUPS.appendChild(divUserGroup); 
+
 
 
 

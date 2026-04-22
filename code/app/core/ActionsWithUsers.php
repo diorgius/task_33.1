@@ -31,10 +31,12 @@ class ActionsWithUsers
         DB::dbconnect();
         $prop = array_keys($this->data)[1];
         $value = htmlspecialchars(trim($this->data[$prop]));
-        $result = DB::getByProp('users', $prop, $value);
+        $table = $this->data['table'];
+        $result = DB::getByProp($table, $prop, $value);
+        $message = $table === 'users' ? "Пользователь с таким {$prop} уже существует" : "Такая группа уже существует";
 
         if ($result) {
-            echo "Пользователь с таким {$prop} уже существует";
+            echo $message;
         }
     }
 

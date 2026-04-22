@@ -8,7 +8,7 @@
          <!-- может его заменить на другой элемент -->
         <input type="text" id="userid" hidden value="<?= $userId ?>">
 
-        <aside class="sidebar-left">
+        <aside class="sidebar-left" id="sidebarleft">
 
             <?php if (!empty($data['user'])): ?>
 
@@ -67,7 +67,6 @@
         
         <section class="section-main-window" id="mainwindow">
             
-
             <div class="div-list-users" id="divlistusers"></div>
             <div class="div-wrapper-create-group" id="divwrappercreategroup"></div>
 

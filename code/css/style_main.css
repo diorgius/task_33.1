@@ -487,3 +487,11 @@
     outline: none;
     border: .1rem solid #cccccc;
 }
+
+.div-user-groups {
+    overflow: hidden;
+    overflow-y: auto;
+    height: auto;
+    width: 90%;
+    border-top: .1rem solid #cccccc;
+}
