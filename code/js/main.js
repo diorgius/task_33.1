@@ -65,7 +65,7 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 14. сделать удаление всей переписки с пользователем
 //
-// 14.1 при удалении пользователя из списка контактов ??? НАДО ЛИ удалять переписку с ним
+// !!! СДЕЛАНО 14.1 при удалении пользователя из списка контактов ??? НАДО ЛИ удалять переписку с ним
 //
 // !!! СДЕЛАНО 15. удаление конкретного сообщения
 //
@@ -91,7 +91,7 @@ if (document.querySelector('#userid')) {
 // 24. !!! ??? НАДО ПОДУМАТЬ о статусе сообщения прочитано/непрочитано, чтобы пользователь
 // при входе мог видеть, что ему поступили новые сообщения и от кого, пока он был неактивен
 // 
-// 25. !!! ??? при удалении контакта ??? тоже удалять себя у него
+// !!! СДЕЛАНО 25. !!! ??? при удалении контакта ??? тоже удалять себя у него
 
 
 
@@ -217,77 +217,51 @@ window.oncontextmenu = (e) => {
             })
         }
 
-        // удаляем пользователя из списка контактов с удаление всей переписки и удаляем у него свой контакт
+        // удаляем пользователя из списка контактов с удалением всей переписки и удаляем у него свой контакт
         let deleteChatUser = document.querySelector('#deletechatuser');
         deleteChatUser.onclick = async () => {
             // console.log(e);
-            // отправляем данные на бэкенд для удаления из БД
-            data = {
-                action: 'deleteContact',
-                'userId': USER_ID,
-                'contactUserId': e.target.id
-            }
-            try {
-                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(data)
-                });
-                let result = await response.text();
-                // console.log('Успех: ', result);
+            // отправляем сообщение в сокет для удаления контакта пользователя и
+            // если пользователь активен отправляем сообщение пользователю, что его контакт удален
+            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
+            WS.send(JSON.stringify({
+                command: 'deleteContact',
+                user_id: e.target.id,
+                to: to,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME
+            }))
+            // если открыт чат с удаленным пользователем, закрываем его
+            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
+            // выводим сообщение, что данный пользователь удален из списка контактов
+            alertMessage(`Пользователь ${e.target.innerText} удален из списка контактов`);
+            document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
 
-                // если пользователь активен отправляем сообщение пользователю, что его контакт удален
-                // и удаляем контакт из списка
-                to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
-                WS.send(JSON.stringify({
-                    command: 'deleteContact',
-                    id: e.target.id,
-                    to: to,
-                    send_user_id = USER_ID,
-                    nickname: USER_NICKNAME
-                }))
-
-
-                // выводим сообщение, что данный пользователь удален из списка контактов
-                alertMessage(`Пользователь ${e.target.innerText} удален из списка контактов`);
-                document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
-            } catch (error) {
-                console.log('Ошибка: ', error);
-            }
         }
 
         // удаляем переписку с пользователем
         let deleteUserChats = document.querySelector('#deleteuserchats');
         deleteUserChats.onclick = async () => {
             // console.log(e.target.id);
-            // отправляем данные на бэкенд для удаления из БД
-            data = {
-                action: 'deleteUserMessages',
-                'send_user_id': USER_ID,
-                'accept_user_id': e.target.id
-            }
-            try {
-                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(data)
-                });
-                let result = await response.text();
-                // console.log('Успех: ', result);
+            // отправляем сообщение в сокет для удаления всей переписки с пользователем и
+            // если пользователь активен отправляем сообщение пользователю, что переписка удалена
+            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
+            WS.send(JSON.stringify({
+                command: 'deleteAllMessages',
+                user_id: e.target.id,
+                to: to,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME
+            }))
+            // если открыт чат с удаленным пользователем, закрываем его
+            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
+            // выводим сообщение, что переписка удалена
+            alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
 
-                // выводим сообщение, что переписка с пользователем удалена
-
-                // !!!надо выводить еще и сообщение пользователю с которым удалена переписка
-
-                document.getElementById(`${e.target.innerText}`) ? document.getElementById(`${e.target.innerText}`).remove() : null;
-                alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
-            } catch (error) {
-                console.log('Ошибка: ', error);
-            }
         }
     }
 
@@ -320,7 +294,7 @@ window.oncontextmenu = (e) => {
                 command: 'deleteMessage',
                 id: e.target.id,
                 to: to,
-                nickname: USER_NICKNAME
+                send_nickname: USER_NICKNAME
             }))
             // выводим сообщение, что сообщение удалено
             document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
@@ -353,7 +327,7 @@ window.oncontextmenu = (e) => {
                         to: to,
                         send_user_id: USER_ID,
                         accept_user_id: chatUser,
-                        nickname: USER_NICKNAME,
+                        send_nickname: USER_NICKNAME,
                         text_message: textSendMessage
                     });
                     WS.send(message);

@@ -50,7 +50,6 @@ WS.onmessage = (e) => {
             // добавления этого пользователя в контакты добавленного пользователя
             addUser(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar, data.hideemail, false);
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
-
             break;
         case 'privateMessage':
             // console.log(data);
@@ -109,11 +108,27 @@ WS.onmessage = (e) => {
             let divUserMessages = document.querySelector('.div-user-messages');
             outputMessage(divUserMessages, data);
             break;
+        case 'deleteContact':
+            // console.log(data);
+            // удаляем чат если он открыт
+            document.getElementById(data.send_nickname) ? document.getElementById(data.send_nickname).remove() : null;
+            // удаляем пользователя из списка контактов
+            document.getElementById(data.send_user_id).remove();
+            // выводим сообщение об удалении
+            alertMessage(`Пользователь ${data.send_nickname} удалил Ваш контакт`);
+            break;
+        case 'deleteAllMessages':
+            // console.log(data);
+            // удаляем чат если он открыт
+            document.getElementById(data.send_nickname) ? document.getElementById(data.send_nickname).remove() : null;
+            // выводим сообщение об удалении всей переписки
+            alertMessage(`Пользователь ${data.send_nickname} удалил все сообщения`);
+            break;
         case 'deleteMessage':
             // console.log(data);
             // удаляем сообщение
             // проверяем открыт ли чат с пользователем удалившим сообщение
-            if (document.getElementById(data.nickname)) {
+            if (document.getElementById(data.send_nickname)) {
                 // удаляем текст удаленного сообщения
                 document.getElementById(data.id).textContent = 'Сообщение удалено';
                 DELETEMESSAGE.play();
@@ -123,7 +138,7 @@ WS.onmessage = (e) => {
             // console.log(data);
             // изменяем сообщение
             // проверяем открыт ли чат с пользователем изменившим сообщение
-            if (document.getElementById(data.nickname)) {
+            if (document.getElementById(data.send_nickname)) {
                 let divUserMessage = document.getElementById(data.id);
                 // изменяем сообщение
                 divUserMessage.firstChild.textContent = data.text_message;

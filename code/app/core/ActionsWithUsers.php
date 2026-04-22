@@ -78,14 +78,6 @@ class ActionsWithUsers
         DB::create('messages', $value);
     }
 
-    // метод удаления контакта и всей переписки с ним
-    public function deleteContact()
-    {
-        DB::dbconnect();
-        DB::deleteContact('contacts', $this->data['userId'], $this->data['contactUserId']);
-        DB::deleteUserMessages('messages', $this->data['userId'], $this->data['contactUserId']);
-    }
-
     // метод удаления всех сообщений с контактом
     public function deleteUserMessages()
     {

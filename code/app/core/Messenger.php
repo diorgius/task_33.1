@@ -41,6 +41,7 @@ class Messenger implements MessageComponentInterface
                 $this->sendGreetingMessage($from, $data);
                 break;
             case 'addedToContacts':
+                // метод добавления в контакты
                 $this->addedToContacts($from, $data);
                 break;
             case 'privateMessage':
@@ -50,6 +51,10 @@ class Messenger implements MessageComponentInterface
             case 'deleteContact';
                 // метод удаления контакта
                 $this->deleteContact($from, $data);
+                break;
+            case 'deleteAllMessages';
+                // метод удаления всех сообщения с пользователем
+                $this->deleteAllMessages($from, $data);
                 break;
             case 'deleteMessage';
                 // метод отправки сообщения об удалении сообщения
@@ -152,12 +157,44 @@ class Messenger implements MessageComponentInterface
 
     protected function deleteContact(ConnectionInterface $from, $data)
     {
-        
+        DB::dbconnect();
+        // удаляем контакты в БД
+        DB::deleteContact('contacts', $data['user_id'], $data['send_user_id']);
+        // удаляем сообщения в БД
+        DB::deleteUserMessages('messages', $data['user_id'], $data['send_user_id']);
+        // если пользователь активен отправляем ему сообщение
+        if (isset($data['to'])) {
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === intval($data['to'])) {
+                    $client->send($message);
+                    break;
+                }
+            }
+        }
+    }
+
+    protected function deleteAllMessages(ConnectionInterface $from, $data)
+    {
+        var_dump($data);
+        DB::dbconnect();
+        // удаляем сообщения в БД
+        DB::deleteUserMessages('messages', $data['user_id'], $data['send_user_id']);
+        // если пользователь активен отправляем ему сообщение
+        if (isset($data['to'])) {
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === intval($data['to'])) {
+                    $client->send($message);
+                    break;
+                }
+            }
+        }
     }
 
     protected function deleteMessage(ConnectionInterface $from, $data)
     {
-        // делаем удаление сообщения из базы
+        // делаем удаление сообщения из БД
         DB::dbconnect();
         // удаляем сообщение в БД
         DB::delete('messages', $data['id']);
@@ -233,7 +270,7 @@ class Messenger implements MessageComponentInterface
                     // клиента отрабатывались те же условиями как и у обычного сообщения
                     // что бы не дублировать код
                     $data['command'] = 'privateMessage';
-                    $data['accept_user_id'] = $data['acceptUsersId'][$key];
+                    $data['accept_user_id'] = $data['usersToForward'][$key];
                     $data['id'] = $result;
                     $data['from'] = (string) $from->resourceId;
                     $data['created'] = $created;
