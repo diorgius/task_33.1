@@ -41,13 +41,13 @@ class DB
             $sql =
                 "CREATE TABLE IF NOT EXISTS `messenger`.`users` 
                 (`id` INT NOT NULL AUTO_INCREMENT , 
-                `email` VARCHAR(64) NOT NULL ,
-                `password` VARCHAR(128) NOT NULL , 
-                `nickname` VARCHAR(64) NULL , 
-                `avatar` VARCHAR(64) NULL ,
+                `email` VARCHAR(64) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+                `password` VARCHAR(128) NOT NULL COLLATE 'utf8mb4_0900_ai_ci', 
+                `nickname` VARCHAR(64) NULL COLLATE 'utf8mb4_0900_ai_ci', 
+                `avatar` VARCHAR(64) NULL COLLATE 'utf8mb4_0900_ai_ci',
                 `hideemail` tinyint(1) NULL,
-                `role` VARCHAR(20) NULL , 
-                `cookiehash` VARCHAR(128) NULL , 
+                `role` VARCHAR(20) NULL COLLATE 'utf8mb4_0900_ai_ci', 
+                `cookiehash` VARCHAR(128) NULL COLLATE 'utf8mb4_0900_ai_ci', 
                 `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`id`) USING BTREE, INDEX `email` (`email`) USING BTREE)";
 
@@ -80,6 +80,14 @@ class DB
                 REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
                 CONSTRAINT `FK_messages_users_2` FOREIGN KEY (`accept_user_id`) 
                 REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+            self::$pdo->exec($sql);
+
+            $sql = "CREATE TABLE IF NOT EXISTS `groupchats` (
+	                `id` INT NOT NULL AUTO_INCREMENT,
+	                `group_name` VARCHAR(128) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	                PRIMARY KEY (`id`) USING BTREE)";
 
             self::$pdo->exec($sql);
 

@@ -1,4 +1,5 @@
 const BUTTON_ADD_USER = document.querySelector('#btnadduser');
+const BUTTON_CREATE_GROUP = document.querySelector('#btncreategroup');
 const DIV_LIST_USERS = document.querySelector('#divlistusers');
 const DIV_USER_CHATS = document.querySelector('#divuserchats');
 const MAIN_WINDOW = document.querySelector('#mainwindow');
@@ -111,13 +112,21 @@ if (TEXT_AREA_MESSAGE) {
 // выводим список пользователей для добавления в свои контакты
 if (BUTTON_ADD_USER) {
     BUTTON_ADD_USER.addEventListener('click', async () => {
+        // если список уже выведен  - убираем его и меняем надпись на кнопке
         if (document.querySelector('#divaddusers')) {
             BUTTON_ADD_USER.textContent = 'Добавить пользователей';
             document.querySelector('#divaddusers').remove();
         } else {
+            // меняем надпись на кнопке
+            BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+            // если открыто окно создание группы - убираем его
+            if (document.querySelector('#divcreategroup')) {
+                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+                document.querySelector('#divcreategroup').remove();
+            }
             // если есть открытый чат - убираем его
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
-            BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+            // отправляем запрос в БД, получаем список пользователей
             data = { action: 'getAllUsers' };
             try {
                 let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
@@ -165,6 +174,71 @@ if (BUTTON_ADD_USER) {
                 });
             } catch (error) {
                 console.log('Ошибка: ', error);
+            }
+        }
+    });
+}
+
+if (BUTTON_CREATE_GROUP) {
+    BUTTON_CREATE_GROUP.addEventListener('click', () => {
+        // если уже вывено окно создания группы - убираем его и меняем надпись на кнопке
+        if (document.querySelector('#divcreategroup')) {
+            BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+            document.querySelector('#divcreategroup').remove();
+        } else {
+            // меняем надпись на кнопке
+            BUTTON_CREATE_GROUP.textContent = 'Убрать создание группы';
+            // если открыто окно добавления пользователей - убираем его
+            if (document.querySelector('#divaddusers')) {
+                document.querySelector('#divaddusers').remove();
+                BUTTON_ADD_USER.textContent = 'Добавить пользователей';
+            }
+            // если есть открытый чат - убираем его
+            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+            // добавляем окно создания группы
+            document.querySelector('#divwrappercreategroup').innerHTML =
+                `<div class="div-create-group" id="divcreategroup">
+                <div class="div-create-group-header" id="divcreategroupheader">
+                    <p>Создание группы пользователей</p>
+                </div>
+                <label for="inputgroupname">Введите название группы</label>
+                <input class="input-group-name" type="text" id="inputgroupname" name="inputgroupname" />
+                <button class="btn-add" id="btnaddgroup" name="btnaddgroup">Создать</button>
+            </div>`;
+            const BUTTON_ADD_GROUP = document.querySelector('#btnaddgroup');
+            // ловим нажатие кнопки создания группы
+            BUTTON_ADD_GROUP.onclick = async () => {
+                let inputGroupName = document.querySelector('#inputgroupname');
+                if (inputGroupName.value === '') {
+                    alertMessage('Введите название группы');
+                } else {
+                    // отправляем данные в БД для записи
+                    data = {
+                        action: 'createGroup',
+                        group_name: inputGroupName.value
+                    };
+                    try {
+                        let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json;charset=utf-8'
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        let result = await response.text();
+                        console.log('Успех: ', result);
+
+                        if (result) {
+                            console.log(result);
+                        }
+
+
+
+                    } catch (error) {
+                        console.log('Ошибка: ', error);
+                    }
+
+                }
             }
         }
     });
@@ -219,7 +293,7 @@ window.oncontextmenu = (e) => {
 
         // удаляем пользователя из списка контактов с удалением всей переписки и удаляем у него свой контакт
         let deleteChatUser = document.querySelector('#deletechatuser');
-        deleteChatUser.onclick = async () => {
+        deleteChatUser.onclick = () => {
             // console.log(e);
             // отправляем сообщение в сокет для удаления контакта пользователя и
             // если пользователь активен отправляем сообщение пользователю, что его контакт удален
@@ -243,7 +317,7 @@ window.oncontextmenu = (e) => {
 
         // удаляем переписку с пользователем
         let deleteUserChats = document.querySelector('#deleteuserchats');
-        deleteUserChats.onclick = async () => {
+        deleteUserChats.onclick = () => {
             // console.log(e.target.id);
             // отправляем сообщение в сокет для удаления всей переписки с пользователем и
             // если пользователь активен отправляем сообщение пользователю, что переписка удалена
@@ -347,7 +421,7 @@ window.oncontextmenu = (e) => {
             // получаем список пользователей из своих контактов для пересылки сообщения
             data = {
                 action: 'getUserContacts',
-                'user_id': USER_ID
+                user_id: USER_ID
             }
             try {
                 let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {

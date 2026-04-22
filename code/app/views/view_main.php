@@ -5,6 +5,7 @@
         <button class="btn-admin-action" onclick="location.href='/admin'">Страница администрирования</button>
         <?php phpinfo(); ?>
     <?php else: ?>
+         <!-- может его заменить на другой элемент -->
         <input type="text" id="userid" hidden value="<?= $userId ?>">
 
         <aside class="sidebar-left">
@@ -57,20 +58,18 @@
 
             <div class="div-btn-right-group">
                 <button class="btn-add" id="btnadduser" name="btnadduser">Добавить пользователей</button>
-                <button class="btn-add" id="btnaddgroup" name="btnaddgroup">Создать группу</button>
+                <button class="btn-add" id="btncreategroup" name="btncreategroup">Создать группу</button>
             </div>
 
         </aside>
 
         <div class="div-alert"></div>
-
+        
         <section class="section-main-window" id="mainwindow">
-
-            <!-- <div class="div-seach-users">
-                <input class="input-search-users" type="text" id="searchusers" name="searchusers" />
-            </div> -->
+            
 
             <div class="div-list-users" id="divlistusers"></div>
+            <div class="div-wrapper-create-group" id="divwrappercreategroup"></div>
 
             <ul class="ul-message-menu">
                 <li id="deletemessage">Удалить сообщение</li>

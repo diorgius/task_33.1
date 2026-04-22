@@ -112,11 +112,16 @@
 .btn-add:active {
     background-color: #ffffff;
     border: .1rem solid #007bff;
-    color: #007bff;
+    color: hsl(211, 100%, 50%);
 }
 
 .btn-add:focus {
     border: .1rem solid #cccccc;
+    outline: none;
+}
+
+.btn-add::focus-within {
+    border: .1rem solid #007bff;
     outline: none;
 }
 
@@ -134,27 +139,6 @@
     overflow-y: auto;
     z-index: 99;
 }
-
-/* .div-seach-users {
-    width: 60%;
-    height: 3rem;
-} */
-
-/* .input-search-users {
-    font-size: 1.2rem;
-    border: .1rem solid #cccccc;
-    background-color: #ffffff;
-    border-radius: .2rem;
-    height: 2.5rem;
-    width: 80%;
-    text-align: left;
-    color: #666666;
-    padding: .1rem .5rem .1rem .5rem;
-} */
-
-/* .input-search-users:focus {
-    outline: none;
-} */
 
 .div-list-users {
     margin: 1rem;
@@ -269,6 +253,11 @@
     outline: none;
 }
 
+.a-send-message:focus-within {
+    border: .1rem solid #007bff;
+    outline: none;
+}
+
 .div-chat-user-without-notice {
     background-color: #eeeeee;
 }
@@ -339,10 +328,6 @@
     margin-bottom: .5rem;
 }
 
-/* .span-chat-name {
-
-} */
-
 .span-chat-close {
     display: flex;
     flex-direction: column;
@@ -396,11 +381,6 @@
     font-size: .7rem;
     color: #007bff;
 }
-
-/* #forwardmessage {
-    font-size: 1rem;
-    font-weight: bold;
-} */
 
 .ul-users-menu {
     display: none;
@@ -461,4 +441,49 @@
     background-color: #ffffff;
     border: .1rem solid #007bff;
     color: #007bff;
+}
+
+.div-wrapper-create-group{
+    width: 80%;
+    display: flex;
+    justify-content: center;
+}
+
+.div-create-group {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+
+.div-create-group label {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.div-create-group-header {
+    margin: 3rem 0 2rem 0;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.input-group-name {
+    font-size: 1.2rem;
+    border: .1rem solid #007bff;
+    background-color: #ffffff;
+    border-radius: .2rem;
+    height: 2.5rem;
+    width: 80%;
+    text-align: center;
+    color: #007bff;
+    padding: .1rem .5rem .1rem .5rem;
+    margin-bottom: 1.5rem;
+}
+
+.input-group-name:focus {
+    outline: none;
+    border: .1rem solid #cccccc;
 }

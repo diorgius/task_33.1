@@ -9,6 +9,7 @@ const DIV_ALERT = document.querySelector('.div-alert');
 const INPUT_HIDE_EMAIL = document.querySelector('#hideemail');
 const INPUT_NICKNAME = document.querySelector('#nickname');
 const INPUT_FILE_AVATAR = document.querySelector('#fileavatar');
+const INPUT_GROUP_NAME = document.querySelector('#inputgroupname');
 
 if (INPUTE_MAIL) {
     INPUTE_MAIL.addEventListener('change', (e) => {
@@ -45,6 +46,59 @@ if (INPUT_FILE_AVATAR) {
         validation(e);
     });
 }
+
+// if (INPUT_GROUP_NAME) {
+    // INPUT_GROUP_NAME.addEventListener('change', (e) => {
+    //     console.log(e);
+    //     validation(e);
+    // });
+
+    // window.addEventListener('DOMNodeInserted', (e) => {
+    //     console.log(e);
+
+    // // if (e.target.matches(INPUT_GROUP_NAME)) {
+    //     console.log(e);
+    //     // validation(e); // Элемент, который мы искали
+    // // }
+    // });
+// }
+
+// const waitForElement = (selector, callback) => {
+//   const observer = new MutationObserver(mutations => {
+//     mutations.forEach(mutation => {
+//       mutation.addedNodes.forEach(node => {
+//         if (node.matches && node.matches(selector)) {
+//           callback(node);
+//           observer.disconnect();
+//         }
+//       });
+//     });
+//   });
+
+//   observer.observe(document.body, { childList: true, subtree: true });
+// };
+
+// // Пример использования
+// waitForElement('#divwrappercreategroup', element => {
+//   // Код, выполняющийся после обнаружения элемента '#myElement' в DOM
+//   console.log('Элемент найден:', element);
+// });
+  
+
+const target = document.querySelector('#divwrappercreategroup');
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.type === 'childList') {
+      console.log('Элемент появился!' + target.childNodes.forEach(() => { console.log (target.children)}));
+      
+      // Здесь можно выполнить действия с появившимся элементом
+    }
+  });
+});
+
+const config = { childList: true, subtree: true };
+
+observer.observe(target, config);
 
 // на форме редактирования профиля (и проверки поля ввода пароля на форме регистрации, т.к. используется одна проверка)
 // пришлось добавлять стиль таким способом:
@@ -194,5 +248,8 @@ async function validation(e) {
             INPUT_FILE_AVATAR.setAttribute('style', 'border: .1rem solid #007bff');
             BUTTON_SEND.removeAttribute('disabled');
         }
+    } else if (e.target.id === 'inputgroupname') {
+        console.log('test');
+
     }
 }

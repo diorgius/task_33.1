@@ -115,14 +115,14 @@ class Messenger implements MessageComponentInterface
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
         // формируем массив для записи в БД
-        $value = [
+        $values = [
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
             'text_message' => htmlspecialchars($data['text_message']),
             'created' => $created
         ];
         // записываем в БД
-        $result = DB::create('messages', $value);
+        $result = DB::create('messages', $values);
         // дополняем сообщение для отправки пользователю
         if ($result) {
             $data['id'] = $result;
@@ -217,7 +217,7 @@ class Messenger implements MessageComponentInterface
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
         // формируем массив для записи в БД
-        $value = [
+        $values = [
             'id' => $data['id'],
             'send_user_Id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_id'],
@@ -226,7 +226,7 @@ class Messenger implements MessageComponentInterface
             'created' => $created
         ];
         // записываем изменения в БД
-        DB::update('messages', $value);
+        DB::update('messages', $values);
         // отправляем сообщение пользователю для изменения сообщения у него
         $message = json_encode($data);
         foreach ($this->clients as $client) {
@@ -246,7 +246,7 @@ class Messenger implements MessageComponentInterface
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
         // в цикле проходим по адресатам пересылки
-        foreach ($data['usersToForward'] as $key => $value) {
+        foreach ($data['usersToForward'] as $key => $values) {
             // формируем массив для записи в БД
             $values = [
                 'send_user_id' => intVal($data['send_user_id']),

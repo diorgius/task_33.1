@@ -56,9 +56,9 @@ WS.onmessage = (e) => {
             // сюда прилетают обычные сообщения и пересланные
             // проверяем отключено или нет оповещение для этого пользователя
             if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-notice')) {
-                // если открыт список добавления пользователей, то выделяем пользователя цветом 
+                // если открыт список добавления пользователей или создание группы, то выделяем пользователя цветом 
                 // (сообщаем, что от этого пользователя пришло сообщение)
-                if (document.querySelector('#divaddusers')) {
+                if (document.querySelector('#divaddusers') || document.querySelector('#divcreategroup')) {
                     document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
                 } else {
                     // проверяем если есть открытый чат
@@ -171,6 +171,11 @@ document.body.addEventListener('click', async (e) => {
             document.querySelector('#divaddusers').remove();
             BUTTON_ADD_USER.textContent = 'Добавить пользователей';
         }
+        // если открыто создание группы убираем его
+        if (document.querySelector('#divcreategroup')) {
+            BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+            document.querySelector('#divcreategroup').remove();
+        }
         // если пользователь не в чате, блокируем отправку сообщения
         if (!e.target.classList.contains('div-chat-user-onchat')) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
@@ -191,8 +196,8 @@ document.body.addEventListener('click', async (e) => {
                 // готовим данные для отправки на бэкенд
                 data = {
                     action: 'getUserMessages',
-                    sendUserId: USER_ID,
-                    acceptUserId: e.target.id
+                    send_user_id: USER_ID,
+                    accept_user_id: e.target.id
                 };
                 // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения               
                 getUserMessages(data);

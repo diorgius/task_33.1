@@ -4,9 +4,9 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
         // отправляем данные на бэкенд для записи в БД и создания сообщения в БД о добавлении пользователя
         data = {
             action: 'createContact',
-            'user_id': userId,
-            'contact_user_id': contactUserId,
-            'text_message': `Вас добавил(а) в свои контакты пользователь ${USER_NICKNAME}`
+            user_id: userId,
+            contact_user_id: contactUserId,
+            text_message: `Вас добавил(а) в свои контакты пользователь ${USER_NICKNAME}`
         };
         try {
             // отправляем запрос на создание записей в БД только один раз,
@@ -23,7 +23,7 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
                     body: JSON.stringify(data)
                 });
                 let result = await response.text();
-                // console.log('Успех: ', result);
+                console.log('Успех: ', result);
             }
             // добавляем пользователя в свои контакты
             let divChatUser = document.createElement('div');
