@@ -219,7 +219,7 @@ if (BUTTON_CREATE_GROUP) {
             </div>`;
             let inputGroupName = document.querySelector('#inputgroupname');
             // проверяем уникальность имени группы
-            // inputGroupName.onchange = (e) => { validation(e) }
+            inputGroupName.onchange = (e) => { validation(e) }
             const BUTTON_ADD_GROUP = document.querySelector('#btnaddgroup');
             // ловим нажатие кнопки создания группы
             BUTTON_ADD_GROUP.onclick = async () => {
@@ -228,21 +228,21 @@ if (BUTTON_CREATE_GROUP) {
                     alertMessage('Введите название группы');
                 } else {
                     // отправляем данные в БД для записи
-                    // data = {
-                    //     action: 'createGroup',
-                    //     group_name: inputGroupName.value
-                    // };
-                    // try {
-                    //     let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    //         method: 'POST',
-                    //         headers: {
-                    //             'Content-Type': 'application/json;charset=utf-8'
-                    //         },
-                    //         body: JSON.stringify(data)
-                    //     });
-                    //     let result = await response.text();
-                    //     console.log('Успех: ', result);
-                        result = '1';
+                    data = {
+                        action: 'createGroup',
+                        group_name: inputGroupName.value,
+                        creator: USER_ID
+                    };
+                    try {
+                        let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json;charset=utf-8'
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        let result = await response.text();
+                        console.log('Успех: ', result);
                         // добавляем созданную группу в левую панель
                         // уменьшаем область пользователей
                         DIV_USER_CHATS.style.height = '45%';
@@ -270,9 +270,9 @@ if (BUTTON_CREATE_GROUP) {
                         document.querySelector('#divcreategroup').remove();
                         BUTTON_CREATE_GROUP.textContent = 'Создать группу';
 
-                    // } catch (error) {
-                    //     console.log('Ошибка: ', error);
-                    // }
+                    } catch (error) {
+                        console.log('Ошибка: ', error);
+                    }
 
                 }
             }
@@ -388,9 +388,11 @@ window.oncontextmenu = (e) => {
         CHAT_USER_MENU.style.top = positionY + 'px';
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
-        let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
-        e.target.classList.add('div-chat-user-active');
+        let divChatGroupActive = document.querySelector('.div-chat-group-active');
+        divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-group-active') : null;
+        e.target.classList.add('div-chat-group-active');
+
+
     }
 
     // выводим контекстное меню на сообщении
@@ -569,6 +571,7 @@ window.oncontextmenu = (e) => {
     // убираем меню по клику в любом месте документа
     window.addEventListener('click', (elem) => {
         document.querySelector('.ul-chat-user-menu').style.display = 'none';
+        document.querySelector('.ul-chat-group-menu').style.display = 'none';
         // !!! если здесь убирать выделение кликнутого пользователя рамкой,
         // то потом при клике левой кнопкой пользователь не выделяется
         // пока не понял почему
@@ -588,6 +591,7 @@ window.oncontextmenu = (e) => {
     window.addEventListener('keydown', (press) => {
         if (press.key === 'Escape') {
             document.querySelector('.ul-chat-user-menu').style.display = 'none';
+            document.querySelector('.ul-chat-group-menu').style.display = 'none';
             // аналогично
             // e.target.classList.remove('div-chat-user-active');
             // по клавише убираем все меню

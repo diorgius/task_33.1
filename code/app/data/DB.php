@@ -57,8 +57,12 @@ class DB
             $sql = "CREATE TABLE IF NOT EXISTS `groupchats` (
 	                `id` INT NOT NULL AUTO_INCREMENT,
 	                `group_name` VARCHAR(128) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+                    `creator` INT NOT NULL,
 	                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	                PRIMARY KEY (`id`) USING BTREE)";
+	                PRIMARY KEY (`id`) USING BTREE,
+                    INDEX `FK_groupchats_users` (`creator`) USING BTREE,
+	                CONSTRAINT `FK_groupchats_users_id` FOREIGN KEY (`creator`) 
+                    REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
 
             self::$pdo->exec($sql);
 
@@ -66,7 +70,7 @@ class DB
                 "CREATE TABLE IF NOT EXISTS `messenger`.`contacts` (
 	            `id` INT NOT NULL AUTO_INCREMENT,
 	            `user_id` INT NOT NULL,
-	            `contact_user_id` INT NOT NULL,
+	            `contact_user_id` INT NULL,
 	            `contact_group_id` INT NULL,
 	            `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	            PRIMARY KEY (`id`) USING BTREE,

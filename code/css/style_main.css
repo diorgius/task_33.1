@@ -513,3 +513,27 @@
 .div-chat-group-active {
     border: .1rem solid #007bff;
 }
+
+.ul-chat-group-menu {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    min-width: max-content;
+    height: auto;
+    border: .1rem solid #cccccc;
+    border-radius: .2rem;
+    background-color: #ffffff;
+    color: #666666;
+    font-size: .8rem;
+    list-style: none;
+    box-shadow: .1rem .1rem .7rem .1rem #cccccc ;
+}
+
+.ul-chat-group-menu li {
+    padding: .5rem;
+    cursor: pointer;
+}
+
+.ul-chat-group-menu li:hover{
+    color: #007bff;
+}

@@ -100,10 +100,20 @@ class ActionsWithUsers
     public function createGroup()
     {
         DB::dbconnect();
+        // создаем группу
         $values = [
             'group_name' => htmlspecialchars($this->data['group_name']),
+            'creator' => $this->data['creator']
         ];
         $result = DB::create('groupchats', $values);
+        // получаем id группы
+        $group_id = $result;
+        // создаем контакт группы у создавшено группу пользователя
+        $values = [
+            'user_id' => $this->data['creator'],
+            'contact_group_id' => $group_id
+        ];
+        DB::create('contacts', $values);
         echo $result;
     }
 }

@@ -14,6 +14,7 @@ class Model_Main extends Model
             DB::dbconnect();
             $user = DB::getByProp('users', 'id', $id);
             $contacts = DB::getContacts('contacts', 'user_id', $id);
+            // $groups = DB::getContacts('contacts', 'user_id', $id);
             if ($user) {
                 $data = [
                     'user' => $user,
