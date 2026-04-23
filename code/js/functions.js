@@ -23,7 +23,7 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
                     body: JSON.stringify(data)
                 });
                 let result = await response.text();
-                console.log('Успех: ', result);
+                // console.log('Успехgit: ', result);
             }
             // добавляем пользователя в свои контакты
             let divChatUser = document.createElement('div');
@@ -42,8 +42,8 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
             divChatUserNickname.classList.add('div-user-nickname');
             divChatUser.appendChild(divChatUserNickname);
             let pChatUser = document.createElement('p');
-            divChatUserNickname.appendChild(pChatUser);
             nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
+            divChatUserNickname.appendChild(pChatUser);
             // проверяем активен ли сейчас добавленный пользователь
             Object.values(connectedUsers).forEach(async value => {
                 // console.log(value);

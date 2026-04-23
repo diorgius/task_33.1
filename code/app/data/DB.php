@@ -49,37 +49,8 @@ class DB
                 `role` VARCHAR(20) NULL COLLATE 'utf8mb4_0900_ai_ci', 
                 `cookiehash` VARCHAR(128) NULL COLLATE 'utf8mb4_0900_ai_ci', 
                 `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`) USING BTREE, INDEX `email` (`email`) USING BTREE)";
-
-            self::$pdo->exec($sql);
-
-            $sql = 
-                "CREATE TABLE IF NOT EXISTS `messenger`.`contacts` (
-	            `id` INT NOT NULL AUTO_INCREMENT,
-	            `user_id` INT NOT NULL,
-	            `contact_user_id` INT NOT NULL,
-	            `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	            PRIMARY KEY (`contact_id`) USING BTREE,
-	            INDEX `FK_contacts_users` (`user_id`) USING BTREE,
-	            CONSTRAINT `FK_user_contacts_users` FOREIGN KEY (`user_id`) 
-                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
-
-            self::$pdo->exec($sql);
-
-             $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
-                `id` INT NOT NULL AUTO_INCREMENT,
-                `send_user_id` INT NOT NULL,
-                `accept_user_id` INT NOT NULL,
-                `text_message` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
-                `status_message` VARCHAR(60) NULL COLLATE 'utf8mb4_0900_ai_ci',
-                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`message_id`) USING BTREE,
-                INDEX `FK_messages_users` (`send_user_id`) USING BTREE,
-                INDEX `FK_messages_users_2` (`accept_user_id`) USING BTREE,
-                CONSTRAINT `FK_messages_users` FOREIGN KEY (`send_user_id`) 
-                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
-                CONSTRAINT `FK_messages_users_2` FOREIGN KEY (`accept_user_id`) 
-                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
+                PRIMARY KEY (`id`) USING BTREE, INDEX `email` (`email`) USING BTREE, 
+                INDEX `nickname` (`nickname`) USING BTREE)";
 
             self::$pdo->exec($sql);
 
@@ -88,6 +59,44 @@ class DB
 	                `group_name` VARCHAR(128) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
 	                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	                PRIMARY KEY (`id`) USING BTREE)";
+
+            self::$pdo->exec($sql);
+
+            $sql = 
+                "CREATE TABLE IF NOT EXISTS `messenger`.`contacts` (
+	            `id` INT NOT NULL AUTO_INCREMENT,
+	            `user_id` INT NOT NULL,
+	            `contact_user_id` INT NOT NULL,
+	            `contact_group_id` INT NULL,
+	            `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	            PRIMARY KEY (`id`) USING BTREE,
+	            INDEX `FK_contacts_users_id` (`user_id`) USING BTREE,
+	            INDEX `FK_contacts_contact_group_id` (`contact_group_id`) USING BTREE,
+	            CONSTRAINT `FK_contacts_users_id` FOREIGN KEY (`user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+	            CONSTRAINT `FK_contacts_contact_group_id` FOREIGN KEY (`contact_group_id`) 
+                REFERENCES `groupchats` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+            self::$pdo->exec($sql);
+
+             $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
+                `id` INT NOT NULL AUTO_INCREMENT,
+                `send_user_id` INT NOT NULL,
+                `accept_user_id` INT NOT NULL,
+                `accept_group_id` INT NULL,
+                `text_message` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+                `status_message` VARCHAR(60) NULL COLLATE 'utf8mb4_0900_ai_ci',
+                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`) USING BTREE,
+                INDEX `FK_messages_send_users_id` (`send_user_id`) USING BTREE,
+                INDEX `FK_messages_accept_users_id` (`accept_user_id`) USING BTREE,
+                INDEX `FK_messages_accept_group_id` (`accept_group_id`) USING BTREE,
+                CONSTRAINT `FK_messages_send_users_id` FOREIGN KEY (`send_user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+                CONSTRAINT `FK_messages_accept_users_id` FOREIGN KEY (`accept_user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+                CONSTRAINT `FK_messages_accept_group_id` FOREIGN KEY (`accept_group_id`) 
+                REFERENCES `groupchats` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
 
             self::$pdo->exec($sql);
 

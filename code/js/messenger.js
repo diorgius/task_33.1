@@ -160,7 +160,7 @@ WS.onmessage = (e) => {
 
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку (загружаем ранние сообщения из базы))
 document.body.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('div-chat-user')) {
+    if (e.target.classList.contains('div-chat-user') || e.target.classList.contains('div-chat-group')) {
         // console.log(e);
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');

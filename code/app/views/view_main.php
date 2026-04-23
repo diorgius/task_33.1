@@ -43,6 +43,8 @@
                 <?php endif; ?>
 
             </div>
+            
+            <div id="divusergroups"></div>
 
             <ul class="ul-chat-user-menu">
                 <li id="addgroupchat">Добавить в групповой чат</li>
@@ -50,6 +52,15 @@
                 <li id="onnotification">Включить оповещение</li>
                 <li id="deletechatuser">Удалить пользователя из списка контактов</li>
                 <li id="deleteuserchats">Удалить переписку с пользователем</li>
+            </ul>
+
+            <ul class="ul-chat-group-menu">
+                <li id="addgroupchatuser">Добавить пользователя</li>
+                <li id="offnotification">Отключить оповещение</li>
+                <li id="onnotification">Включить оповещение</li>
+                <li id="deletegroupchatuser">Удалить пользователя из группы</li>
+                <li id="deletegroupchats">Удалить переписку группы</li>
+                <li id="deletegroup">Удалить группу</li>
             </ul>
 
         </aside>

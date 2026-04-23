@@ -2,6 +2,7 @@ const BUTTON_ADD_USER = document.querySelector('#btnadduser');
 const BUTTON_CREATE_GROUP = document.querySelector('#btncreategroup');
 const DIV_LIST_USERS = document.querySelector('#divlistusers');
 const DIV_USER_CHATS = document.querySelector('#divuserchats');
+const DIV_USER_GROUPS = document.querySelector('#divusergroups');
 const MAIN_WINDOW = document.querySelector('#mainwindow');
 const TEXT_AREA_MESSAGE = document.querySelector('#textsendmessage');
 if (document.querySelector('#userid')) {
@@ -74,25 +75,36 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕРЕСЫЛКЕ ???
 //
-// !!! ??? ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта !!!
+// 18. !!! ??? ВОЗМОЖНО ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта !!!
 //
-// 18. создание группы и добавление пользователей в группу
+// 19. создание группы и добавление пользователей в группу
 // 
-// 19. рассылка групповых сообщений
+// 20. рассылка групповых сообщений
 //
-// 20. удаление пользователя из группы
+// 21. удаление пользователя из группы
 // 
-// 21. удаление группы ???только ее создателем
+// 22. удаление группы ???только ее создателем
 //
-// !!! СДЕЛАНО 22. при добавлении пользователя в список своих контактов
+// !!! СДЕЛАНО 23. при добавлении пользователя в список своих контактов
 // добавлять себя в список его контактов с отправкой ему сообщения об этом
 //
-// 23. правый клик не только на див сообщения, а на всей области сообщения
+// 24. правый клик не только на див сообщения, а на всей области сообщения
 //
-// 24. !!! ??? НАДО ПОДУМАТЬ о статусе сообщения прочитано/непрочитано, чтобы пользователь
+// 25. !!! ??? НАДО ПОДУМАТЬ о статусе сообщения прочитано/непрочитано, чтобы пользователь
 // при входе мог видеть, что ему поступили новые сообщения и от кого, пока он был неактивен
 // 
-// !!! СДЕЛАНО 25. !!! ??? при удалении контакта ??? тоже удалять себя у него
+// !!! СДЕЛАНО 26. !!! ??? при удалении контакта ??? тоже удалять себя у него
+//
+// 27. НАДО еще подумать над вкл/выкл оповещения сейчас оно отключает не только беззвучный режим,
+// но и полностью оповещение о приходе сообщений, при этом если при отключенном оповещении
+// кликнуть на пользователя, выводится сообщение, что пользователь не в чате (ЭТО надо поправить
+// чтобы пользователь мог загружать сообщения),
+// ПОКА я не понял вкл/выкл оповещения ЭТО только беззвучный режим или ВООБЩЕ 
+// отключение оповещения о приходе новых сообщений
+//
+// 28. сортировка пользователей чата при входе в соответствии с полученными последними сообщениями
+// И ВОЗМОЖНО перемещение пользователя вверх при поступлении сообщения
+
 
 
 
@@ -197,7 +209,7 @@ if (BUTTON_CREATE_GROUP) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
             // добавляем окно создания группы
             document.querySelector('#divwrappercreategroup').innerHTML =
-                `<div class="div-create-group" id="divcreategroup">
+            `<div class="div-create-group" id="divcreategroup">
                 <div class="div-create-group-header" id="divcreategroupheader">
                     <p>Создание группы пользователей</p>
                 </div>
@@ -207,7 +219,7 @@ if (BUTTON_CREATE_GROUP) {
             </div>`;
             let inputGroupName = document.querySelector('#inputgroupname');
             // проверяем уникальность имени группы
-            inputGroupName.onchange = (e) => { validation(e) }
+            // inputGroupName.onchange = (e) => { validation(e) }
             const BUTTON_ADD_GROUP = document.querySelector('#btnaddgroup');
             // ловим нажатие кнопки создания группы
             BUTTON_ADD_GROUP.onclick = async () => {
@@ -216,37 +228,51 @@ if (BUTTON_CREATE_GROUP) {
                     alertMessage('Введите название группы');
                 } else {
                     // отправляем данные в БД для записи
-                    data = {
-                        action: 'createGroup',
-                        group_name: inputGroupName.value
-                    };
-                    try {
-                        let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json;charset=utf-8'
-                            },
-                            body: JSON.stringify(data)
-                        });
-                        let result = await response.text();
-                        console.log('Успех: ', result);
-
-                        DIV_USER_CHATS.style.height = '40%';
-
-                        const DIV_USER_GROUPS = document.createElement('div');
+                    // data = {
+                    //     action: 'createGroup',
+                    //     group_name: inputGroupName.value
+                    // };
+                    // try {
+                    //     let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    //         method: 'POST',
+                    //         headers: {
+                    //             'Content-Type': 'application/json;charset=utf-8'
+                    //         },
+                    //         body: JSON.stringify(data)
+                    //     });
+                    //     let result = await response.text();
+                    //     console.log('Успех: ', result);
+                        result = '1';
+                        // добавляем созданную группу в левую панель
+                        // уменьшаем область пользователей
+                        DIV_USER_CHATS.style.height = '45%';
+                        // добавляем класс для дива групп
                         DIV_USER_GROUPS.classList.add('div-user-groups');
-                        document.querySelector('#sidebarleft').appendChild(DIV_USER_GROUPS);
+                        // создаем элемент группы
                         let divUserGroup = document.createElement('div');
-                        divUserGroup.classList.add('div-chat-user');
-                        divUserGroup.textContent = inputGroupName.value;
-                        DIV_USER_GROUPS.appendChild(divUserGroup); 
+                        divUserGroup.classList.add('div-chat-group');
+                        divUserGroup.setAttribute('id', result);
+                        let divGroupAvatar = document.createElement('div');
+                        let imgGroupAvatar = document.createElement('img');
+                        imgGroupAvatar.src = URL + '/img/group.jpg';
+                        imgGroupAvatar.alt = 'Аватар';
+                        imgGroupAvatar.width = '35';
+                        divGroupAvatar.appendChild(imgGroupAvatar);
+                        divUserGroup.appendChild(divGroupAvatar);
+                        let divUserGroupName = document.createElement('div');
+                        divUserGroupName.classList.add('div-user-nickname');
+                        divUserGroup.appendChild(divUserGroupName);
+                        let pUserGroup = document.createElement('p');
+                        pUserGroup.textContent = inputGroupName.value;
+                        divUserGroupName.appendChild(pUserGroup);
+                        DIV_USER_GROUPS.appendChild(divUserGroup);
+                        // убираем окно создания группы
+                        document.querySelector('#divcreategroup').remove();
+                        BUTTON_CREATE_GROUP.textContent = 'Создать группу';
 
-
-
-
-                    } catch (error) {
-                        console.log('Ошибка: ', error);
-                    }
+                    // } catch (error) {
+                    //     console.log('Ошибка: ', error);
+                    // }
 
                 }
             }
@@ -271,7 +297,8 @@ window.oncontextmenu = (e) => {
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
         e.target.classList.add('div-chat-user-active');
 
-        // добавляем пользователя в групповой чат
+        // !!! ПОКА ПО ВОПРОСОМ добавляем пользователя в групповой чат ИЛИ ДОБАВЛЯЕМ ПРИ КЛИКЕ НА ГРУППЕ
+        // в LIST_USER ВЫВОДИ СПИСОК МОИХ КОНТАКТОВ И ОТ ТУДА ДОБАВЛЯЕМ
         let addGroupChat = document.querySelector('#addgroupchat');
         addGroupChat.onclick = () => {
             // console.log(e.target.id);
@@ -347,6 +374,23 @@ window.oncontextmenu = (e) => {
             document.querySelector('.div-text-send-message').style.visibility = 'hidden';
 
         }
+    }
+
+    // выводим контекстное меню на группе
+    if (e.target.classList.contains('div-chat-group')) {
+        console.log(e.target.id);
+        e.preventDefault();
+
+        // выводим меню
+        const CHAT_USER_MENU = document.querySelector('.ul-chat-group-menu');
+        CHAT_USER_MENU.style.display = 'block';
+        positionY = e.pageY - CHAT_USER_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
+        CHAT_USER_MENU.style.top = positionY + 'px';
+        CHAT_USER_MENU.style.left = `${e.pageX}px`;
+        // добавляем/удаляем выделение элемента border на кликнутом пользователе
+        let divChatUserActive = document.querySelector('.div-chat-user-active');
+        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
+        e.target.classList.add('div-chat-user-active');
     }
 
     // выводим контекстное меню на сообщении
