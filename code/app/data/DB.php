@@ -157,13 +157,25 @@ class DB
         $stmt = self::$pdo->prepare(
             "SELECT c.id, contact_user_id, email, nickname, avatar 
             FROM $table AS c LEFT JOIN users AS u ON 
-            u.id = (SELECT contact_user_id FROM contacts 
-            WHERE 
-            contact_user_id = c.contact_user_id AND $prop = :value_2)
-            WHERE $prop = :value_1");
+            u.id = c.contact_user_id
+            WHERE $prop = :value
+            AND contact_user_id IS NOT NULL");
         $stmt->execute([
-            'value_1' => $value,
-            'value_2' => $value
+            'value' => $value
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getGroups(string $table, string $prop, string $value)
+    {
+        $stmt = self::$pdo->prepare(
+            "SELECT g.id, c.user_id, c.contact_group_id, g.group_name  
+            FROM $table AS c LEFT JOIN groupchats AS g ON 
+            g.id = c.contact_group_id
+            WHERE $prop = :value
+            AND contact_group_id IS NOT NULL");
+        $stmt->execute([
+            'value' => $value
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

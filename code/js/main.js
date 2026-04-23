@@ -2,7 +2,6 @@ const BUTTON_ADD_USER = document.querySelector('#btnadduser');
 const BUTTON_CREATE_GROUP = document.querySelector('#btncreategroup');
 const DIV_LIST_USERS = document.querySelector('#divlistusers');
 const DIV_USER_CHATS = document.querySelector('#divuserchats');
-const DIV_USER_GROUPS = document.querySelector('#divusergroups');
 const MAIN_WINDOW = document.querySelector('#mainwindow');
 const TEXT_AREA_MESSAGE = document.querySelector('#textsendmessage');
 if (document.querySelector('#userid')) {
@@ -244,10 +243,16 @@ if (BUTTON_CREATE_GROUP) {
                         let result = await response.text();
                         console.log('Успех: ', result);
                         // добавляем созданную группу в левую панель
-                        // уменьшаем область пользователей
-                        DIV_USER_CHATS.style.height = '45%';
-                        // добавляем класс для дива групп
-                        DIV_USER_GROUPS.classList.add('div-user-groups');
+                        // проверяем если ли див добавления групп
+                        if (!document.querySelector('#divusergroups')) {
+                            // создаем див контейнер
+                            let divUserGroups =  document.createElement('div');
+                            divUserGroups.classList.add('div-user-groups');
+                            divUserGroups.setAttribute('id', 'divusergroups');
+                            document.querySelector('#sidebarleft').appendChild(divUserGroups);
+                            // уменьшаем область пользователей
+                            DIV_USER_CHATS.style.height = '45%';
+                        }
                         // создаем элемент группы
                         let divUserGroup = document.createElement('div');
                         divUserGroup.classList.add('div-chat-group');
@@ -265,15 +270,14 @@ if (BUTTON_CREATE_GROUP) {
                         let pUserGroup = document.createElement('p');
                         pUserGroup.textContent = inputGroupName.value;
                         divUserGroupName.appendChild(pUserGroup);
-                        DIV_USER_GROUPS.appendChild(divUserGroup);
+                        let divUserGroups = document.querySelector('#divusergroups');
+                        divUserGroups.appendChild(divUserGroup);
                         // убираем окно создания группы
                         document.querySelector('#divcreategroup').remove();
                         BUTTON_CREATE_GROUP.textContent = 'Создать группу';
-
                     } catch (error) {
                         console.log('Ошибка: ', error);
                     }
-
                 }
             }
         }

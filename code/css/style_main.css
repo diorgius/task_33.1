@@ -492,7 +492,6 @@
 .div-user-groups {
     overflow: hidden;
     overflow-y: auto;
-    height: auto;
     width: 90%;
     height: 45%;
     border-top: .1rem solid #cccccc;
@@ -536,4 +535,8 @@
 
 .ul-chat-group-menu li:hover{
     color: #007bff;
+}
+
+.groups-exist {
+    height: 45%;
 }

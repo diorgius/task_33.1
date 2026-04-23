@@ -5,7 +5,7 @@
         <button class="btn-admin-action" onclick="location.href='/admin'">Страница администрирования</button>
         <?php phpinfo(); ?>
     <?php else: ?>
-         <!-- может его заменить на другой элемент -->
+        <!-- может его заменить на другой элемент -->
         <input type="text" id="userid" hidden value="<?= $userId ?>">
 
         <aside class="sidebar-left" id="sidebarleft">
@@ -15,25 +15,26 @@
                 <div class="div-user-avatar">
                     <?php isset($data['user']['avatar']) ? $image = URL . 'avatars/' . $data['user']['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
                     <img src="<?= $image; ?>" alt="avatar" width="90px">
-                    <?php isset($data['user']['nickname']) && !empty($data['user']['nickname']) ? 
+                    <?php isset($data['user']['nickname']) && !empty($data['user']['nickname']) ?
                         $nickname = $data['user']['nickname'] : $nickname = $data['user']['email']; ?>
                     <p class="p-nickname"><?= $nickname; ?></p>
-                <?php endif; ?>
-            </div>
+                </div>
 
-            <div class="div-user-chats" id="divuserchats">
+            <?php endif; ?>
+
+            <div class="div-user-chats <?= !empty($data['groups']) ? "groups-exist" : null; ?>" id="divuserchats">
 
                 <?php if (!empty($data['contacts'])): ?>
 
                     <?php foreach ($data['contacts'] as $key => $value): ?>
                         <div class="div-chat-user" id="<?= $data['contacts'][$key]['contact_user_id']; ?>">
                             <div>
-                                <?php !empty($data['contacts'][$key]['avatar']) ? 
+                                <?php !empty($data['contacts'][$key]['avatar']) ?
                                     $image = URL . 'avatars/' . $data['contacts'][$key]['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
                                 <img src="<?= $image; ?>" alt="Аватар" width="35">
                             </div>
                             <div class="div-user-nickname">
-                                <?php isset($data['contacts'][$key]['nickname']) && !empty($data['contacts'][$key]['nickname']) ? 
+                                <?php isset($data['contacts'][$key]['nickname']) && !empty($data['contacts'][$key]['nickname']) ?
                                     $nickname = $data['contacts'][$key]['nickname'] : $nickname = $data['contacts'][$key]['email']; ?>
                                 <p><?= $nickname; ?></p>
                             </div>
@@ -43,8 +44,23 @@
                 <?php endif; ?>
 
             </div>
-            
-            <div id="divusergroups"></div>
+
+            <?php if (!empty($data['groups'])): ?>
+                <div class="div-user-groups" id="divusergroups">
+
+                    <?php foreach ($data['groups'] as $key => $value): ?>
+                        <div class="div-chat-group" id="<?= $data['groups'][$key]['contact_group_id']; ?>">
+                            <div>
+                                <img src="../img/group.jpg" alt="Аватар" width="35">
+                            </div>
+                            <div class="div-user-nickname">
+                                <p><?= $data['groups'][$key]['group_name']; ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                </div>
+            <?php endif; ?>
 
             <ul class="ul-chat-user-menu">
                 <li id="addgroupchat">Добавить в групповой чат</li>
@@ -75,9 +91,9 @@
         </aside>
 
         <div class="div-alert"></div>
-        
+
         <section class="section-main-window" id="mainwindow">
-            
+
             <div class="div-list-users" id="divlistusers"></div>
             <div class="div-wrapper-create-group" id="divwrappercreategroup"></div>
 
@@ -101,4 +117,3 @@
         <script defer src="../../js/messenger.js"></script>
     <?php endif; ?>
 <?php endif; ?>
-
