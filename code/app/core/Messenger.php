@@ -68,6 +68,10 @@ class Messenger implements MessageComponentInterface
                 // метод записи в БД и отправки пересылаемого сообщения
                 $this->forwardMessage($from, $data);
                 break;
+            case 'deleteGroup';
+                // метод записи в БД и отправки пересылаемого сообщения
+                $this->deleteGroup($from, $data);
+                break;
         }
     }
 
@@ -237,7 +241,7 @@ class Messenger implements MessageComponentInterface
         }
     }
 
-    public function forwardMessage(ConnectionInterface $from, $data)
+    protected function forwardMessage(ConnectionInterface $from, $data)
     {
         // делаем запись в БД перенаправленного сообщения
         DB::dbconnect();
@@ -285,6 +289,43 @@ class Messenger implements MessageComponentInterface
                 }
             }
         }
+    }
+
+    protected function deleteGroup(ConnectionInterface $from, $data)
+    {
+        var_dump($data);
+
+        // делаем удаление группы
+        DB::dbconnect();
+        // проверяем создателя группы (группу удаляет только ее создатель)
+        $result = DB::getByProp('groupchats', 'id', $data['id']);
+        
+        var_dump($result);
+        if ($result['creator'] === intval($data['user_id'])) {
+            
+            $message = json_encode(['alert' => 'Группу может удалить только пользователь ее создавший']);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === intval($data['from'])) {
+                    $client->send($message);
+                    break;
+                }
+            }
+        } else {
+            // удаляем группу в БД
+            DB::delete('groupchats', $data['id']);
+            // отправляем сообщение пользователю для удаления сообщения у него
+            // $message = json_encode($data);
+            // foreach ($this->clients as $client) {
+            //     if ($client->resourceId === intval($data['to'])) {
+            //         $client->send($message);
+            //         break;
+            //     }
+            // }
+
+        }
+
+
+
     }
 
     public function onClose(ConnectionInterface $conn)

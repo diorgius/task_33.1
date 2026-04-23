@@ -241,7 +241,7 @@ if (BUTTON_CREATE_GROUP) {
                             body: JSON.stringify(data)
                         });
                         let result = await response.text();
-                        console.log('Успех: ', result);
+                        // console.log('Успех: ', result);
                         // добавляем созданную группу в левую панель
                         // проверяем если ли див добавления групп
                         if (!document.querySelector('#divusergroups')) {
@@ -350,7 +350,8 @@ window.oncontextmenu = (e) => {
             document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
             // выводим сообщение, что данный пользователь удален из списка контактов
             alertMessage(`Пользователь ${e.target.innerText} удален из списка контактов`);
-            document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
+            // удаляем пользователя из списка контактов
+            document.getElementById(e.target.id) ? document.getElementById(e.target.id).remove() : null;
             // скрываем текстовую область
             document.querySelector('.div-text-send-message').style.visibility = 'hidden';
 
@@ -382,9 +383,8 @@ window.oncontextmenu = (e) => {
 
     // выводим контекстное меню на группе
     if (e.target.classList.contains('div-chat-group')) {
-        console.log(e.target.id);
+        console.log(e);
         e.preventDefault();
-
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-group-menu');
         CHAT_USER_MENU.style.display = 'block';
@@ -395,6 +395,35 @@ window.oncontextmenu = (e) => {
         let divChatGroupActive = document.querySelector('.div-chat-group-active');
         divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-group-active') : null;
         e.target.classList.add('div-chat-group-active');
+
+
+
+        // удаляем группу
+        let deleteGroup = document.querySelector('#deletegroup');
+        deleteGroup.onclick = () => {
+            // удалять группу будем через сокет, чтобы можно было послать сообщение
+            // членам группы об удалении группы
+
+            // в дальнейшем надо в еще как-то получать id группы и кто вней состоит, чтобы потом рассылать сообщения
+            
+            // to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
+            WS.send(JSON.stringify({
+                command: 'deleteGroup',
+                id: e.target.id,
+                // to: to,
+                user_id: USER_ID,
+                user_nickname: USER_NICKNAME,
+                group_name: e.target.innerText
+            }))
+            // если открыт чат с удаленной группой, закрываем его
+            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
+            // удаляем группу из списка контактов
+            document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
+            // выводим сообщение, что переписка удалена
+            alertMessage(`Группа ${e.target.innerText} удалена`);
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+        }
 
 
     }

@@ -145,6 +145,10 @@ WS.onmessage = (e) => {
                 divUserMessage.lastChild.textContent = 'edited';
             }
             break;
+        case 'deleteGroup':
+            console.log(data);
+            alertMessage(data.alert);
+            break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
             delete connectedUsers[data.connectId];
