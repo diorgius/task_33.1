@@ -82,7 +82,8 @@ if (document.querySelector('#userid')) {
 //
 // 21. удаление пользователя из группы
 // 
-// 22. удаление группы ???только ее создателем
+// ???!!! СДЕЛАНО 22. удаление группы только ее создателем, НО НАДО ЕЩЕ ДОДЕЛАТЬ РАССЫЛКУ СООБЩЕНИЙ
+// ПОЛЬЗОВАТЕЛЯМ ГРУППЫ ОБ ЕЕ УДАЛЕНИИ
 //
 // !!! СДЕЛАНО 23. при добавлении пользователя в список своих контактов
 // добавлять себя в список его контактов с отправкой ему сообщения об этом
@@ -150,39 +151,9 @@ if (BUTTON_ADD_USER) {
                 let result = await response.json();
                 // console.log('Успех: ', result);
 
-                let divAddUsers = document.createElement('div');
-                DIV_LIST_USERS.appendChild(divAddUsers);
-                divAddUsers.setAttribute('id', 'divaddusers');
-                result.forEach((item) => {
-                    if (`${item.id}` !== USER_ID) {
-                        // console.log(item);
-                        let divUser = document.createElement('div');
-                        divUser.classList.add('div-user');
-                        divUser.setAttribute('id', 'divuser_' + `${item.id}`);
-                        divAddUsers.appendChild(divUser);
-                        let divUserAvatar = document.createElement('div');
-                        divUser.appendChild(divUserAvatar);
-                        let imgUserAvatar = document.createElement('img');
-                        let image = item.avatar !== null ? URL + '/avatars/' + item.avatar : URL + '/img/avatar_0.jpg';
-                        imgUserAvatar.src = image;
-                        imgUserAvatar.alt = 'Аватар';
-                        imgUserAvatar.width = '40';
-                        divUserAvatar.appendChild(imgUserAvatar);
-                        let divUserNickname = document.createElement('div');
-                        divUserNickname.classList.add('div-user-nickname');
-                        divUser.appendChild(divUserNickname);
-                        let pUserNickname = document.createElement('p');
-                        divUserNickname.appendChild(pUserNickname);
-                        pUserNickname.textContent = item.nickname;
-                        if (item.hideemail === 0) {
-                            let pUserEmail = document.createElement('p');
-                            divUserNickname.appendChild(pUserEmail);
-                            pUserEmail.textContent = item.email;
-                        }
-                        // при клике на пользователе вызываем функцию добавления пользователя в список своих контактов
-                        divUser.onclick = () => { addUser(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
-                    }
-                });
+                // вызываем функцию вывода списка пользователей
+                // в которой при клике на пользователе вызывается функция добавления пользователя                
+                showUsersToAdd(result, 'addUserToPrivate');
             } catch (error) {
                 console.log('Ошибка: ', error);
             }
@@ -384,7 +355,7 @@ window.oncontextmenu = (e) => {
 
     // выводим контекстное меню на группе
     if (e.target.classList.contains('div-chat-group')) {
-        console.log(e);
+        // console.log(e);
         e.preventDefault();
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-group-menu');
@@ -397,6 +368,49 @@ window.oncontextmenu = (e) => {
         divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-group-active') : null;
         e.target.classList.add('div-chat-group-active');
 
+
+        // добавляем пользователя в группу
+        // сделал добавление пользователей через вывод списка пользователей как при добавлении пользователей
+        // закрытие окна сделал через туже кнопку "ДОБАВИТЬ ПОЛЬЗОВАТЕЛЕЙ"
+        // можно было сделать добавление через вывод дополнительного меню, как при пересылке сообщения
+        let addGroupChatUser = document.querySelector('#addgroupchatuser');
+        addGroupChatUser.onclick = async () => {
+            BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+            // если выведен список добавления пользователей - убираем его и меняем надпись на кнопке
+            if (document.querySelector('#divaddusers')) {
+                BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+                document.querySelector('#divaddusers').remove();
+            }
+            // если открыто окно создание группы - убираем его
+            if (document.querySelector('#divcreategroup')) {
+                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+                document.querySelector('#divcreategroup').remove();
+            }
+            // если есть открытый чат - убираем его
+            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+            // получаем список пользователей из своих контактов для добавления в группу
+            data = {
+                action: 'getUserContacts',
+                user_id: USER_ID
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.json();
+                // console.log('Успех: ', result);
+
+                // вызываем функцию вывода списка пользователей
+                // в которой при клике на пользователе вызывается функция добавления пользователя
+                showUsersToAdd(result, 'addUserToGroup');
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }
+        }
 
 
         // удаляем группу
@@ -558,7 +572,7 @@ window.oncontextmenu = (e) => {
                         liChatUser.classList.add('li-users-menu');
                         let spanUserNickname = document.createElement('span');
                         spanUserNickname.classList.add('span-forward-user');
-                        item.nickname !== '' ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
+                        item.nickname !== null ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
                         let spanCheckbox = document.createElement('span');
                         spanCheckbox.classList.add('span-forward-user');
                         let checkbox = document.createElement('input');
@@ -615,7 +629,6 @@ window.oncontextmenu = (e) => {
                     document.querySelector('.ul-message-menu').style.display = 'none';
                     document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
                 }
-
             } catch (error) {
                 console.log('Ошибка: ', error);
             }

@@ -1,5 +1,49 @@
-// функция добавления пользователя в список контактов
-async function addUser(userId, contactUserId, email, nickname, avatar, hideemail, contactAddition = false) {
+// функция вывода списка пользователей и добавления пользователя в список контактов
+function showUsersToAdd(result, typeOfAdding) {
+    // console.log(result);
+    let divAddUsers = document.createElement('div');
+    DIV_LIST_USERS.appendChild(divAddUsers);
+    divAddUsers.setAttribute('id', 'divaddusers');
+    result.forEach((item) => {
+        if (`${item.id}` !== USER_ID) {
+            // console.log(item);
+            let divUser = document.createElement('div');
+            divUser.classList.add('div-user');
+            divUser.setAttribute('id', 'divuser_' + `${item.id}`);
+            divAddUsers.appendChild(divUser);
+            let divUserAvatar = document.createElement('div');
+            divUser.appendChild(divUserAvatar);
+            let imgUserAvatar = document.createElement('img');
+            let image = item.avatar !== null ? URL + '/avatars/' + item.avatar : URL + '/img/avatar_0.jpg';
+            imgUserAvatar.src = image;
+            imgUserAvatar.alt = 'Аватар';
+            imgUserAvatar.width = '40';
+            divUserAvatar.appendChild(imgUserAvatar);
+            let divUserNickname = document.createElement('div');
+            divUserNickname.classList.add('div-user-nickname');
+            divUser.appendChild(divUserNickname);
+            let pUserNickname = document.createElement('p');
+            divUserNickname.appendChild(pUserNickname);
+            pUserNickname.textContent = item.nickname;
+            if (item.hideemail === 0) {
+                let pUserEmail = document.createElement('p');
+                divUserNickname.appendChild(pUserEmail);
+                pUserEmail.textContent = item.email;
+            }
+            // при клике на пользователе
+            // если добавление в личный список вызываем функцию добавления пользователя в список своих контактов
+            if (typeOfAdding === 'addUserToPrivate') {
+                divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
+            // если добавление в группу вызываем функцию добавления пользователя в группу
+            } else if ((typeOfAdding === 'addUserToGroup')) {
+                // divUser.onclick = () => { addUserToGroup(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
+            }
+        }
+    });
+}
+
+// функция добавления пользователя в личный список
+async function addUserToPrivate(userId, contactUserId, email, nickname, avatar, hideemail, contactAddition = false) {
     if (!document.getElementById(contactUserId)) {
         // отправляем данные на бэкенд для записи в БД и создания сообщения в БД о добавлении пользователя
         data = {
@@ -85,6 +129,8 @@ async function addUser(userId, contactUserId, email, nickname, avatar, hideemail
     }
 }
 
+
+
 // функция вывода информационных сообщений
 function alertMessage(msg) {
     let pAlert = document.createElement('p');
@@ -161,3 +207,4 @@ async function getUserMessages(data) {
         console.log('Ошибка: ', error);
     }
 }
+

@@ -71,10 +71,11 @@
             </ul>
 
             <ul class="ul-chat-group-menu">
-                <li id="addgroupchatuser">Добавить пользователя</li>
+                <li id="addgroupchatuser">Добавить пользователей в группу</li>
                 <li id="exitgroupchatuser">Выйти из группы</li>
                 <li id="offnotificationgroup">Отключить оповещение</li>
                 <li id="onnotificationgroup">Включить оповещение</li>
+                <li id="showgroupchatuser">Вывести список пользователей группы</li>
                 <li id="deletegroupchatuser">Удалить пользователя из группы</li>
                 <li id="deletegroupchats">Удалить переписку группы</li>
                 <li id="deletegroup">Удалить группу</li>
