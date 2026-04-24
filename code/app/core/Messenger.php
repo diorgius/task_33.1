@@ -301,11 +301,14 @@ class Messenger implements MessageComponentInterface
         $result = DB::getByProp('groupchats', 'id', $data['id']);
         
         var_dump($result);
-        if ($result['creator'] === intval($data['user_id'])) {
-            
-            $message = json_encode(['alert' => 'Группу может удалить только пользователь ее создавший']);
+        var_dump($result['creator']);
+        var_dump(intval($data['user_id']));
+
+        if ($result['creator'] !== intval($data['user_id'])) {
+            $data['alert'] = 'Группу может удалить только пользователь ее создавший';
+            $message = json_encode($data);
             foreach ($this->clients as $client) {
-                if ($client->resourceId === intval($data['from'])) {
+                if ($client->resourceId === $from->resourceId) {
                     $client->send($message);
                     break;
                 }
@@ -313,14 +316,15 @@ class Messenger implements MessageComponentInterface
         } else {
             // удаляем группу в БД
             DB::delete('groupchats', $data['id']);
-            // отправляем сообщение пользователю для удаления сообщения у него
-            // $message = json_encode($data);
-            // foreach ($this->clients as $client) {
-            //     if ($client->resourceId === intval($data['to'])) {
-            //         $client->send($message);
-            //         break;
-            //     }
-            // }
+            $data['deleted'] = true;
+            $data['alert'] = "Группа {$data['group_name']} удалена";
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === $from->resourceId) {
+                    $client->send($message);
+                    break;
+                }
+            }
 
         }
 

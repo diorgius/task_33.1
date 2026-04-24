@@ -208,7 +208,7 @@ if (BUTTON_CREATE_GROUP) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
             // добавляем окно создания группы
             document.querySelector('#divwrappercreategroup').innerHTML =
-            `<div class="div-create-group" id="divcreategroup">
+                `<div class="div-create-group" id="divcreategroup">
                 <div class="div-create-group-header" id="divcreategroupheader">
                     <p>Создание группы пользователей</p>
                 </div>
@@ -246,7 +246,7 @@ if (BUTTON_CREATE_GROUP) {
                         // проверяем если ли див добавления групп
                         if (!document.querySelector('#divusergroups')) {
                             // создаем див контейнер
-                            let divUserGroups =  document.createElement('div');
+                            let divUserGroups = document.createElement('div');
                             divUserGroups.classList.add('div-user-groups');
                             divUserGroups.setAttribute('id', 'divusergroups');
                             document.querySelector('#sidebarleft').appendChild(divUserGroups);
@@ -310,7 +310,7 @@ window.oncontextmenu = (e) => {
         }
 
         // отключаем оповещение
-        let offNotification = document.querySelector('#offnotification');
+        let offNotification = document.querySelector('#offnotificationuser');
         offNotification.onclick = () => {
             // console.log(e.target.id);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
@@ -319,12 +319,13 @@ window.oncontextmenu = (e) => {
         }
 
         // включаем оповещение
-        let onNotification = document.querySelector('#onnotification');
+        let onNotification = document.querySelector('#onnotificationuser');
         onNotification.onclick = () => {
             // console.log(e.target.id);
             // console.log(connectedUsers);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
             chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
+            // если пользователь активен, то добаляем ему соответствущий класс
             Object.values(connectedUsers).forEach(value => {
                 if (value === e.target.id) {
                     chatUserWithoutNotice.classList.add('div-chat-user-onchat');
@@ -405,7 +406,7 @@ window.oncontextmenu = (e) => {
             // членам группы об удалении группы
 
             // в дальнейшем надо в еще как-то получать id группы и кто вней состоит, чтобы потом рассылать сообщения
-            
+
             // to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
             WS.send(JSON.stringify({
                 command: 'deleteGroup',
@@ -417,16 +418,36 @@ window.oncontextmenu = (e) => {
             }))
             // если открыт чат с удаленной группой, закрываем его
             document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
-            // удаляем группу из списка контактов
-            document.getElementById(`${e.target.id}`) ? document.getElementById(`${e.target.id}`).remove() : null;
-            // выводим сообщение, что переписка удалена
-            alertMessage(`Группа ${e.target.innerText} удалена`);
             // скрываем текстовую область
             document.querySelector('.div-text-send-message').style.visibility = 'hidden';
         }
 
 
+        // отключаем оповещение
+        let offNotification = document.querySelector('#offnotificationgroup');
+        offNotification.onclick = () => {
+            // console.log(e);
+            let chatUserWithoutNotice = document.getElementById(e.target.id);
+            chatUserWithoutNotice.classList.contains('div-chat-user-onchat') ? chatUserWithoutNotice.classList.remove('div-chat-user-onchat') : null;
+            chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
+        }
+    
+        // включаем оповещение
+        let onNotification = document.querySelector('#onnotificationgroup');
+        onNotification.onclick = () => {
+            // console.log(e);
+            let chatUserWithoutNotice = document.getElementById(e.target.id);
+            chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
+            // если пользователь активен, то добаляем ему соответствущий класс
+            Object.values(connectedUsers).forEach(value => {
+                if (value === e.target.id) {
+                    chatUserWithoutNotice.classList.add('div-chat-user-onchat');
+                }
+            })
+        }
     }
+
+
 
     // выводим контекстное меню на сообщении
     if (e.target.classList.contains('div-send-message')

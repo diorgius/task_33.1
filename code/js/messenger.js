@@ -147,6 +147,7 @@ WS.onmessage = (e) => {
             break;
         case 'deleteGroup':
             console.log(data);
+            data.deleted ? document.getElementById(data.id).remove() : null;
             alertMessage(data.alert);
             break;
         case 'disconnect':
