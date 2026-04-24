@@ -68,8 +68,12 @@ class Messenger implements MessageComponentInterface
                 // метод записи в БД и отправки пересылаемого сообщения
                 $this->forwardMessage($from, $data);
                 break;
+            case 'addedToGroup';
+                // метод добавления пользователей в группу
+                $this->addedToGroup($from, $data);
+                break;
             case 'deleteGroup';
-                // метод записи в БД и отправки пересылаемого сообщения
+                // метод удаления группы
                 $this->deleteGroup($from, $data);
                 break;
         }
@@ -291,19 +295,44 @@ class Messenger implements MessageComponentInterface
         }
     }
 
+    protected function addedToGroup(ConnectionInterface $from, $data)
+    {
+        // добавляем пользователя в группу
+        var_dump($data);
+        // DB::dbconnect();
+        // // проверяем создателя группы (группу удаляет только ее создатель)
+        // $result = DB::getByProp('groupchats', 'id', $data['id']);
+        // if ($result['creator'] !== intval($data['user_id'])) {
+        //     $data['alert'] = 'Группу может удалить только пользователь ее создавший';
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === $from->resourceId) {
+                    $client->send($message);
+                    break;
+                }
+            }
+        // } else {
+        //     // удаляем группу в БД
+        //     DB::delete('groupchats', $data['id']);
+        //     $data['deleted'] = true;
+        //     $data['alert'] = "Группа {$data['group_name']} удалена";
+        //     $message = json_encode($data);
+        //     foreach ($this->clients as $client) {
+        //         if ($client->resourceId === $from->resourceId) {
+        //             $client->send($message);
+        //             break;
+        //         }
+        //     }
+
+        // }
+    }
+
     protected function deleteGroup(ConnectionInterface $from, $data)
     {
-        var_dump($data);
-
-        // делаем удаление группы
+        // удаляем группу
         DB::dbconnect();
         // проверяем создателя группы (группу удаляет только ее создатель)
         $result = DB::getByProp('groupchats', 'id', $data['id']);
-        
-        var_dump($result);
-        var_dump($result['creator']);
-        var_dump(intval($data['user_id']));
-
         if ($result['creator'] !== intval($data['user_id'])) {
             $data['alert'] = 'Группу может удалить только пользователь ее создавший';
             $message = json_encode($data);
@@ -325,11 +354,7 @@ class Messenger implements MessageComponentInterface
                     break;
                 }
             }
-
         }
-
-
-
     }
 
     public function onClose(ConnectionInterface $conn)

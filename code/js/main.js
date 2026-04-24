@@ -213,6 +213,7 @@ if (BUTTON_CREATE_GROUP) {
                         });
                         let result = await response.text();
                         // console.log('Успех: ', result);
+                        
                         // добавляем созданную группу в левую панель
                         // проверяем если ли див добавления групп
                         if (!document.querySelector('#divusergroups')) {
@@ -404,6 +405,8 @@ window.oncontextmenu = (e) => {
                 let result = await response.json();
                 // console.log('Успех: ', result);
 
+                // добавляем id группы
+                result.group_id = e.target.id;
                 // вызываем функцию вывода списка пользователей
                 // в которой при клике на пользователе вызывается функция добавления пользователя
                 showUsersToAdd(result, 'addUserToGroup');

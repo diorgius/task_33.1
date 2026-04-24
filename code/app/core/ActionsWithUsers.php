@@ -106,12 +106,10 @@ class ActionsWithUsers
             'creator' => $this->data['creator']
         ];
         $result = DB::create('groupchats', $values);
-        // получаем id группы
-        $group_id = $result;
-        // создаем контакт группы у создавшено группу пользователя
+        // создаем контакт группы у создавшего группу пользователя
         $values = [
             'user_id' => $this->data['creator'],
-            'contact_group_id' => $group_id
+            'contact_group_id' => $result
         ];
         DB::create('contacts', $values);
         echo $result;

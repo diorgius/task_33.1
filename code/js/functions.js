@@ -6,7 +6,7 @@ function showUsersToAdd(result, typeOfAdding) {
     divAddUsers.setAttribute('id', 'divaddusers');
     result.forEach((item) => {
         if (`${item.id}` !== USER_ID) {
-            // console.log(item);
+            console.log(item);
             let divUser = document.createElement('div');
             divUser.classList.add('div-user');
             divUser.setAttribute('id', 'divuser_' + `${item.id}`);
@@ -33,23 +33,23 @@ function showUsersToAdd(result, typeOfAdding) {
             // при клике на пользователе
             // если добавление в личный список вызываем функцию добавления пользователя в список своих контактов
             if (typeOfAdding === 'addUserToPrivate') {
-                divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
-            // если добавление в группу вызываем функцию добавления пользователя в группу
+                divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar, true); };
+                // если добавление в группу вызываем функцию добавления пользователя в группу
             } else if ((typeOfAdding === 'addUserToGroup')) {
-                // divUser.onclick = () => { addUserToGroup(USER_ID, item.id, item.email, item.nickname, item.avatar, item.hideemail, true); };
+                divUser.onclick = () => { addUserToGroup(USER_ID, result.group_id, item.id, item.email, item.nickname, item.avatar, true); };
             }
         }
     });
 }
 
 // функция добавления пользователя в личный список
-async function addUserToPrivate(userId, contactUserId, email, nickname, avatar, hideemail, contactAddition = false) {
-    if (!document.getElementById(contactUserId)) {
+async function addUserToPrivate(user_id, contact_user_id, email, nickname, avatar, contactAddition = false) {
+    if (!document.getElementById(contact_user_id)) {
         // отправляем данные на бэкенд для записи в БД и создания сообщения в БД о добавлении пользователя
         data = {
             action: 'createContact',
-            user_id: userId,
-            contact_user_id: contactUserId,
+            user_id: user_id,
+            contact_user_id: contact_user_id,
             text_message: `Вас добавил(а) в свои контакты пользователь ${USER_NICKNAME}`
         };
         try {
@@ -72,7 +72,7 @@ async function addUserToPrivate(userId, contactUserId, email, nickname, avatar, 
             // добавляем пользователя в свои контакты
             let divChatUser = document.createElement('div');
             divChatUser.classList.add('div-chat-user');
-            divChatUser.setAttribute('id', contactUserId);
+            divChatUser.setAttribute('id', contact_user_id);
             DIV_USER_CHATS.appendChild(divChatUser);
             let divChatUserAvatar = document.createElement('div');
             divChatUser.appendChild(divChatUserAvatar);
@@ -92,7 +92,7 @@ async function addUserToPrivate(userId, contactUserId, email, nickname, avatar, 
             Object.values(connectedUsers).forEach(async value => {
                 // console.log(value);
                 // если пользователь соединен с сервером выделяем его цветом
-                if (parseInt(value) === parseInt(contactUserId)) {
+                if (parseInt(value) === parseInt(contact_user_id)) {
                     document.getElementById(value).classList.add('div-chat-user-onchat');
 
                     // при добавлении контакта вместе с записью в БД о своем новом контакте
@@ -108,12 +108,12 @@ async function addUserToPrivate(userId, contactUserId, email, nickname, avatar, 
                     // когда функция addUser запускается после отправки нижеидущего сообщения, то ставим false 
                     if (contactAddition) {
                         // готовим и отправляем сообщение пользователю о том, что его присоединили
-                        to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contactUserId.toString());
+                        to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
                         message = JSON.stringify({
                             command: 'addedToContacts',
                             to: to,
-                            accept_user_id: contactUserId,
-                            send_user_id: userId,
+                            send_user_id: user_id,
+                            accept_user_id: contact_user_id
                         });
                         WS.send(message);
                     }
@@ -129,7 +129,22 @@ async function addUserToPrivate(userId, contactUserId, email, nickname, avatar, 
     }
 }
 
+// функция добавления пользователя в группу
+async function addUserToGroup(user_id, group_id, contact_user_id, email, nickname, avatar) {
+    console.log(group_id);
 
+
+    // to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contactUserId.toString());
+    message = JSON.stringify({
+        command: 'addedToGroup',
+        // to: to,
+        group_id: group_id,
+        send_user_id: user_id,
+        accept_user_id: contact_user_id
+    });
+    WS.send(message);
+
+}
 
 // функция вывода информационных сообщений
 function alertMessage(msg) {

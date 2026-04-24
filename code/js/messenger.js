@@ -45,10 +45,10 @@ WS.onmessage = (e) => {
             })
             break;
         case 'addedToContacts':
-            // console.log(data);
+            console.log(data);
             // после получения сообщения о внешнем добавлении в чей-то контакт, запускаем функцию
             // добавления этого пользователя в контакты добавленного пользователя
-            addUser(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar, data.hideemail, false);
+            addUserToPrivate(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar, false);
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
             break;
         case 'privateMessage':
@@ -144,6 +144,11 @@ WS.onmessage = (e) => {
                 divUserMessage.firstChild.textContent = data.text_message;
                 divUserMessage.lastChild.textContent = 'edited';
             }
+            break;
+        case 'addedToGroup':
+            console.log(data);
+            // data.deleted ? document.getElementById(data.id).remove() : null;
+            // alertMessage(data.alert);
             break;
         case 'deleteGroup':
             console.log(data);
