@@ -64,7 +64,7 @@ class ActionsWithUsers
             'contact_user_id' => $this->data['user_id'],
         ];
         DB::create('contacts', $values);
-        // записываем в БД сообщение
+        // записываем сообщение о создании контакта с пользователем в БД 
         // формируем метку времени
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));

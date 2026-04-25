@@ -6,7 +6,7 @@ function showUsersToAdd(result, typeOfAdding) {
     divAddUsers.setAttribute('id', 'divaddusers');
     result.forEach((item) => {
         if (`${item.id}` !== USER_ID) {
-            console.log(item);
+            // console.log(item);
             let divUser = document.createElement('div');
             divUser.classList.add('div-user');
             divUser.setAttribute('id', 'divuser_' + `${item.id}`);
@@ -36,7 +36,9 @@ function showUsersToAdd(result, typeOfAdding) {
                 divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar, true); };
                 // если добавление в группу вызываем функцию добавления пользователя в группу
             } else if ((typeOfAdding === 'addUserToGroup')) {
-                divUser.onclick = () => { addUserToGroup(USER_ID, result.group_id, item.id, item.email, item.nickname, item.avatar, true); };
+                let nickname = ''
+                item.nickname === null ? nickname = item.email : nickname = item.nickname;
+                divUser.onclick = () => { addUserToGroup(result.group_id, item.contact_user_id, nickname, result.group_name); };
             }
         }
     });
@@ -130,19 +132,53 @@ async function addUserToPrivate(user_id, contact_user_id, email, nickname, avata
 }
 
 // функция добавления пользователя в группу
-async function addUserToGroup(user_id, group_id, contact_user_id, email, nickname, avatar) {
-    console.log(group_id);
-
-
-    // to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contactUserId.toString());
+async function addUserToGroup(group_id, contact_user_id, nickname, group_name) {
+    to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
     message = JSON.stringify({
         command: 'addedToGroup',
-        // to: to,
-        group_id: group_id,
-        send_user_id: user_id,
-        accept_user_id: contact_user_id
+        to: to,
+        id: group_id,
+        group_name: group_name,
+        send_user_id: USER_ID,
+        send_nickname: USER_NICKNAME,
+        accept_user_id: contact_user_id,
+        accept_nickname: nickname
     });
     WS.send(message);
+
+}
+
+// функция создания элемента группы в левой панели
+function addGroupIntoSidebar(group_id, group_name) {
+    // проверяем если ли див добавления групп
+    if (!document.querySelector('#divusergroups')) {
+        // создаем див контейнер
+        let divUserGroups = document.createElement('div');
+        divUserGroups.classList.add('div-user-groups');
+        divUserGroups.setAttribute('id', 'divusergroups');
+        document.querySelector('#sidebarleft').appendChild(divUserGroups);
+        // уменьшаем область пользователей
+        DIV_USER_CHATS.style.height = '45%';
+    }
+    // создаем элемент группы
+    let divUserGroup = document.createElement('div');
+    divUserGroup.classList.add('div-chat-group');
+    divUserGroup.setAttribute('id', group_id);
+    let divGroupAvatar = document.createElement('div');
+    let imgGroupAvatar = document.createElement('img');
+    imgGroupAvatar.src = URL + '/img/group.jpg';
+    imgGroupAvatar.alt = 'Аватар';
+    imgGroupAvatar.width = '35';
+    divGroupAvatar.appendChild(imgGroupAvatar);
+    divUserGroup.appendChild(divGroupAvatar);
+    let divUserGroupName = document.createElement('div');
+    divUserGroupName.classList.add('div-user-nickname');
+    divUserGroup.appendChild(divUserGroupName);
+    let pUserGroup = document.createElement('p');
+    pUserGroup.textContent = group_name;
+    divUserGroupName.appendChild(pUserGroup);
+    let divUserGroups = document.querySelector('#divusergroups');
+    divUserGroups.appendChild(divUserGroup);
 
 }
 

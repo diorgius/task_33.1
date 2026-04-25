@@ -147,8 +147,9 @@ WS.onmessage = (e) => {
             break;
         case 'addedToGroup':
             console.log(data);
-            // data.deleted ? document.getElementById(data.id).remove() : null;
-            // alertMessage(data.alert);
+            alertMessage(data.alert);
+            data.forUser ? addGroupIntoSidebar(data.id, data.group_name) : null;
+            data.created ? document.getElementById(data.id).classList.add('div-chat-group-withusers') : null;
             break;
         case 'deleteGroup':
             console.log(data);

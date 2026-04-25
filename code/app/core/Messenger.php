@@ -299,11 +299,12 @@ class Messenger implements MessageComponentInterface
     {
         // добавляем пользователя в группу
         var_dump($data);
-        // DB::dbconnect();
-        // // проверяем создателя группы (группу удаляет только ее создатель)
-        // $result = DB::getByProp('groupchats', 'id', $data['id']);
-        // if ($result['creator'] !== intval($data['user_id'])) {
-        //     $data['alert'] = 'Группу может удалить только пользователь ее создавший';
+        DB::dbconnect();
+        // проверяем создателя группы (добавляет пользователей в группу только ее создатель)
+        $result = DB::getByProp('groupchats', 'id', $data['id']);
+        if ($result['creator'] !== intval($data['send_user_id'])) {
+            // отправляем сообщение пользователю
+            $data['alert'] = 'В группу может добавлять только пользователь ее создавший';
             $message = json_encode($data);
             foreach ($this->clients as $client) {
                 if ($client->resourceId === $from->resourceId) {
@@ -311,20 +312,68 @@ class Messenger implements MessageComponentInterface
                     break;
                 }
             }
-        // } else {
-        //     // удаляем группу в БД
-        //     DB::delete('groupchats', $data['id']);
-        //     $data['deleted'] = true;
-        //     $data['alert'] = "Группа {$data['group_name']} удалена";
-        //     $message = json_encode($data);
-        //     foreach ($this->clients as $client) {
-        //         if ($client->resourceId === $from->resourceId) {
-        //             $client->send($message);
-        //             break;
-        //         }
-        //     }
+            // проверяем есть ли уже пользователь в этой группе
+        } else {
+            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['id']);
+            if (array_search($data['accept_user_id'], array_column($result, 'user_id')) !== false) {
+                // отправляем сообщение пользователю
+                $data['alert'] = "Пользователь {$data['accept_nickname']} уже в этой группе";
+                $message = json_encode($data);
+                foreach ($this->clients as $client) {
+                    if ($client->resourceId === $from->resourceId) {
+                        $client->send($message);
+                        break;
+                    }
+                }
+            } else {
+                // делаем запись в БД
+                $values = [
+                    'user_id' => $data['accept_user_id'],
+                    'contact_group_id' => $data['id']
+                ];
+                DB::create('contacts', $values);
+                // отправляем сообщение себе о добавлении пользователя
+                $data['created'] = true;
+                $data['alert'] = "Пользователь {$data['accept_nickname']} добавлен в группу";
+                $message = json_encode($data);
+                foreach ($this->clients as $client) {
+                    if ($client->resourceId === $from->resourceId) {
+                        $client->send($message);
+                        break;
+                    }
+                }
+                // отправляем сообщение пользователю для создания элемента группы у него
+                $data['forUser'] = true;
+                $data['created'] = true;
+                // проверяем активенли ли пользователь
+                if (isset($data['to'])) {
+                    $message = json_encode($data);
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId === intval($data['to'])) {
+                            $client->send($message);
+                            break;
+                        }
+                    }
+                }
+                // записываем сообщение о добавлении пользователя в группу в БД
+                // формируем метку времени
+                $date = new DateTime();
+                $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+                $created = $date->format('Y-m-d H:i:s');
+                // формируем массив для записи в БД
+                $values = [
+                    'send_user_id' => $data['send_user_id'],
+                    'accept_user_id' => $data['accept_user_id'],
+                    'accept_group_id' => $data['id'],
+                    'text_message' => "Вас добавил(а) в группу {$data['group_name']} пользователь {$data['send_nickname']}",
+                    'created' => $created
+                ];
+                // записываем в БД сообщение
+                DB::create('messages', $values);
 
-        // }
+            }
+            
+        }
     }
 
     protected function deleteGroup(ConnectionInterface $from, $data)

@@ -104,6 +104,10 @@ if (document.querySelector('#userid')) {
 //
 // 28. сортировка пользователей чата при входе в соответствии с полученными последними сообщениями
 // И ВОЗМОЖНО перемещение пользователя вверх при поступлении сообщения
+//
+// 29. !!! ??? НАДО ПОДУМАТЬ И ПЕРЕДЕЛАТЬ ДОБАВЛНИЕ ПОЛЬЗОВАТЕЛЕЙ сделать добавление только через сокет
+// сейчас очень запутанная схема надо ее упростить
+
 
 
 
@@ -213,40 +217,13 @@ if (BUTTON_CREATE_GROUP) {
                         });
                         let result = await response.text();
                         // console.log('Успех: ', result);
-                        
-                        // добавляем созданную группу в левую панель
-                        // проверяем если ли див добавления групп
-                        if (!document.querySelector('#divusergroups')) {
-                            // создаем див контейнер
-                            let divUserGroups = document.createElement('div');
-                            divUserGroups.classList.add('div-user-groups');
-                            divUserGroups.setAttribute('id', 'divusergroups');
-                            document.querySelector('#sidebarleft').appendChild(divUserGroups);
-                            // уменьшаем область пользователей
-                            DIV_USER_CHATS.style.height = '45%';
-                        }
-                        // создаем элемент группы
-                        let divUserGroup = document.createElement('div');
-                        divUserGroup.classList.add('div-chat-group');
-                        divUserGroup.setAttribute('id', result);
-                        let divGroupAvatar = document.createElement('div');
-                        let imgGroupAvatar = document.createElement('img');
-                        imgGroupAvatar.src = URL + '/img/group.jpg';
-                        imgGroupAvatar.alt = 'Аватар';
-                        imgGroupAvatar.width = '35';
-                        divGroupAvatar.appendChild(imgGroupAvatar);
-                        divUserGroup.appendChild(divGroupAvatar);
-                        let divUserGroupName = document.createElement('div');
-                        divUserGroupName.classList.add('div-user-nickname');
-                        divUserGroup.appendChild(divUserGroupName);
-                        let pUserGroup = document.createElement('p');
-                        pUserGroup.textContent = inputGroupName.value;
-                        divUserGroupName.appendChild(pUserGroup);
-                        let divUserGroups = document.querySelector('#divusergroups');
-                        divUserGroups.appendChild(divUserGroup);
+
+                        // вызываем функцию создания элемента группы в левой панели
+                        addGroupIntoSidebar(result, inputGroupName.value);
                         // убираем окно создания группы
                         document.querySelector('#divcreategroup').remove();
                         BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+
                     } catch (error) {
                         console.log('Ошибка: ', error);
                     }
@@ -407,6 +384,7 @@ window.oncontextmenu = (e) => {
 
                 // добавляем id группы
                 result.group_id = e.target.id;
+                result.group_name = e.target.innerText;
                 // вызываем функцию вывода списка пользователей
                 // в которой при клике на пользователе вызывается функция добавления пользователя
                 showUsersToAdd(result, 'addUserToGroup');
@@ -448,7 +426,7 @@ window.oncontextmenu = (e) => {
             chatUserWithoutNotice.classList.contains('div-chat-user-onchat') ? chatUserWithoutNotice.classList.remove('div-chat-user-onchat') : null;
             chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
         }
-    
+
         // включаем оповещение
         let onNotification = document.querySelector('#onnotificationgroup');
         onNotification.onclick = () => {
