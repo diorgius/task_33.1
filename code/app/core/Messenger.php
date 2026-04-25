@@ -254,11 +254,11 @@ class Messenger implements MessageComponentInterface
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
         // в цикле проходим по адресатам пересылки
-        foreach ($data['usersToForward'] as $key => $values) {
+        foreach ($data['usersToForward'] as $contact => $value) {
             // формируем массив для записи в БД
             $values = [
                 'send_user_id' => intVal($data['send_user_id']),
-                'accept_user_id' => intVal($data['usersToForward'][$key]),
+                'accept_user_id' => intVal($data['usersToForward'][$contact]),
                 'text_message' => $data['text_message'],
                 'status_message' => $data['status_message'],
                 'created' => $created
@@ -268,7 +268,7 @@ class Messenger implements MessageComponentInterface
             // ищем среди активных пользователей тех кому адресована пересылка
             // для отображения пересланного сообщения без перезагрузки страницы
             // получаем id подключения
-            $to = array_search($data['usersToForward'][$key], $this->connectedUsers);
+            $to = array_search($data['usersToForward'][$contact], $this->connectedUsers);
             // если есть подключеные пользователи из тех кому пересылается сообщение
             // то отправляем его им
             if ($to) {
@@ -278,7 +278,7 @@ class Messenger implements MessageComponentInterface
                     // клиента отрабатывались те же условиями как и у обычного сообщения
                     // что бы не дублировать код
                     $data['command'] = 'privateMessage';
-                    $data['accept_user_id'] = $data['usersToForward'][$key];
+                    $data['accept_user_id'] = $data['usersToForward'][$contact];
                     $data['id'] = $result;
                     $data['from'] = (string) $from->resourceId;
                     $data['created'] = $created;
@@ -298,7 +298,6 @@ class Messenger implements MessageComponentInterface
     protected function addedToGroup(ConnectionInterface $from, $data)
     {
         // добавляем пользователя в группу
-        var_dump($data);
         DB::dbconnect();
         // проверяем создателя группы (добавляет пользователей в группу только ее создатель)
         $result = DB::getByProp('groupchats', 'id', $data['id']);
@@ -333,7 +332,6 @@ class Messenger implements MessageComponentInterface
                 ];
                 DB::create('contacts', $values);
                 // отправляем сообщение себе о добавлении пользователя
-                $data['created'] = true;
                 $data['alert'] = "Пользователь {$data['accept_nickname']} добавлен в группу";
                 $message = json_encode($data);
                 foreach ($this->clients as $client) {
@@ -344,7 +342,7 @@ class Messenger implements MessageComponentInterface
                 }
                 // отправляем сообщение пользователю для создания элемента группы у него
                 $data['forUser'] = true;
-                $data['created'] = true;
+                unset($data['alert']);
                 // проверяем активенли ли пользователь
                 if (isset($data['to'])) {
                     $message = json_encode($data);
@@ -355,6 +353,9 @@ class Messenger implements MessageComponentInterface
                         }
                     }
                 }
+
+                // !!! ??? РАССЫЛКА В ГРУППУ
+
                 // записываем сообщение о добавлении пользователя в группу в БД
                 // формируем метку времени
                 $date = new DateTime();
@@ -372,7 +373,7 @@ class Messenger implements MessageComponentInterface
                 DB::create('messages', $values);
 
             }
-            
+
         }
     }
 
@@ -382,7 +383,7 @@ class Messenger implements MessageComponentInterface
         DB::dbconnect();
         // проверяем создателя группы (группу удаляет только ее создатель)
         $result = DB::getByProp('groupchats', 'id', $data['id']);
-        if ($result['creator'] !== intval($data['user_id'])) {
+        if ($result['creator'] !== intval($data['send_user_id'])) {
             $data['alert'] = 'Группу может удалить только пользователь ее создавший';
             $message = json_encode($data);
             foreach ($this->clients as $client) {
@@ -392,17 +393,27 @@ class Messenger implements MessageComponentInterface
                 }
             }
         } else {
-            // удаляем группу в БД
-            DB::delete('groupchats', $data['id']);
-            $data['deleted'] = true;
-            $data['alert'] = "Группа {$data['group_name']} удалена";
-            $message = json_encode($data);
-            foreach ($this->clients as $client) {
-                if ($client->resourceId === $from->resourceId) {
-                    $client->send($message);
-                    break;
+            // получаем пользователей группы
+            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['id']);
+            // ищем активных пользователей
+            foreach ($result as $contact) {
+                $to = array_search($contact['user_id'], $this->connectedUsers);
+                if ($to) {
+                    // дополняем сообщение для отправки пользователям
+                    $data['deleted'] = true;
+                    $data['alert'] = "Группа {$data['group_name']} удалена пользователем {$data['send_nickname']}";
+                    $message = json_encode($data);
+                    // отправляем сообщение пользователям группы об ее удалении
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId === intval($to)) {
+                            $client->send($message);
+                            break;
+                        }
+                    }
                 }
             }
+            // удаляем группу в БД
+            DB::delete('groupchats', $data['id']);
         }
     }
 

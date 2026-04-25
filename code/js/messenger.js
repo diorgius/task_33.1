@@ -85,15 +85,15 @@ WS.onmessage = (e) => {
                         // готовим данные для отправки на бэкенд
                         data = {
                             action: 'getUserMessages',
-                            sendUserId: USER_ID,
-                            acceptUserId: data.send_user_id
+                            send_user_id: USER_ID,
+                            accept_user_id: data.send_user_id
                         };
                         // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
                         getUserMessages(data);
                         // воспроизводим звук
                         NOTICE.play();
                         // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
-                        document.getElementById(data.acceptUserId).click();
+                        document.getElementById(data.accept_user_id).click();
                     }
                 }
             }
@@ -146,15 +146,18 @@ WS.onmessage = (e) => {
             }
             break;
         case 'addedToGroup':
-            console.log(data);
+            // console.log(data);
+            // выводим сообщение о добавлении в группу
             alertMessage(data.alert);
+            // вызываем функцию добавления группы в левую панель у пользователя добавленного в группу 
             data.forUser ? addGroupIntoSidebar(data.id, data.group_name) : null;
-            data.created ? document.getElementById(data.id).classList.add('div-chat-group-withusers') : null;
             break;
         case 'deleteGroup':
-            console.log(data);
-            data.deleted ? document.getElementById(data.id).remove() : null;
+            // console.log(data);
+            // выводим сообщение об удалении
             alertMessage(data.alert);
+            // удаляем группу из левой панели
+            data.deleted ? document.getElementById(data.id).remove() : null;
             break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей

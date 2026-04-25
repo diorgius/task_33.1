@@ -63,7 +63,6 @@
             <?php endif; ?>
 
             <ul class="ul-chat-user-menu">
-                <li id="addgroupchat">Добавить в групповой чат</li>
                 <li id="offnotificationuser">Отключить оповещение</li>
                 <li id="onnotificationuser">Включить оповещение</li>
                 <li id="deletechatuser">Удалить пользователя из списка контактов</li>
@@ -77,7 +76,6 @@
                 <li id="onnotificationgroup">Включить оповещение</li>
                 <li id="showgroupchatuser">Вывести список пользователей группы</li>
                 <li id="deletegroupchatuser">Удалить пользователя из группы</li>
-                <li id="deletegroupchats">Удалить переписку группы</li>
                 <li id="deletegroup">Удалить группу</li>
             </ul>
 
