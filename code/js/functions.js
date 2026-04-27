@@ -148,47 +148,65 @@ function addGroupIntoSidebar(group_id, group_name) {
 }
 
 // функция проверки и вывода сообщений
-function showMessage(message) {
-    console.log(message)
-    if (!document.getElementById(message.contactId).classList.contains('div-chat-user-without-notice')) {
-        // если открыт список добавления пользователей или создание группы, то выделяем от кого пришло цветом 
+function showMessage(data, chatType) {
+    console.log(data);
+    console.log(chatType);
+    if (chatType === 'private') {
+        contactId = data.send_user_id;
+        contactName = data.send_nickname;
+    } else if (chatType === 'group') {
+        contactId = data.group_id;
+        contactName = data.group_name;
+    }
+    // проверяем отключено или нет оповещение для этого пользователя
+    if (!document.getElementById(contactId).classList.contains('div-chat-user-without-notice')) {
+        // если открыт список добавления пользователей или создание группы, то выделяем пользователя цветом 
+        // (сообщаем, что от этого пользователя пришло сообщение)
         if (document.querySelector('#divaddusers') || document.querySelector('#divcreategroup')) {
-            document.getElementById(message.contactId).classList.add('div-chat-user-onmessage');
+            document.getElementById(contactId).classList.add('div-chat-user-onmessage');
         } else {
             // проверяем если есть открытый чат
-            if (document.querySelector(`.div-user-messages`)) {
-                // проверяем если открытый чат с тем, от которого пришло сообщение, то выводим сообщение
-                if (document.querySelector('.div-user-messages').id === message.contactName) {
-                    let divUserMessages = document.getElementById(message.contactName);
+            if (document.querySelector('.div-user-messages')) {
+                // проверяем если открытый чат с пользователем от которого пришло сообщение, то выводим сообщение
+                if (document.querySelector('.div-user-messages').id === contactName) {
+                    let divUserMessages = document.getElementById(contactName);
                     // выводим принятое сообщение
-                    outputMessage(divUserMessages, message);
+                    outputMessage(divUserMessages, data);
                     // воспроизводим звук
                     NOTICE.play();
-                    // если у пользователя открыт чат и приходит сообщение от другого, 
-                    // то выделяем цветом от кого пришло сообщение
-                } else if (document.querySelector('.div-user-messages').id !== message.contactName) {
-                    document.getElementById(message.contactId).classList.add('div-chat-user-onmessage');
+                    // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
+                    // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
+                } else if (document.querySelector('.div-user-messages').id !== contactName) {
+                    document.getElementById(contactId).classList.add('div-chat-user-onmessage');
                 }
                 // если нет открытых чатов, то создаем его с тем от кого пришло сообщение и выводим текст
             } else {
                 // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
-                createDivUserMessages(message.contactName, message.chatType);
-                let divUserMessages = document.getElementById(message.contactName);
-                outputMessage(divUserMessages, message);
-                // console.log(data);
+                createDivUserMessages(contactName, chatType);
+                // let divUserMessages = document.getElementById(contactName);
                 // выводим ранние сообщения из базы
                 // готовим данные для отправки на бэкенд
-                // data = {
-                //     action: 'getUserMessages',
-                //     send_user_id: USER_ID,
-                //     accept_user_id: contactName
-                // };
-                // // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
+                if (chatType === 'private') {
+                    data = {
+                        action: 'getUserMessages',
+                        send_user_id: USER_ID,
+                        accept_user_id: contactId,
+                        chat_type: 'private'
+                    };
+                } else if (chatType === 'group') {
+                    data = {
+                        action: 'getUserMessages',
+                        send_user_id: USER_ID,
+                        accept_group_id: contactId,
+                        chat_type: 'group'
+                    };
+                }
+                // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
                 // getUserMessages(data);
                 // воспроизводим звук
                 NOTICE.play();
                 // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
-                // document.getElementById(contactId).click();
+                document.getElementById(contactId).click();
             }
         }
     }
@@ -208,7 +226,8 @@ function alertMessage(msg) {
 }
 
 // функция создания дива для отображения сообщений
-function createDivUserMessages(divId, type) {
+function createDivUserMessages(divId, chatType) {
+    console.log(divId);
     let divUserMessages = document.createElement('div');
     divUserMessages.classList.add('div-user-messages');
     divUserMessages.setAttribute('id', divId);
@@ -219,7 +238,7 @@ function createDivUserMessages(divId, type) {
     let spanChatName = document.createElement('span');
     spanChatName.classList.add('span-chat-name');
     spanChatName.setAttribute('id', 'spanchatname');
-    chatName = type === 'user' ? `Чат с пользователем ${divId}` : `Групповой чат ${divId}`;
+    chatName = chatType === 'private' ? `Чат с пользователем ${divId}` : `Групповой чат ${divId}`;
     spanChatName.textContent = chatName;
     divUserMessagesHeader.appendChild(spanChatName);
     let spanChatClose = document.createElement('span');
@@ -230,52 +249,53 @@ function createDivUserMessages(divId, type) {
 }
 
 // функция вывода сообщения
-function outputMessage(location, message) {
-    // console.log(msg);
-    parseInt(message.sendUserId) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
-    let divMessage = document.createElement('div');
-    divMessage.classList.add(`div-${type}-message`);
-    divMessage.setAttribute('id', message.messageId);
-    let divTextMessage = document.createElement('div');
-    divTextMessage.classList.add(`div-text-message`);
-    let divDateTimeMessage = document.createElement('div');
-    divDateTimeMessage.classList.add(`div-datetime-message`);
-    divTextMessage.textContent = message.messageText;
-    dateTimeCreate = new Date(message.messageCreated);
-    divDateTimeMessage.textContent = dateTimeCreate.toLocaleTimeString("ru-RU") + ' ' + dateTimeCreate.toLocaleDateString("ru-RU");
-    let divInfoMessage = document.createElement('div')
-    divInfoMessage.classList.add(`div-info-message`);
-    // divInfoMessage.textContent = msg.status_message;
-    location.appendChild(divMessage);
-    divMessage.append(divTextMessage, divDateTimeMessage, divInfoMessage);
-    location.scrollIntoView({ block: 'end', behavior: 'smooth' });
-}
-
-
-// функция вывода сообщений
-// function outputMessage(location, msg) {
-//     // console.log(msg);
-//     parseInt(msg.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
+// function outputMessage(location, message) {
+//     console.log(message);
+//     parseInt(message.contact_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
 //     let divMessage = document.createElement('div');
 //     divMessage.classList.add(`div-${type}-message`);
-//     divMessage.setAttribute('id', msg.id);
+//     divMessage.setAttribute('id', message.message_id);
 //     let divTextMessage = document.createElement('div');
 //     divTextMessage.classList.add(`div-text-message`);
 //     let divDateTimeMessage = document.createElement('div');
 //     divDateTimeMessage.classList.add(`div-datetime-message`);
-//     divTextMessage.textContent = msg.text_message;
-//     dateTimeCreate = new Date(msg.created);
+//     divTextMessage.textContent = message.message_text;
+//     dateTimeCreate = new Date(message.message_created);
 //     divDateTimeMessage.textContent = dateTimeCreate.toLocaleTimeString("ru-RU") + ' ' + dateTimeCreate.toLocaleDateString("ru-RU");
 //     let divInfoMessage = document.createElement('div')
 //     divInfoMessage.classList.add(`div-info-message`);
-//     divInfoMessage.textContent = msg.status_message;
+//     // divInfoMessage.textContent = msg.status_message;
 //     location.appendChild(divMessage);
 //     divMessage.append(divTextMessage, divDateTimeMessage, divInfoMessage);
 //     location.scrollIntoView({ block: 'end', behavior: 'smooth' });
 // }
 
+
+// функция вывода сообщений
+function outputMessage(location, message) {
+    // console.log(message);
+    parseInt(message.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
+    let divMessage = document.createElement('div');
+    divMessage.classList.add(`div-${type}-message`);
+    divMessage.setAttribute('id', message.id);
+    let divTextMessage = document.createElement('div');
+    divTextMessage.classList.add(`div-text-message`);
+    let divDateTimeMessage = document.createElement('div');
+    divDateTimeMessage.classList.add(`div-datetime-message`);
+    divTextMessage.textContent = message.text_message;
+    dateTimeCreate = new Date(message.created);
+    divDateTimeMessage.textContent = dateTimeCreate.toLocaleTimeString("ru-RU") + ' ' + dateTimeCreate.toLocaleDateString("ru-RU");
+    let divInfoMessage = document.createElement('div')
+    divInfoMessage.classList.add(`div-info-message`);
+    divInfoMessage.textContent = message.status_message;
+    location.appendChild(divMessage);
+    divMessage.append(divTextMessage, divDateTimeMessage, divInfoMessage);
+    location.scrollIntoView({ block: 'end', behavior: 'smooth' });
+}
+
 // функция загрузки из БД и вывода сообщений пользователя
 async function getUserMessages(data) {
+    console.log(data);
     try {
         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
             method: 'POST',
@@ -285,7 +305,7 @@ async function getUserMessages(data) {
             body: JSON.stringify(data)
         });
         let result = await response.json();
-        // console.log('Успех: ', result);
+        console.log('Успех: ', result);
 
         // выводим ранние сообщения пользователя
         result.forEach((item) => {

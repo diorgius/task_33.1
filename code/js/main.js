@@ -404,9 +404,9 @@ window.oncontextmenu = (e) => {
             WS.send(JSON.stringify({
                 command: 'leaveGroup',
                 group_id: e.target.id,
+                group_name: e.target.innerText,
                 send_user_id: USER_ID,
-                send_nickname: USER_NICKNAME,
-                group_name: e.target.innerText
+                send_nickname: USER_NICKNAME
             }))
             // // если открыт чат с удаленной группой, закрываем его
             // document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;

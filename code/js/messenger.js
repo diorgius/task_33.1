@@ -56,53 +56,65 @@ WS.onmessage = (e) => {
             break;
         case 'privateMessage':
             console.log(data);
-            // сюда прилетают обычные сообщения и пересланные
-            // проверяем отключено или нет оповещение для этого пользователя
-            if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-notice')) {
-                // если открыт список добавления пользователей или создание группы, то выделяем пользователя цветом 
-                // (сообщаем, что от этого пользователя пришло сообщение)
-                if (document.querySelector('#divaddusers') || document.querySelector('#divcreategroup')) {
-                    document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
-                } else {
-                    // проверяем если есть открытый чат
-                    if (document.querySelector('.div-user-messages')) {
-                        // проверяем если открытый чат с пользователем от которого пришло сообщение, то выводим сообщение
-                        if (document.querySelector('.div-user-messages').id === data.send_nickname) {
-                            let divUserMessages = document.getElementById(data.send_nickname);
-                            // выводим принятое сообщение
-                            outputMessage(divUserMessages, data);
-                            // воспроизводим звук
-                            NOTICE.play();
-                            // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
-                            // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
-                        } else if (document.querySelector('.div-user-messages').id !== data.send_nickname) {
-                            document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
-                        }
-                        // если нет открытых чатов, то создаем его с тем от кого пришло сообщение и выводим текст
-                    } else {
-                        // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
-                        createDivUserMessages(data.send_nickname);
-                        let divUserMessages = document.getElementById(data.send_nickname);
-                        // console.log(data);
-                        // выводим ранние сообщения из базы
-                        // готовим данные для отправки на бэкенд
-                        data = {
-                            action: 'getUserMessages',
-                            send_user_id: USER_ID,
-                            accept_user_id: data.send_user_id
-                        };
-                        // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
-                        getUserMessages(data);
-                        // воспроизводим звук
-                        NOTICE.play();
-                        // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
-                        document.getElementById(data.accept_user_id).click();
-                    }
-                }
-            }
+            message = {
+                contact_id: data.send_user_id,
+                contact_name: data.send_nickname, 
+                send_user_id: data.accept_user_id,
+                send_user_nickname: data.accept_nickname, 
+                message_id: data.message_id, 
+                message_text: data.text_message,
+                message_created: data.created,
+                chat_type: 'private'
+            };
+            showMessage(data, 'private');
+
+            // // сюда прилетают обычные сообщения и пересланные
+            // // проверяем отключено или нет оповещение для этого пользователя
+            // if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-notice')) {
+            //     // если открыт список добавления пользователей или создание группы, то выделяем пользователя цветом 
+            //     // (сообщаем, что от этого пользователя пришло сообщение)
+            //     if (document.querySelector('#divaddusers') || document.querySelector('#divcreategroup')) {
+            //         document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
+            //     } else {
+            //         // проверяем если есть открытый чат
+            //         if (document.querySelector('.div-user-messages')) {
+            //             // проверяем если открытый чат с пользователем от которого пришло сообщение, то выводим сообщение
+            //             if (document.querySelector('.div-user-messages').id === data.send_nickname) {
+            //                 let divUserMessages = document.getElementById(data.send_nickname);
+            //                 // выводим принятое сообщение
+            //                 outputMessage(divUserMessages, data);
+            //                 // воспроизводим звук
+            //                 NOTICE.play();
+            //                 // если у пользователя открыт чат и приходит сообщение от другого пользователя, 
+            //                 // то выделяем пользователя цветом (сообщаем, что от этого пользователя пришло сообщение)
+            //             } else if (document.querySelector('.div-user-messages').id !== data.send_nickname) {
+            //                 document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
+            //             }
+            //             // если нет открытых чатов, то создаем его с тем от кого пришло сообщение и выводим текст
+            //         } else {
+            //             // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
+            //             createDivUserMessages(data.send_nickname);
+            //             let divUserMessages = document.getElementById(data.send_nickname);
+            //             // console.log(data);
+            //             // выводим ранние сообщения из базы
+            //             // готовим данные для отправки на бэкенд
+            //             data = {
+            //                 action: 'getUserMessages',
+            //                 send_user_id: USER_ID,
+            //                 accept_user_id: data.send_user_id
+            //             };
+            //             // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
+            //             getUserMessages(data);
+            //             // воспроизводим звук
+            //             NOTICE.play();
+            //             // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
+            //             document.getElementById(data.accept_user_id).click();
+            //         }
+            //     }
+            // }
             break;
         case 'replay':
-            // console.log(data);
+            console.log(data);
             // добавлена отправка сообщения самому себе после отправки сообщения адресату
             // для того чтобы получить message_id из БД, дату и время сообщения
             // для присвоения div id для однозначной идентификации и возможности удалять, редактировать, персылать
@@ -160,16 +172,16 @@ WS.onmessage = (e) => {
             // вызываем функцию вывода сообщения
             // showMessage(data.group_id, data.group_name, data.send_user_id, data.send_nickname, data.message_id, data.text_message, data.created, 'group');
             message = {
-                contactId: data.group_id,
-                contactName: data.group_name, 
-                sendUserId: data.send_user_id,
-                sendUserNickname: data.send_nickname, 
-                messageId: data.message_id, 
-                messageText: data.text_message,
-                messageCreated: data.created,
-                chatType: 'group'
+                contact_id: data.group_id,
+                contact_name: data.group_name, 
+                send_user_id: data.send_user_id,
+                send_user_nickname: data.send_nickname, 
+                message_id: data.message_id, 
+                message_text: data.text_message,
+                message_created: data.created,
+                chat_type: 'group'
             };
-            showMessage(message);
+            showMessage(data, 'group');
             break;
         case 'leaveGroup':
             console.log(data);
@@ -199,6 +211,7 @@ WS.onmessage = (e) => {
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку (загружаем ранние сообщения из базы))
 document.body.addEventListener('click', async (e) => {
     if (e.target.classList.contains('div-chat-user') || e.target.classList.contains('div-chat-group')) {
+        e.target.classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group'; 
         // console.log(e);
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-user-active');
@@ -229,13 +242,14 @@ document.body.addEventListener('click', async (e) => {
                 document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
                 document.getElementById(e.target.id).classList.add('div-chat-user-onchat');
                 // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
-                createDivUserMessages(e.target.innerText);
+                createDivUserMessages(e.target.innerText, chatType);
                 // выводим ранние сообщения из базы
                 // готовим данные для отправки на бэкенд
                 data = {
                     action: 'getUserMessages',
                     send_user_id: USER_ID,
-                    accept_user_id: e.target.id
+                    accept_user_id: e.target.id,
+                    chat_type: 'private'
                 };
                 // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения               
                 getUserMessages(data);
@@ -261,6 +275,7 @@ document.body.addEventListener('click', async (e) => {
                         command: 'privateMessage',
                         to: to,
                         accept_user_id: e.target.id,
+                        accept_nickname: e.target.innerText,
                         send_user_id: USER_ID,
                         send_nickname: USER_NICKNAME,
                         text_message: textSendMessage

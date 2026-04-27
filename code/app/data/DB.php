@@ -180,7 +180,7 @@ class DB
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getGroupContacts(string $table, string $prop, string $value)
+    public static function getByPropAll(string $table, string $prop, string $value)
     {
         $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value");
         $stmt->execute(['value' => $value]);

@@ -168,16 +168,18 @@ class Messenger implements MessageComponentInterface
         $result = DB::create('messages', $values);
         // дополняем сообщение для отправки пользователю
         if ($result) {
-            $data['id'] = $result;
+
+            $data['message_id'] = $result;
             $data['from'] = (string) $from->resourceId;
             $data['created'] = $created;
         }
         // формируем ответ отправителю сообщения, для вывода сообщения у него
         $replay = [
             'command' => 'replay',
-            'id' => $result,
+            'message_id' => $result,
             'send_user_id' => $data['send_user_id'],
             'accept_user_id' => $data['accept_user_d'],
+            'accept_nickname' => $data['accept_nickname'],
             'text_message' => $data['text_message'],
             'created' => $created
         ];
@@ -194,7 +196,6 @@ class Messenger implements MessageComponentInterface
                 $client->send($replay);
             }
         }
-        echo "Private message from {$from->resourceId} to {$data['to']}\n";
     }
 
     protected function deleteContact(ConnectionInterface $from, $data)
@@ -312,7 +313,7 @@ class Messenger implements MessageComponentInterface
                     // клиента отрабатывались те же условиями как и у обычного сообщения
                     $data['command'] = 'privateMessage';
                     $data['accept_user_id'] = $data['usersToForward'][$contact];
-                    $data['id'] = $result;
+                    $data['message_id'] = $result;
                     $data['from'] = (string) $from->resourceId;
                     $data['created'] = $created;
                 }
@@ -346,7 +347,7 @@ class Messenger implements MessageComponentInterface
             }
             // проверяем есть ли уже пользователь в этой группе
         } else {
-            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['group_id']);
+            $result = DB::getByPropAll('contacts', 'contact_group_id', $data['group_id']);
             if (array_search($data['accept_user_id'], array_column($result, 'user_id')) !== false) {
                 // отправляем сообщение пользователю
                 $data['alert'] = "Пользователь {$data['accept_nickname']} уже в этой группе";
@@ -454,7 +455,7 @@ class Messenger implements MessageComponentInterface
             $message_id = DB::create('messages', $values);
             
             // получаем пользователей группы
-            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['group_id']);
+            $result = DB::getByPropAll('contacts', 'contact_group_id', $data['group_id']);
             // ищем активных пользователей
             foreach ($result as $contact) {
                 $to = array_search($contact['user_id'], $this->connectedUsers);
@@ -498,7 +499,7 @@ class Messenger implements MessageComponentInterface
             }
         } else {
             // получаем пользователей группы
-            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['group_id']);
+            $result = DB::getByPropAll('contacts', 'contact_group_id', $data['group_id']);
             // ищем активных пользователей
             foreach ($result as $contact) {
                 $to = array_search($contact['user_id'], $this->connectedUsers);

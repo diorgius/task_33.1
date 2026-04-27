@@ -51,7 +51,12 @@ class ActionsWithUsers
     public function getUserMessages()
     {
         DB::dbconnect();
-        $result = DB::getUserMessages('messages', $this->data['send_user_id'], $this->data['accept_user_id']);
+        if ($this->data['chat_type'] === 'private')  {
+            $result = DB::getUserMessages('messages', $this->data['send_user_id'], $this->data['accept_user_id']);
+        } elseif ($this->data['chat_type'] === 'group') {
+            $result = DB::getByPropAll('messages', 'accept_group_id', $this->data['accept_group_id']);
+        }
+        
         echo json_encode($result);
     }
 
