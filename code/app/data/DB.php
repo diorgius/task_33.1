@@ -86,7 +86,7 @@ class DB
              $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
                 `id` INT NOT NULL AUTO_INCREMENT,
                 `send_user_id` INT NOT NULL,
-                `accept_user_id` INT NOT NULL,
+                `accept_user_id` INT NULL,
                 `accept_group_id` INT NULL,
                 `text_message` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
                 `status_message` VARCHAR(60) NULL COLLATE 'utf8mb4_0900_ai_ci',

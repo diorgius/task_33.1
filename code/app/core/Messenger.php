@@ -72,6 +72,10 @@ class Messenger implements MessageComponentInterface
                 // метод добавления пользователей в группу
                 $this->addedToGroup($from, $data);
                 break;
+            case 'leaveGroup';
+                // метод выхода выхода из группу
+                $this->leaveGroup($from, $data);
+                break;
             case 'deleteGroup';
                 // метод удаления группы
                 $this->deleteGroup($from, $data);
@@ -185,8 +189,7 @@ class Messenger implements MessageComponentInterface
             }
             // добавлена отправка сообщения самому себе после отправки сообщения адресату
             // для того чтобы получить message_id из БД, дату и время сообщения
-            // для присвоения div id для однозначной идентификации
-            // сообщения и вывода даты и времени
+            // для присвоения div id для идентификации сообщения и вывода даты и времени
             if ($client->resourceId === intval($data['from'])) {
                 $client->send($replay);
             }
@@ -307,7 +310,6 @@ class Messenger implements MessageComponentInterface
                 if ($result) {
                     // ставим ему статус privateMessage для того что бы на стороне
                     // клиента отрабатывались те же условиями как и у обычного сообщения
-                    // что бы не дублировать код
                     $data['command'] = 'privateMessage';
                     $data['accept_user_id'] = $data['usersToForward'][$contact];
                     $data['id'] = $result;
@@ -331,7 +333,7 @@ class Messenger implements MessageComponentInterface
         // добавляем пользователя в группу
         DB::dbconnect();
         // проверяем создателя группы (добавляет пользователей в группу только ее создатель)
-        $result = DB::getByProp('groupchats', 'id', $data['id']);
+        $result = DB::getByProp('groupchats', 'id', $data['group_id']);
         if ($result['creator'] !== intval($data['send_user_id'])) {
             // отправляем сообщение пользователю
             $data['alert'] = 'В группу может добавлять только пользователь ее создавший';
@@ -344,7 +346,7 @@ class Messenger implements MessageComponentInterface
             }
             // проверяем есть ли уже пользователь в этой группе
         } else {
-            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['id']);
+            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['group_id']);
             if (array_search($data['accept_user_id'], array_column($result, 'user_id')) !== false) {
                 // отправляем сообщение пользователю
                 $data['alert'] = "Пользователь {$data['accept_nickname']} уже в этой группе";
@@ -359,7 +361,7 @@ class Messenger implements MessageComponentInterface
                 // делаем запись в БД
                 $values = [
                     'user_id' => $data['accept_user_id'],
-                    'contact_group_id' => $data['id']
+                    'contact_group_id' => $data['group_id']
                 ];
                 DB::create('contacts', $values);
                 // отправляем сообщение себе о добавлении пользователя
@@ -400,7 +402,7 @@ class Messenger implements MessageComponentInterface
                     // а у активных пользователей делаем как при личном сообщении если открыт чат, не с этой группой
                     // то отмечаем цветом о приходе нового сообщения группу, если чат активен, то выводим сообщение
                     'accept_user_id' => $data['accept_user_id'],
-                    'accept_group_id' => $data['id'],
+                    'accept_group_id' => $data['group_id'],
                     'text_message' => "Вас добавил(а) в группу {$data['group_name']} пользователь {$data['send_nickname']}",
                     'created' => $created
                 ];
@@ -412,12 +414,79 @@ class Messenger implements MessageComponentInterface
         }
     }
 
+    protected function leaveGroup(ConnectionInterface $from, $data)
+    {
+        var_dump($data);
+        // покидаем группу
+        DB::dbconnect();
+        // проверяем создателя группы (создатель группы не может ее покинуть)
+        $result = DB::getByProp('groupchats', 'id', $data['group_id']);
+        if ($result['creator'] === intval($data['send_user_id'])) {
+            $data['alert'] = 'Создатель группы не может ее покинуть';
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === $from->resourceId) {
+                    $client->send($message);
+                    break;
+                }
+            }
+        } else {
+            // создаем сообщение, что пользователь покинул группу
+            // формируем метку времени
+            $date = new DateTime();
+            $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+            $created = $date->format('Y-m-d H:i:s');
+            // формируем сообщение
+            $text_message = "Пользователь {$data['send_nickname']} покинул группу";
+            // формируем массив для записи в БД
+            $values = [
+                'send_user_id' => $data['send_user_id'],
+                // !!! СДЕЛАТЬ для того, чтобы сообщение приходило в группу, а не пользователю
+                // убираем accept_user_id оставляем accept_group_id и при клике подгружаем сообщение, 
+                // а у активных пользователей делаем как при личном сообщении если открыт чат, не с этой группой
+                // то отмечаем цветом о приходе нового сообщения группу, если чат активен, то выводим сообщение
+                // 'accept_user_id' => $data['accept_user_id'],
+                'accept_group_id' => $data['group_id'],
+                'text_message' => $text_message,
+                'created' => $created
+            ];
+            // записываем в БД сообщение
+            $message_id = DB::create('messages', $values);
+            
+            // получаем пользователей группы
+            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['group_id']);
+            // ищем активных пользователей
+            foreach ($result as $contact) {
+                $to = array_search($contact['user_id'], $this->connectedUsers);
+                if ($to) {
+                    // дополняем сообщение для отправки пользователям
+                    // ставим ему статус groupMessage для того что бы на стороне
+                    // клиента отрабатывались те же условиями как и у обычного сообщения
+                    $data['command'] = 'groupMessage';
+                    $data['message_id'] = $message_id;
+                    $data['text_message'] = $text_message;
+                    $data['created'] = $created;
+                    $message = json_encode($data);
+                    // отправляем сообщение пользователям группы
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId === intval($to)) {
+                            $client->send($message);
+                            break;
+                        }
+                    }
+                }
+            }
+            // удаляем контакт из группы в БД
+            // DB::delete('contacts', $data['group_id']);
+        }
+    }    
+
     protected function deleteGroup(ConnectionInterface $from, $data)
     {
         // удаляем группу
         DB::dbconnect();
         // проверяем создателя группы (группу удаляет только ее создатель)
-        $result = DB::getByProp('groupchats', 'id', $data['id']);
+        $result = DB::getByProp('groupchats', 'id', $data['group_id']);
         if ($result['creator'] !== intval($data['send_user_id'])) {
             $data['alert'] = 'Группу может удалить только пользователь ее создавший';
             $message = json_encode($data);
@@ -429,7 +498,7 @@ class Messenger implements MessageComponentInterface
             }
         } else {
             // получаем пользователей группы
-            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['id']);
+            $result = DB::getGroupContacts('contacts', 'contact_group_id', $data['group_id']);
             // ищем активных пользователей
             foreach ($result as $contact) {
                 $to = array_search($contact['user_id'], $this->connectedUsers);
@@ -448,7 +517,7 @@ class Messenger implements MessageComponentInterface
                 }
             }
             // удаляем группу в БД
-            DB::delete('groupchats', $data['id']);
+            DB::delete('groupchats', $data['group_id']);
         }
     }
 

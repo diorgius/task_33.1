@@ -240,6 +240,11 @@ window.oncontextmenu = (e) => {
     if (e.target.classList.contains('div-chat-user')) {
         // console.log(e.target.id);
         e.preventDefault();
+        // если открыто меню сообщения, убираем его
+        document.querySelector('.ul-message-menu') ? document.querySelector('.ul-message-menu').style.display = 'none' : null;
+        document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
+        // если открыто меню группы, убираем его
+        document.querySelector('.ul-chat-group-menu') ? document.querySelector('.ul-chat-group-menu').style.display = 'none' : null;
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-user-menu');
         CHAT_USER_MENU.style.display = 'block';
@@ -328,6 +333,11 @@ window.oncontextmenu = (e) => {
     if (e.target.classList.contains('div-chat-group')) {
         // console.log(e);
         e.preventDefault();
+        // если открыто меню сообщения, убираем его
+        document.querySelector('.ul-message-menu') ? document.querySelector('.ul-message-menu').style.display = 'none' : null;
+        document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
+        // если открыто меню пользователя, убираем его
+        document.querySelector('.ul-chat-user-menu') ? document.querySelector('.ul-chat-user-menu').style.display = 'none' : null;
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-group-menu');
         CHAT_USER_MENU.style.display = 'block';
@@ -386,6 +396,23 @@ window.oncontextmenu = (e) => {
             }
         }
 
+        // покидаем группу
+        let leaveGroup = document.querySelector('#leavegroupchatuser');
+        leaveGroup.onclick = () => {
+            // console.log(e.target.id);
+            // покидаем группу и послаем сообщение пользователям об этом
+            WS.send(JSON.stringify({
+                command: 'leaveGroup',
+                group_id: e.target.id,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME,
+                group_name: e.target.innerText
+            }))
+            // // если открыт чат с удаленной группой, закрываем его
+            // document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
+            // // скрываем текстовую область
+            // document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+        }
 
         // удаляем группу
         let deleteGroup = document.querySelector('#deletegroup');
@@ -393,7 +420,7 @@ window.oncontextmenu = (e) => {
             // удаляем группу и послаем сообщение пользователям группы об ее удалении
             WS.send(JSON.stringify({
                 command: 'deleteGroup',
-                id: e.target.id,
+                group_id: e.target.id,
                 send_user_id: USER_ID,
                 send_nickname: USER_NICKNAME,
                 group_name: e.target.innerText
@@ -429,8 +456,6 @@ window.oncontextmenu = (e) => {
         }
     }
 
-
-
     // выводим контекстное меню на сообщении
     if (e.target.classList.contains('div-send-message')
         || e.target.classList.contains('div-accept-message')
@@ -439,6 +464,10 @@ window.oncontextmenu = (e) => {
     ) {
         // console.log(e.target.id);
         e.preventDefault();
+        // если открыто меню пользователя, убираем его
+        document.querySelector('.ul-chat-user-menu') ? document.querySelector('.ul-chat-user-menu').style.display = 'none' : null;
+        // если открыто меню группы, убираем его
+        document.querySelector('.ul-chat-group-menu') ? document.querySelector('.ul-chat-group-menu').style.display = 'none' : null;
         // выводим меню
         const CHAT_MESSAGE_MENU = document.querySelector('.ul-message-menu');
         CHAT_MESSAGE_MENU.style.display = 'block';
@@ -530,7 +559,7 @@ window.oncontextmenu = (e) => {
                 let sectionMain = document.querySelector('#mainwindow');
                 let ulChatUsers = document.createElement('ul');
                 ulChatUsers.classList.add('ul-users-menu');
-                ulChatUsers.setAttribute('id', 'ulusersmenu')
+                ulChatUsers.setAttribute('id', 'ulforwardmessagemenu')
                 let divUserMessages = document.querySelector('.div-user-messages');
                 result.forEach((item) => {
                     // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
@@ -595,7 +624,7 @@ window.oncontextmenu = (e) => {
                     WS.send(message);
                     // убираем контекстное меню
                     document.querySelector('.ul-message-menu').style.display = 'none';
-                    document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
+                    document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
                 }
             } catch (error) {
                 console.log('Ошибка: ', error);
@@ -617,7 +646,7 @@ window.oncontextmenu = (e) => {
         if (!elem.target.classList.contains('li-users-menu')
             && !elem.target.classList.contains('span-forward-user')
             && !elem.target.classList.contains('checkbox-forward-user')) {
-            document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
+            document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
             document.querySelector('.ul-message-menu').style.display = 'none';
         }
     });

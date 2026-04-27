@@ -71,7 +71,7 @@
 
             <ul class="ul-chat-group-menu">
                 <li id="addgroupchatuser">Добавить пользователей в группу</li>
-                <li id="exitgroupchatuser">Покинуть группу</li>
+                <li id="leavegroupchatuser">Покинуть группу</li>
                 <li id="offnotificationgroup">Отключить оповещение</li>
                 <li id="onnotificationgroup">Включить оповещение</li>
                 <li id="showgroupchatuser">Вывести список пользователей группы</li>

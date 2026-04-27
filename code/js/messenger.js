@@ -55,7 +55,7 @@ WS.onmessage = (e) => {
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
             break;
         case 'privateMessage':
-            // console.log(data);
+            console.log(data);
             // сюда прилетают обычные сообщения и пересланные
             // проверяем отключено или нет оповещение для этого пользователя
             if (!document.getElementById(data.send_user_id).classList.contains('div-chat-user-without-notice')) {
@@ -155,12 +155,33 @@ WS.onmessage = (e) => {
             // вызываем функцию добавления группы в левую панель у пользователя добавленного в группу 
             data.forUser ? addGroupIntoSidebar(data.id, data.group_name) : null;
             break;
+        case 'groupMessage':
+            console.log(data);
+            // вызываем функцию вывода сообщения
+            // showMessage(data.group_id, data.group_name, data.send_user_id, data.send_nickname, data.message_id, data.text_message, data.created, 'group');
+            message = {
+                contactId: data.group_id,
+                contactName: data.group_name, 
+                sendUserId: data.send_user_id,
+                sendUserNickname: data.send_nickname, 
+                messageId: data.message_id, 
+                messageText: data.text_message,
+                messageCreated: data.created,
+                chatType: 'group'
+            };
+            showMessage(message);
+            break;
+        case 'leaveGroup':
+            console.log(data);
+            // выводим сообщение, что псоздатель группы не может ее покинуть
+            alertMessage(data.alert);
+            break;
         case 'deleteGroup':
             // console.log(data);
             // выводим сообщение об удалении
             alertMessage(data.alert);
             // удаляем группу из левой панели
-            data.deleted ? document.getElementById(data.id).remove() : null;
+            data.deleted ? document.getElementById(data.group_id).remove() : null;
             break;
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
