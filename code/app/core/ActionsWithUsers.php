@@ -25,7 +25,7 @@ class ActionsWithUsers
         }
     }
 
-    // метод проверки email при регистрации и nickname в профиле
+    // метод проверки email при регистрации, nickname в профиле и названия группы
     public function checkUserData()
     {
         DB::dbconnect();
@@ -34,7 +34,6 @@ class ActionsWithUsers
         $table = $this->data['table'];
         $result = DB::getByProp($table, $prop, $value);
         $message = $table === 'users' ? "Пользователь с таким {$prop} уже существует" : "Такая группа уже существует";
-
         if ($result) {
             echo $message;
         }
@@ -46,38 +45,6 @@ class ActionsWithUsers
         DB::dbconnect();
         $result = DB::getAll('users');
         echo json_encode($result);
-    }
-
-    // метод создания контакта
-    public function createContact()
-    {
-        DB::dbconnect();
-        // создаем контакт у себя
-        $values = [
-            'user_id' => $this->data['user_id'],
-            'contact_user_id' => $this->data['contact_user_id'],
-        ];
-        DB::create('contacts', $values);
-        // создаем контакт у добавленного пользователя
-        $values = [
-            'user_id' => $this->data['contact_user_id'],
-            'contact_user_id' => $this->data['user_id'],
-        ];
-        DB::create('contacts', $values);
-        // записываем сообщение о создании контакта с пользователем в БД 
-        // формируем метку времени
-        $date = new DateTime();
-        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
-        $created = $date->format('Y-m-d H:i:s');
-        // формируем массив для записи в БД
-        $values = [
-            'send_user_id' => $this->data['user_id'],
-            'accept_user_id' => $this->data['contact_user_id'],
-            'text_message' => htmlspecialchars($this->data['text_message']),
-            'created' => $created
-        ];
-        // записываем в БД сообщение
-        DB::create('messages', $values);
     }
 
     // метод получения всех сообщений с контактом

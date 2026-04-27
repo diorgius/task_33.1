@@ -95,21 +95,52 @@ class Messenger implements MessageComponentInterface
 
     protected function addedToContacts(ConnectionInterface $from, $data)
     {
-        // делаем запрос в БД для получения сведений о добавившем пользователе
         DB::dbconnect();
-        $user = DB::getByProp('users', 'id', $data['send_user_id']);
-        // дополняем ответ
-        if ($user) {
-            $data['email'] = $user['email'];
-            $data['nickname'] = $user['nickname'];
-            $data['avatar'] = $user['avatar'];
-            $data['hideemail'] = $user['hideemail'];
-        }
-        // отправляем данные
-        $message = json_encode($data);
-        foreach ($this->clients as $client) {
-            if ($client->resourceId === intval($data['to'])) {
-                $client->send($message);
+        // создаем контакт у себя
+        $values = [
+            'user_id' => $data['send_user_id'],
+            'contact_user_id' => $data['accept_user_id'],
+        ];
+        DB::create('contacts', $values);
+        // создаем контакт у добавленного пользователя
+        $values = [
+            'user_id' => $data['accept_user_id'],
+            'contact_user_id' => $data['send_user_id'],
+        ];
+        DB::create('contacts', $values);
+        // записываем сообщение о создании контакта с пользователем в БД 
+        // формируем метку времени
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+        // формируем массив для записи в БД
+        $values = [
+            'send_user_id' => $data['send_user_id'],
+            'accept_user_id' => $data['accept_user_id'],
+            'text_message' => "Вас добавил(а) в свои контакты пользователь {$data['send_nickname']}",
+            'created' => $created
+        ];
+        // записываем в БД сообщение
+        DB::create('messages', $values);
+
+        // если пользователь активен, то отправляем ему сообщение для добавления
+        // добавившего пользователя в его контакты
+        if (isset($data['to'])) {
+            // делаем запрос в БД для получения сведений о добавившем пользователе
+            $user = DB::getByProp('users', 'id', $data['send_user_id']);
+            // дополняем ответ
+            if ($user) {
+                $data['email'] = $user['email'];
+                $data['nickname'] = $user['nickname'];
+                $data['avatar'] = $user['avatar'];
+                $data['hideemail'] = $user['hideemail'];
+            }
+            // отправляем данные
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === intval($data['to'])) {
+                    $client->send($message);
+                }
             }
         }
     }
@@ -364,6 +395,10 @@ class Messenger implements MessageComponentInterface
                 // формируем массив для записи в БД
                 $values = [
                     'send_user_id' => $data['send_user_id'],
+                    // !!! СДЕЛАТЬ для того, чтобы сообщение приходило в группу, а не пользователю
+                    // убираем accept_user_id оставляем accept_group_id и при клике подгружаем сообщение, 
+                    // а у активных пользователей делаем как при личном сообщении если открыт чат, не с этой группой
+                    // то отмечаем цветом о приходе нового сообщения группу, если чат активен, то выводим сообщение
                     'accept_user_id' => $data['accept_user_id'],
                     'accept_group_id' => $data['id'],
                     'text_message' => "Вас добавил(а) в группу {$data['group_name']} пользователь {$data['send_nickname']}",

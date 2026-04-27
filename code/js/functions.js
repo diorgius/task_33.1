@@ -33,7 +33,7 @@ function showUsersToAdd(result, typeOfAdding) {
             // при клике на пользователе
             // если добавление в личный список вызываем функцию добавления пользователя в список своих контактов
             if (typeOfAdding === 'addUserToPrivate') {
-                divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar, true); };
+                divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar); };
                 // если добавление в группу вызываем функцию добавления пользователя в группу
             } else if ((typeOfAdding === 'addUserToGroup')) {
                 let nickname = ''
@@ -44,87 +44,29 @@ function showUsersToAdd(result, typeOfAdding) {
     });
 }
 
-// функция добавления пользователя в личный список
-async function addUserToPrivate(user_id, contact_user_id, email, nickname, avatar, contactAddition = false) {
+// функция добавления пользователя в контакты
+function addUserToPrivate(user_id, contact_user_id, email, nickname, avatar) {
+    // проверяем есть ли пользователя в списке контактов
     if (!document.getElementById(contact_user_id)) {
-        // отправляем данные на бэкенд для записи в БД и создания сообщения в БД о добавлении пользователя
-        data = {
-            action: 'createContact',
-            user_id: user_id,
-            contact_user_id: contact_user_id,
-            text_message: `Вас добавил(а) в свои контакты пользователь ${USER_NICKNAME}`
-        };
-        try {
-            // отправляем запрос на создание записей в БД только один раз,
-            // но в методе создания производим сразу две записи и для своего контакта и у него 
-            // записываем себя, а также создаем в БД информационное сообщение для этого пользователя
-            // которое поступит ему сразу если пользователь активен или после его входа в чат
-            // проверяем, что добавление запускается по клику
-            if (contactAddition) {
-                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(data)
-                });
-                let result = await response.text();
-                // console.log('Успехgit: ', result);
+        // вызываем функцию добавления контакта в левую панель
+        addContactIntoSidebar(user_id, contact_user_id, email, nickname, avatar)
+        // если пользователь активен, то потом будем отправлять ему сообщение о добавлении его в контаты
+        to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
+        message = JSON.stringify({
+            command: 'addedToContacts',
+            to: to,
+            send_user_id: user_id,
+            send_nickname: USER_NICKNAME,
+            accept_user_id: contact_user_id
+        });
+        WS.send(message);
+        // проверяем активен ли сейчас добавленный пользователь
+        Object.values(connectedUsers).forEach(async value => {
+            // если пользователь соединен с сервером выделяем его цветом
+            if (parseInt(value) === parseInt(contact_user_id)) {
+                document.getElementById(value).classList.add('div-chat-user-onchat');
             }
-            // добавляем пользователя в свои контакты
-            let divChatUser = document.createElement('div');
-            divChatUser.classList.add('div-chat-user');
-            divChatUser.setAttribute('id', contact_user_id);
-            DIV_USER_CHATS.appendChild(divChatUser);
-            let divChatUserAvatar = document.createElement('div');
-            divChatUser.appendChild(divChatUserAvatar);
-            let imgChatUserAvatar = document.createElement('img');
-            let image = avatar !== null ? URL + '/avatars/' + avatar : URL + '/img/avatar_0.jpg';
-            imgChatUserAvatar.src = image;
-            imgChatUserAvatar.alt = 'Аватар';
-            imgChatUserAvatar.width = '35';
-            divChatUserAvatar.appendChild(imgChatUserAvatar);
-            let divChatUserNickname = document.createElement('div');
-            divChatUserNickname.classList.add('div-user-nickname');
-            divChatUser.appendChild(divChatUserNickname);
-            let pChatUser = document.createElement('p');
-            nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
-            divChatUserNickname.appendChild(pChatUser);
-            // проверяем активен ли сейчас добавленный пользователь
-            Object.values(connectedUsers).forEach(async value => {
-                // console.log(value);
-                // если пользователь соединен с сервером выделяем его цветом
-                if (parseInt(value) === parseInt(contact_user_id)) {
-                    document.getElementById(value).classList.add('div-chat-user-onchat');
-
-                    // при добавлении контакта вместе с записью в БД о своем новом контакте
-                    // делаем запись и себя в его контакты,
-                    // теперь проверяем если добавленный контакт активен, то
-                    // отправляем ему через сокет сообщение при получении которого запускается эта же 
-                    // функция, которая добавляет ему контакт добавившего его пользователя
-                    // информационное сообщение о добавлении его в контакты отправляется выше в этой же функции
-
-                    // проверяем, что признак инициации добавления контакта ПОЛЬЗОВАТЕЛЕМ (через клик), а не автоматическое добавление
-                    // инициированное добавлением контакта, что бы не запускалось добавление контактов по кругу
-                    // при вызове из main.js по клику ставим contactAddition = true, а при вызове из messenger.js
-                    // когда функция addUser запускается после отправки нижеидущего сообщения, то ставим false 
-                    if (contactAddition) {
-                        // готовим и отправляем сообщение пользователю о том, что его присоединили
-                        to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
-                        message = JSON.stringify({
-                            command: 'addedToContacts',
-                            to: to,
-                            send_user_id: user_id,
-                            accept_user_id: contact_user_id
-                        });
-                        WS.send(message);
-                    }
-                    return;
-                }
-            })
-        } catch (error) {
-            console.log('Ошибка: ', error);
-        }
+        });
     } else {
         // выводим сообщение, что данный пользователь уже в списке чатов
         alertMessage(`Пользователь ${nickname ? nickname : email}  уже в списке чатов`);
@@ -132,7 +74,8 @@ async function addUserToPrivate(user_id, contact_user_id, email, nickname, avata
 }
 
 // функция добавления пользователя в группу
-async function addUserToGroup(group_id, contact_user_id, nickname, group_name) {
+function addUserToGroup(group_id, contact_user_id, nickname, group_name) {
+    // если пользователь активен, то потом будем отправлять ему сообщение о добавлении его в группу
     to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
     message = JSON.stringify({
         command: 'addedToGroup',
@@ -145,7 +88,29 @@ async function addUserToGroup(group_id, contact_user_id, nickname, group_name) {
         accept_nickname: nickname
     });
     WS.send(message);
+}
 
+// функция создания элемента контакта в левой панели
+function addContactIntoSidebar(user_id, contact_user_id, email, nickname, avatar) {
+    // добавляем пользователя в свои контакты
+    let divChatUser = document.createElement('div');
+    divChatUser.classList.add('div-chat-user');
+    divChatUser.setAttribute('id', contact_user_id);
+    DIV_USER_CHATS.appendChild(divChatUser);
+    let divChatUserAvatar = document.createElement('div');
+    divChatUser.appendChild(divChatUserAvatar);
+    let imgChatUserAvatar = document.createElement('img');
+    let image = avatar !== null ? URL + '/avatars/' + avatar : URL + '/img/avatar_0.jpg';
+    imgChatUserAvatar.src = image;
+    imgChatUserAvatar.alt = 'Аватар';
+    imgChatUserAvatar.width = '35';
+    divChatUserAvatar.appendChild(imgChatUserAvatar);
+    let divChatUserNickname = document.createElement('div');
+    divChatUserNickname.classList.add('div-user-nickname');
+    divChatUser.appendChild(divChatUserNickname);
+    let pChatUser = document.createElement('p');
+    nickname ? pChatUser.textContent = nickname : pChatUser.textContent = email;
+    divChatUserNickname.appendChild(pChatUser);
 }
 
 // функция создания элемента группы в левой панели
@@ -237,6 +202,7 @@ function outputMessage(location, msg) {
     location.scrollIntoView({ block: 'end', behavior: 'smooth' });
 }
 
+// функция загрузки из БД и вывода сообщений пользователя
 async function getUserMessages(data) {
     try {
         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
@@ -252,6 +218,7 @@ async function getUserMessages(data) {
         // выводим ранние сообщения пользователя
         result.forEach((item) => {
             let divUserMessages = document.querySelector('.div-user-messages');
+            // вызываем функцию вывода сообщений
             outputMessage(divUserMessages, item);
         });
     } catch (error) {

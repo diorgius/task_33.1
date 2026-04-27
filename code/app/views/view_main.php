@@ -65,13 +65,13 @@
             <ul class="ul-chat-user-menu">
                 <li id="offnotificationuser">Отключить оповещение</li>
                 <li id="onnotificationuser">Включить оповещение</li>
-                <li id="deletechatuser">Удалить пользователя из списка контактов</li>
                 <li id="deleteuserchats">Удалить переписку с пользователем</li>
+                <li id="deletechatuser">Удалить пользователя из списка контактов</li>
             </ul>
 
             <ul class="ul-chat-group-menu">
                 <li id="addgroupchatuser">Добавить пользователей в группу</li>
-                <li id="exitgroupchatuser">Выйти из группы</li>
+                <li id="exitgroupchatuser">Покинуть группу</li>
                 <li id="offnotificationgroup">Отключить оповещение</li>
                 <li id="onnotificationgroup">Включить оповещение</li>
                 <li id="showgroupchatuser">Вывести список пользователей группы</li>

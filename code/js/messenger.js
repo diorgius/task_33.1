@@ -45,10 +45,13 @@ WS.onmessage = (e) => {
             })
             break;
         case 'addedToContacts':
-            console.log(data);
-            // после получения сообщения о внешнем добавлении в чей-то контакт, запускаем функцию
-            // добавления этого пользователя в контакты добавленного пользователя
-            addUserToPrivate(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar, false);
+            // console.log(data);
+            // после получения сообщения о внешнем добавлении в чей-то контакт, вызываем функцию
+            // добавления контакта этого пользователя в контакты добавленного пользователя
+            addContactIntoSidebar(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar);
+            // отмечаем, что пользователь в чате
+            document.getElementById(data.send_user_id).classList.add('div-chat-user-onchat');
+            // отмечаем, что есть сообщение
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
             break;
         case 'privateMessage':
