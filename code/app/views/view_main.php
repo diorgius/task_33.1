@@ -7,7 +7,6 @@
     <?php else: ?>
         <!-- может его заменить на другой элемент -->
         <input type="text" id="userid" hidden value="<?= $userId ?>">
-
         <aside class="sidebar-left" id="sidebarleft">
 
             <?php if (!empty($data['user'])): ?>
@@ -70,12 +69,11 @@
             </ul>
 
             <ul class="ul-chat-group-menu">
-                <li id="addgroupchatuser">Добавить пользователей в группу</li>
-                <li id="leavegroupchatuser">Покинуть группу</li>
                 <li id="offnotificationgroup">Отключить оповещение</li>
                 <li id="onnotificationgroup">Включить оповещение</li>
+                <li id="addgroupchatuser">Добавить пользователей в группу</li>
                 <li id="showgroupchatuser">Вывести список пользователей группы</li>
-                <li id="deletegroupchatuser">Удалить пользователя из группы</li>
+                <li id="leavegroupchatuser">Покинуть группу</li>
                 <li id="deletegroup">Удалить группу</li>
             </ul>
 

@@ -13,7 +13,7 @@ class Model_Main extends Model
         if ($id !== 0) {
             DB::dbconnect();
             $user = DB::getByProp('users', 'id', $id);
-            $contacts = DB::getContacts('contacts', 'user_id', $id);
+            $contacts = DB::getContacts('contacts', 'user_id', 'contact_user_id', $id);
             $groups = DB::getGroups('contacts', 'user_id', $id);
             if ($user) {
                 $data = [

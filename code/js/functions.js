@@ -1,6 +1,7 @@
 // функция вывода списка пользователей и добавления пользователя в список контактов
-function showUsersToAdd(result, typeOfAdding) {
-    // console.log(result);
+function showUsersList(result, typeAction) {
+    console.log(result);
+    console.log(typeAction);
     let divAddUsers = document.createElement('div');
     DIV_LIST_USERS.appendChild(divAddUsers);
     divAddUsers.setAttribute('id', 'divaddusers');
@@ -32,13 +33,26 @@ function showUsersToAdd(result, typeOfAdding) {
             }
             // при клике на пользователе
             // если добавление в личный список вызываем функцию добавления пользователя в список своих контактов
-            if (typeOfAdding === 'addUserToPrivate') {
+            if (typeAction === 'addUserToPrivate') {
                 divUser.onclick = () => { addUserToPrivate(USER_ID, item.id, item.email, item.nickname, item.avatar); };
                 // если добавление в группу вызываем функцию добавления пользователя в группу
-            } else if ((typeOfAdding === 'addUserToGroup')) {
+            } else if (typeAction === 'addUserToGroup') {
                 let nickname = ''
                 item.nickname === null ? nickname = item.email : nickname = item.nickname;
                 divUser.onclick = () => { addUserToGroup(result.group_id, item.contact_user_id, nickname, result.group_name); };
+                // если удаляем пользователя из группы (при выводе списка пользователей группы)
+            } else if (typeAction === 'deleteGroupUser') {
+                let nickname = ''
+                item.nickname === null ? nickname = item.email : nickname = item.nickname;
+                divDeleteGroupUser = document.createElement('div');
+                divDeleteGroupUser.classList.add('div-delete-group-user');
+                let spanDeleteGroupUser = document.createElement('span');
+                spanDeleteGroupUser.classList.add('span-delete-group-user');
+                spanDeleteGroupUser.setAttribute('id', 'spandeletegroupuser');
+                spanDeleteGroupUser.setAttribute('title', 'Удалить пользователя из группы');
+                divDeleteGroupUser.appendChild(spanDeleteGroupUser);
+                divUser.appendChild(divDeleteGroupUser);
+                spanDeleteGroupUser.onclick = () => { deleteGroupUser(item.id, item.user_id, result.group_id, nickname, result.group_name); };
             }
         }
     });
@@ -61,7 +75,7 @@ function addUserToPrivate(user_id, contact_user_id, email, nickname, avatar) {
         });
         WS.send(message);
         // проверяем активен ли сейчас добавленный пользователь
-        Object.message(connectedUsers).forEach(async value => {
+        Object.values(connectedUsers).forEach(async value => {
             // если пользователь соединен с сервером выделяем его цветом
             if (parseInt(value) === parseInt(contact_user_id)) {
                 document.getElementById(value).classList.add('div-chat-user-onchat');
@@ -293,3 +307,18 @@ async function getUserMessages(data) {
     }
 }
 
+// функция удаления пользователя из группы
+function deleteGroupUser(contact_id, user_id, group_id, nickname, group_name) {
+    // console.log(e.target.id);
+    // удаляем пользователя из группы и послаем сообщение пользователям об этом
+    WS.send(JSON.stringify({
+        command: 'deleteGroupUser',
+        group_id: group_id,
+        group_name: group_name,
+        contact_id: contact_id,
+        user_id: user_id,
+        user_nickname: nickname,
+        send_user_id: USER_ID,
+        send_nickname: USER_NICKNAME
+    }))
+}

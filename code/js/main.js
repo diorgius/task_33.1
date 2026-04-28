@@ -146,6 +146,8 @@ if (BUTTON_ADD_USER) {
             }
             // если есть открытый чат - убираем его
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';            
             // отправляем запрос в БД, получаем список пользователей
             data = { action: 'getAllUsers' };
             try {
@@ -161,7 +163,7 @@ if (BUTTON_ADD_USER) {
 
                 // вызываем функцию вывода списка пользователей
                 // в которой при клике на пользователе вызывается функция добавления пользователя                
-                showUsersToAdd(result, 'addUserToPrivate');
+                showUsersList(result, 'addUserToPrivate');
             } catch (error) {
                 console.log('Ошибка: ', error);
             }
@@ -185,6 +187,8 @@ if (BUTTON_CREATE_GROUP) {
             }
             // если есть открытый чат - убираем его
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';            
             // добавляем окно создания группы
             document.querySelector('#divwrappercreategroup').innerHTML =
                 `<div class="div-create-group" id="divcreategroup">
@@ -283,6 +287,29 @@ window.oncontextmenu = (e) => {
             })
         }
 
+        // удаляем переписку с пользователем
+        let deleteUserChats = document.querySelector('#deleteuserchats');
+        deleteUserChats.onclick = () => {
+            // console.log(e.target.id);
+            // отправляем сообщение в сокет для удаления всей переписки с пользователем и
+            // если пользователь активен отправляем сообщение пользователю, что переписка удалена
+            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
+            WS.send(JSON.stringify({
+                command: 'deleteAllMessages',
+                user_id: e.target.id,
+                to: to,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME
+            }))
+            // если открыт чат с удаленным пользователем, закрываем его
+            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
+            // выводим сообщение, что переписка удалена
+            alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+
+        }
+
         // удаляем пользователя из списка контактов с удалением всей переписки и удаляем у него свой контакт
         let deleteChatUser = document.querySelector('#deletechatuser');
         deleteChatUser.onclick = () => {
@@ -303,29 +330,6 @@ window.oncontextmenu = (e) => {
             alertMessage(`Пользователь ${e.target.innerText} удален из списка контактов`);
             // удаляем пользователя из списка контактов
             document.getElementById(e.target.id) ? document.getElementById(e.target.id).remove() : null;
-            // скрываем текстовую область
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
-
-        }
-
-        // удаляем переписку с пользователем
-        let deleteUserChats = document.querySelector('#deleteuserchats');
-        deleteUserChats.onclick = () => {
-            // console.log(e.target.id);
-            // отправляем сообщение в сокет для удаления всей переписки с пользователем и
-            // если пользователь активен отправляем сообщение пользователю, что переписка удалена
-            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
-            WS.send(JSON.stringify({
-                command: 'deleteAllMessages',
-                user_id: e.target.id,
-                to: to,
-                send_user_id: USER_ID,
-                send_nickname: USER_NICKNAME
-            }))
-            // если открыт чат с удаленным пользователем, закрываем его
-            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
-            // выводим сообщение, что переписка удалена
-            alertMessage(`Вся переписка с пользователем ${e.target.innerText} удалена`);
             // скрываем текстовую область
             document.querySelector('.div-text-send-message').style.visibility = 'hidden';
 
@@ -352,86 +356,6 @@ window.oncontextmenu = (e) => {
         divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-group-active') : null;
         e.target.classList.add('div-chat-group-active');
 
-
-        // добавляем пользователя в группу
-        // сделал добавление пользователей через вывод списка пользователей как при добавлении пользователей
-        // закрытие окна сделал через туже кнопку "ДОБАВИТЬ ПОЛЬЗОВАТЕЛЕЙ"
-        // можно было сделать добавление через вывод дополнительного меню, как при пересылке сообщения
-        let addGroupChatUser = document.querySelector('#addgroupchatuser');
-        addGroupChatUser.onclick = async () => {
-            BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
-            // если выведен список добавления пользователей - убираем его и меняем надпись на кнопке
-            if (document.querySelector('#divaddusers')) {
-                BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
-                document.querySelector('#divaddusers').remove();
-            }
-            // если открыто окно создание группы - убираем его
-            if (document.querySelector('#divcreategroup')) {
-                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
-                document.querySelector('#divcreategroup').remove();
-            }
-            // если есть открытый чат - убираем его
-            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
-            // получаем список пользователей из своих контактов для добавления в группу
-            data = {
-                action: 'getUserContacts',
-                user_id: USER_ID
-            }
-            try {
-                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(data)
-                });
-                let result = await response.json();
-                // console.log('Успех: ', result);
-
-                // добавляем id группы
-                result.group_id = e.target.id;
-                result.group_name = e.target.innerText;
-                // вызываем функцию вывода списка пользователей
-                // в которой при клике на пользователе вызывается функция добавления пользователя
-                showUsersToAdd(result, 'addUserToGroup');
-            } catch (error) {
-                console.log('Ошибка: ', error);
-            }
-        }
-
-        // покидаем группу
-        let leaveGroup = document.querySelector('#leavegroupchatuser');
-        leaveGroup.onclick = () => {
-            // console.log(e.target.id);
-            // покидаем группу и послаем сообщение пользователям об этом
-            WS.send(JSON.stringify({
-                command: 'leaveGroup',
-                group_id: e.target.id,
-                group_name: e.target.innerText,
-                send_user_id: USER_ID,
-                send_nickname: USER_NICKNAME
-            }))
-
-        }
-
-        // удаляем группу
-        let deleteGroup = document.querySelector('#deletegroup');
-        deleteGroup.onclick = () => {
-            // удаляем группу и послаем сообщение пользователям группы об ее удалении
-            WS.send(JSON.stringify({
-                command: 'deleteGroup',
-                group_id: e.target.id,
-                send_user_id: USER_ID,
-                send_nickname: USER_NICKNAME,
-                group_name: e.target.innerText
-            }))
-            // если открыт чат с удаленной группой, закрываем его
-            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
-            // скрываем текстовую область
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
-        }
-
-
         // отключаем оповещение
         let offNotification = document.querySelector('#offnotificationgroup');
         offNotification.onclick = () => {
@@ -453,6 +377,141 @@ window.oncontextmenu = (e) => {
                     chatUserWithoutNotice.classList.add('div-chat-user-onchat');
                 }
             })
+        }
+
+        // добавляем пользователя в группу
+        let addGroupChatUser = document.querySelector('#addgroupchatuser');
+        addGroupChatUser.onclick = async () => {
+            BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+            // если выведен список добавления пользователей - убираем его и меняем надпись на кнопке
+            if (document.querySelector('#divaddusers')) {
+                BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+                document.querySelector('#divaddusers').remove();
+            }
+            // если открыто окно создание группы - убираем его
+            if (document.querySelector('#divcreategroup')) {
+                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+                document.querySelector('#divcreategroup').remove();
+            }
+            // если есть открытый чат - убираем его
+            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+            // получаем список пользователей из своих контактов для добавления в группу
+            data = {
+                action: 'getUserContacts',
+                user_id: USER_ID
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.json();
+                // console.log('Успех: ', result);
+
+                // добавляем id группы
+                result.group_id = e.target.id;
+                result.group_name = e.target.innerText;
+                // вызываем функцию вывода списка пользователей
+                // в которой при клике на пользователе вызывается функция добавления пользователя
+                showUsersList(result, 'addUserToGroup');
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }
+        }
+
+        // выводим список группы
+        let showGroupUsers = document.querySelector('#showgroupchatuser');
+        showGroupUsers.onclick = async () => {
+            BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+            // если выведен список добавления пользователей - убираем его и меняем надпись на кнопке
+            if (document.querySelector('#divaddusers')) {
+                BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
+                document.querySelector('#divaddusers').remove();
+            }
+            // если открыто окно создание группы - убираем его
+            if (document.querySelector('#divcreategroup')) {
+                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+                document.querySelector('#divcreategroup').remove();
+            }
+            // если есть открытый чат - убираем его
+            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';            
+            // получаем список пользователей из своих контактов для добавления в группу
+            data = {
+                action: 'getUserGroupContacts',
+                user_id: USER_ID,
+                contact_group_id: e.target.id
+            }
+            try {
+                let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(data)
+                });
+                let result = await response.json();
+                // console.log('Успех: ', result);
+                // добавляем id группы
+                result.group_id = e.target.id;
+                result.group_name = e.target.innerText;
+                // вызываем функцию вывода списка пользователей
+                // в которой при клике на пользователе вызывается функция добавления пользователя
+                showUsersList(result, 'deleteGroupUser');
+            } catch (error) {
+                console.log('Ошибка: ', error);
+            }
+        }
+
+        // покидаем группу
+        let leaveGroup = document.querySelector('#leavegroupchatuser');
+        leaveGroup.onclick = () => {
+            // console.log(e.target.id);
+            // покидаем группу и послаем сообщение пользователям об этом
+            WS.send(JSON.stringify({
+                command: 'leaveGroup',
+                group_id: e.target.id,
+                group_name: e.target.innerText,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME
+            }))
+        }
+
+        // // удаляем пользователя из группы
+        // let deleteGroupUser = document.querySelector('#spandeletegroupuser');
+        // deleteGroupUser.onclick = () => {
+        //     // console.log(e.target.id);
+        //     // покидаем группу и послаем сообщение пользователям об этом
+        //     WS.send(JSON.stringify({
+        //         command: 'deleteGroupUser',
+        //         group_id: e.target.id,
+        //         group_name: e.target.innerText,
+        //         send_user_id: USER_ID,
+        //         send_nickname: USER_NICKNAME
+        //     }))
+        // }
+
+        // удаляем группу
+        let deleteGroup = document.querySelector('#deletegroup');
+        deleteGroup.onclick = () => {
+            // удаляем группу и послаем сообщение пользователям группы об ее удалении
+            WS.send(JSON.stringify({
+                command: 'deleteGroup',
+                group_id: e.target.id,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME,
+                group_name: e.target.innerText
+            }))
+            // если открыт чат с удаленной группой, закрываем его
+            document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
+            // скрываем текстовую область
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
         }
     }
 

@@ -120,7 +120,7 @@ WS.onmessage = (e) => {
             break;
         case 'leaveGroup':
             // console.log(data);
-            // выводим сообщение, что псоздатель группы не может ее покинуть
+            // выводим сообщение, что создатель группы не может ее покинуть
             alertMessage(data.alert);
             if (data.leaveGroup) {
                 alertMessage(data.alert);
@@ -131,6 +131,20 @@ WS.onmessage = (e) => {
                 // убираем элемент группы
                 document.getElementById(data.group_id).remove();
             }
+            break;
+        case 'deleteGroupUser':
+            console.log(data);
+            // выводим сообщение, что только создатель группы может удалять из нее пользователей
+            alertMessage(data.alert);
+            // if (data.leaveGroup) {
+            //     alertMessage(data.alert);
+            //     // если открыт чат с удаленной группой, закрываем его
+            //     document.getElementById(data.group_name) ? document.getElementById(data.group_name).remove() : null;
+            //     // скрываем текстовую область
+            //     document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+            //     // убираем элемент группы
+            //     document.getElementById(data.group_id).remove();
+            // }
             break;
         case 'deleteGroup':
             // console.log(data);

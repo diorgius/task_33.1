@@ -159,14 +159,14 @@ class DB
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getContacts(string $table, string $prop, string $value)
+    public static function getContacts(string $table, string $prop, string $cond, string $value)
     {
         $stmt = self::$pdo->prepare(
-            "SELECT c.id, contact_user_id, email, nickname, avatar, hideemail
+            "SELECT c.id, user_id, contact_user_id, contact_group_id, email, nickname, avatar, hideemail
             FROM $table AS c LEFT JOIN users AS u ON 
-            u.id = c.contact_user_id
+            u.id = c.$cond
             WHERE $prop = :value
-            AND contact_user_id IS NOT NULL"
+            AND $cond IS NOT NULL"
         );
         $stmt->execute([
             'value' => $value

@@ -76,6 +76,10 @@ class Messenger implements MessageComponentInterface
                 // метод выхода выхода из группу
                 $this->leaveGroup($from, $data);
                 break;
+            case 'deleteGroupUser';
+                // метод удаления пользователей из группы
+                $this->deleteGroupUser($from, $data);
+                break;
             case 'deleteGroup';
                 // метод удаления группы
                 $this->deleteGroup($from, $data);
@@ -379,6 +383,7 @@ class Messenger implements MessageComponentInterface
                 $date = new DateTime();
                 $date->setTimezone(new DateTimeZone('Europe/Moscow'));
                 $created = $date->format('Y-m-d H:i:s');
+                // формируем сообщение
                 $text_message = "Администратор группы {$data['group_name']} {$data['send_nickname']} 
                                 добавил пользователя {$data['accept_nickname']}";
                 // формируем массив для записи в БД
@@ -504,6 +509,83 @@ class Messenger implements MessageComponentInterface
             }
             // удаляем контакт из группы в БД
             DB::deleteContact('contacts', 'contact_group_id', $data['send_user_id'], $data['group_id']);
+        }
+    }
+    
+    protected function deleteGroupUser(ConnectionInterface $from, $data)
+    {
+        var_dump($data);
+        // покидаем группу
+        DB::dbconnect();
+        // проверяем создателя группы (только создатель группы может удалять из нее пользователей)
+        $result = DB::getByProp('groupchats', 'id', $data['group_id']);
+        if ($result['creator'] !== intval($data['send_user_id'])) {
+            $data['alert'] = 'Только создатель группы может удалять из нее пользователей';
+            $message = json_encode($data);
+            foreach ($this->clients as $client) {
+                if ($client->resourceId === $from->resourceId) {
+                    $client->send($message);
+                    break;
+                }
+            }
+        } else {
+            // создаем сообщение, что пользователь был удален
+            // формируем метку времени
+            $date = new DateTime();
+            $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+            $created = $date->format('Y-m-d H:i:s');
+            // формируем сообщение
+            $text_message = "Пользователь {$data['user_nickname']} был удален администратором группы";
+            // формируем массив для записи в БД
+            $values = [
+                'send_user_id' => $data['send_user_id'],
+                'accept_group_id' => $data['group_id'],
+                'text_message' => $text_message,
+                'created' => $created
+            ];
+            // записываем в БД сообщение
+            $message_id = DB::create('messages', $values);
+            // получаем пользователей группы
+            $result = DB::getByPropAll('contacts', 'contact_group_id', $data['group_id']);
+            // ищем активных пользователей
+            foreach ($result as $contact) {
+                if ($contact['user_id'] === intval($data['user_id'])) {
+                    $data['command'] = 'deleteGroupUser';
+                    $data['deleteGroupUser'] = true;
+                    $data['alert'] = "Вы были удалены администратором из группы {$data['group_name']}";
+                    $message = json_encode($data);
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId === $from->resourceId) {
+                            $client->send($message);
+                            break;
+                        }
+                    }
+                    continue;
+                }
+                $to = array_search($contact['user_id'], $this->connectedUsers);
+                if ($to) {
+                    // если это отправитель сообщения о выходе из группы
+                    // дополняем сообщение для отправки пользователям
+                    // ставим ему статус groupMessage для того что бы на стороне
+                    // клиента отрабатывались те же условиями как и у обычного сообщения
+                    unset($data['alert']);
+                    unset($data['leaveGroup']);
+                    $data['command'] = 'groupMessage';
+                    $data['message_id'] = $message_id;
+                    $data['text_message'] = $text_message;
+                    $data['created'] = $created;
+                    $message = json_encode($data);
+                    // отправляем сообщение пользователям группы
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId === intval($to)) {
+                            $client->send($message);
+                            break;
+                        }
+                    }
+                }
+            }
+            // удаляем контакт из группы в БД
+            // DB::deleteContact('contacts', 'contact_group_id', $data['send_user_id'], $data['group_id']);
         }
     }
 

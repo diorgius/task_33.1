@@ -64,7 +64,14 @@ class ActionsWithUsers
     public function getUserContacts()
     {
         DB::dbconnect();
-        $result = DB::getContacts('contacts', 'user_id', $this->data['user_id']);
+        $result = DB::getContacts('contacts', 'user_id', 'contact_user_id', $this->data['user_id']);
+        echo json_encode($result);
+    }
+
+    public function getUserGroupContacts()
+    {
+        DB::dbconnect();
+        $result = DB::getContacts('contacts', 'contact_group_id', 'user_id', $this->data['contact_group_id']);
         echo json_encode($result);
     }
 
