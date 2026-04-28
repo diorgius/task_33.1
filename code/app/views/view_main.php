@@ -49,7 +49,7 @@
                 <div class="div-user-groups" id="divusergroups">
 
                     <?php foreach ($data['groups'] as $key => $value): ?>
-                        <div class="div-chat-group" id="<?= $data['groups'][$key]['contact_group_id']; ?>">
+                        <div class="div-chat-group div-chat-group-onchat" id="<?= $data['groups'][$key]['contact_group_id']; ?>">
                             <div>
                                 <img src="../img/group.jpg" alt="Аватар" width="35">
                             </div>

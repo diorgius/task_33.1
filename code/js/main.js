@@ -108,7 +108,10 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 30. !!! ??? НАДО ПОДУМАТЬ И ПЕРЕДЕЛАТЬ ДОБАВЛНИЕ ПОЛЬЗОВАТЕЛЕЙ сделать добавление только через сокет
 // сейчас очень запутанная схема надо ее упростить
-
+//
+// 31. !!! ??? отправка сообщений только активным пользователям ???
+//
+// 32. !!! ??? разобраться с выделением цветами и рамками групп ???
 
 
 
@@ -408,10 +411,7 @@ window.oncontextmenu = (e) => {
                 send_user_id: USER_ID,
                 send_nickname: USER_NICKNAME
             }))
-            // // если открыт чат с удаленной группой, закрываем его
-            // document.getElementById(e.target.innerText) ? document.getElementById(e.target.innerText).remove() : null;
-            // // скрываем текстовую область
-            // document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+
         }
 
         // удаляем группу

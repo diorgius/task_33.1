@@ -33,7 +33,7 @@ class DB
 
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int) $e->getCode());
-        } 
+        }
 
         try {
             self::$pdo = new PDO($dsn, $user, $pass, $options);
@@ -66,7 +66,7 @@ class DB
 
             self::$pdo->exec($sql);
 
-            $sql = 
+            $sql =
                 "CREATE TABLE IF NOT EXISTS `messenger`.`contacts` (
 	            `id` INT NOT NULL AUTO_INCREMENT,
 	            `user_id` INT NOT NULL,
@@ -83,7 +83,7 @@ class DB
 
             self::$pdo->exec($sql);
 
-             $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
+            $sql = "CREATE TABLE IF NOT EXISTS `messenger`.`messages` (
                 `id` INT NOT NULL AUTO_INCREMENT,
                 `send_user_id` INT NOT NULL,
                 `accept_user_id` INT NULL,
@@ -152,6 +152,13 @@ class DB
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public static function getByPropAll(string $table, string $prop, string $value)
+    {
+        $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value");
+        $stmt->execute(['value' => $value]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public static function getContacts(string $table, string $prop, string $value)
     {
         $stmt = self::$pdo->prepare(
@@ -159,7 +166,8 @@ class DB
             FROM $table AS c LEFT JOIN users AS u ON 
             u.id = c.contact_user_id
             WHERE $prop = :value
-            AND contact_user_id IS NOT NULL");
+            AND contact_user_id IS NOT NULL"
+        );
         $stmt->execute([
             'value' => $value
         ]);
@@ -173,44 +181,40 @@ class DB
             FROM $table AS c LEFT JOIN groupchats AS g ON 
             g.id = c.contact_group_id
             WHERE $prop = :value
-            AND contact_group_id IS NOT NULL");
+            AND contact_group_id IS NOT NULL"
+        );
         $stmt->execute([
             'value' => $value
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getByPropAll(string $table, string $prop, string $value)
-    {
-        $stmt = self::$pdo->prepare("SELECT * FROM $table WHERE $prop = :value");
-        $stmt->execute(['value' => $value]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
-    public static function deleteContact(string $table, string $userId, string $contactUserId): void
+    public static function deleteContact(string $table, $prop, string $user_id, string $contact_id): void
     {
         // удаляем контакт у себя и себя у него
         $stmt = self::$pdo->prepare(
-        "DELETE FROM $table WHERE 
+            "DELETE FROM $table WHERE 
         (user_id = :value_1 
         AND 
-        contact_user_id = :value_2)
+        $prop = :value_2)
         OR
         (user_id = :value_4
         AND 
-        contact_user_id = :value_3)");
+        $prop = :value_3)"
+        );
         $stmt->execute([
-            'value_1' => $userId,
-            'value_2' => $contactUserId,
-            'value_3' => $userId,
-            'value_4' => $contactUserId
+            'value_1' => $user_id,
+            'value_2' => $contact_id,
+            'value_3' => $user_id,
+            'value_4' => $contact_id
         ]);
     }
 
     public static function getUserMessages(string $table, string $send_user_id, string $accept_user_id): array
     {
         $stmt = self::$pdo->prepare(
-        "SELECT * FROM $table WHERE 
+            "SELECT * FROM $table WHERE 
         (send_user_id = :value_1 
         AND 
         accept_user_id = :value_2)
@@ -218,7 +222,8 @@ class DB
         (send_user_id = :value_4 
         AND 
         accept_user_id = :value_3)
-        ORDER BY created");
+        ORDER BY created"
+        );
         $stmt->execute([
             'value_1' => $send_user_id,
             'value_2' => $accept_user_id,
@@ -231,14 +236,15 @@ class DB
     public static function deleteUserMessages(string $table, string $send_user_id, string $accept_user_id): void
     {
         $stmt = self::$pdo->prepare(
-        "DELETE FROM $table WHERE 
+            "DELETE FROM $table WHERE 
         (send_user_id = :value_1 
         AND 
         accept_user_id = :value_2)
         OR
         (send_user_id = :value_4 
         AND 
-        accept_user_id = :value_3)");
+        accept_user_id = :value_3)"
+        );
         $stmt->execute([
             'value_1' => $send_user_id,
             'value_2' => $accept_user_id,
