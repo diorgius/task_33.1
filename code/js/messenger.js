@@ -136,15 +136,17 @@ WS.onmessage = (e) => {
             console.log(data);
             // выводим сообщение, что только создатель группы может удалять из нее пользователей
             alertMessage(data.alert);
-            // if (data.leaveGroup) {
-            //     alertMessage(data.alert);
-            //     // если открыт чат с удаленной группой, закрываем его
-            //     document.getElementById(data.group_name) ? document.getElementById(data.group_name).remove() : null;
-            //     // скрываем текстовую область
-            //     document.querySelector('.div-text-send-message').style.visibility = 'hidden';
-            //     // убираем элемент группы
-            //     document.getElementById(data.group_id).remove();
-            // }
+            // удалеяем элемент удаленного пользователя
+            data.forAdmin ? document.getElementById(`divuser_${data.contact_id}`).remove() : null;
+            if (data.deleteGroupUser) {
+                alertMessage(data.alert);
+                // если открыт чат с удаленной группой, закрываем его
+                document.getElementById(data.group_name) ? document.getElementById(data.group_name).remove() : null;
+                // скрываем текстовую область
+                document.querySelector('.div-text-send-message').style.visibility = 'hidden';
+                // убираем элемент группы
+                document.getElementById(data.group_id).remove();
+            }
             break;
         case 'deleteGroup':
             // console.log(data);
@@ -173,9 +175,12 @@ document.body.addEventListener('click', async (e) => {
         e.target.classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group';
         // console.log(e);
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
-        let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
-        e.target.classList.add('div-chat-user-active');
+        let divChatUserActive = document.querySelector('.div-chat-active');
+        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-active') : null;
+        e.target.classList.add('div-chat-active');
+        // let divChatUserActive = document.querySelector('.div-chat-user-active');
+        // divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
+        // e.target.classList.add('div-chat-user-active');
         // если открыто окно добавления пользователей убираем его
         if (document.querySelector('#divaddusers')) {
             document.querySelector('#divaddusers').remove();

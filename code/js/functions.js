@@ -1,13 +1,14 @@
 // функция вывода списка пользователей и добавления пользователя в список контактов
 function showUsersList(result, typeAction) {
     console.log(result);
-    console.log(typeAction);
     let divAddUsers = document.createElement('div');
     DIV_LIST_USERS.appendChild(divAddUsers);
     divAddUsers.setAttribute('id', 'divaddusers');
     result.forEach((item) => {
-        if (`${item.id}` !== USER_ID) {
-            // console.log(item);
+        // проверяем пользователя, что бы в списках он не выводился
+        if ((typeAction === 'addUserToPrivate' && `${item.id}` !== USER_ID) || 
+            (typeAction === 'addUserToGroup' && `${item.contact_user_id}` !== null) || 
+            (typeAction === 'deleteGroupUser' && `${item.user_id}` !== USER_ID)) {
             let divUser = document.createElement('div');
             divUser.classList.add('div-user');
             divUser.setAttribute('id', 'divuser_' + `${item.id}`);

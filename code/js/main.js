@@ -259,9 +259,12 @@ window.oncontextmenu = (e) => {
         CHAT_USER_MENU.style.top = positionY + 'px';
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
-        let divChatUserActive = document.querySelector('.div-chat-user-active');
-        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
-        e.target.classList.add('div-chat-user-active');
+        // let divChatUserActive = document.querySelector('.div-chat-user-active');
+        // divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
+        // e.target.classList.add('div-chat-user-active');
+        let divChatUserActive = document.querySelector('.div-chat-active');
+        divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-active') : null;
+        e.target.classList.add('div-chat-active');
 
         // отключаем оповещение
         let offNotification = document.querySelector('#offnotificationuser');
@@ -352,9 +355,12 @@ window.oncontextmenu = (e) => {
         CHAT_USER_MENU.style.top = positionY + 'px';
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
-        let divChatGroupActive = document.querySelector('.div-chat-group-active');
-        divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-group-active') : null;
-        e.target.classList.add('div-chat-group-active');
+        // let divChatGroupActive = document.querySelector('.div-chat-group-active');
+        // divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-group-active') : null;
+        // e.target.classList.add('div-chat-group-active');
+        let divChatGroupActive = document.querySelector('.div-chat-active');
+        divChatGroupActive !== null ? divChatGroupActive.classList.remove('div-chat-active') : null;
+        e.target.classList.add('div-chat-active');
 
         // отключаем оповещение
         let offNotification = document.querySelector('#offnotificationgroup');

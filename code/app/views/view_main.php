@@ -48,7 +48,7 @@
                 <div class="div-user-groups" id="divusergroups">
 
                     <?php foreach ($data['groups'] as $key => $value): ?>
-                        <div class="div-chat-group div-chat-group-onchat" id="<?= $data['groups'][$key]['contact_group_id']; ?>">
+                        <div class="div-chat-group" id="<?= $data['groups'][$key]['contact_group_id']; ?>">
                             <div>
                                 <img src="../img/group.jpg" alt="Аватар" width="35">
                             </div>
@@ -72,7 +72,7 @@
                 <li id="offnotificationgroup">Отключить оповещение</li>
                 <li id="onnotificationgroup">Включить оповещение</li>
                 <li id="addgroupchatuser">Добавить пользователей в группу</li>
-                <li id="showgroupchatuser">Вывести список пользователей группы</li>
+                <li id="showgroupchatuser">Список пользователей группы</li>
                 <li id="leavegroupchatuser">Покинуть группу</li>
                 <li id="deletegroup">Удалить группу</li>
             </ul>
