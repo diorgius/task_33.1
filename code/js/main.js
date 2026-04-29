@@ -4,9 +4,9 @@ const DIV_LIST_USERS = document.querySelector('#divlistusers');
 const DIV_USER_CHATS = document.querySelector('#divuserchats');
 const MAIN_WINDOW = document.querySelector('#mainwindow');
 const TEXT_AREA_MESSAGE = document.querySelector('#textsendmessage');
-if (document.querySelector('#userid')) {
-    const USER_ID = document.querySelector('#userid').value;
-}
+const USER_ID = document.querySelector('.div-user-avatar').id;
+const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
+
 
 // !!! БЫЛА ОСНОВНАЯ КОНЦЕПЦИЯ
 // если пользователь активен (в чате), то ему можно отправлять сообщения иначе выводится сообщение, 
@@ -40,6 +40,7 @@ if (document.querySelector('#userid')) {
 // 
 // ПО ПОВОДУ ОПОВЕЩЕНИЯ
 // !!! ??? если отключено оповещение, все будет как обычно, только без звукового оповещения
+// и автоматического открытия чата
 // 
 // ПО ГРУППОВЫМ ЧАТАМ
 // в группу можно отправлять сообщения в любом случае, те пользователи которые активны,
@@ -100,7 +101,7 @@ if (document.querySelector('#userid')) {
 //            // для присвоения div id для однозначной идентификации
 //            // сообщения и вывода даты и времени
 //          )
-//  как идентифицировать сообщение на стороне отправителя??? в момент его отправки???
+// как идентифицировать сообщение на стороне отправителя??? в момент его отправки???
 // на стороне получателя мы при записе в БД получаем message_id и пересылаем его адресату
 // уже с уникальным id, а на стороне отправителя??? id нет и как потом его идентифицировать
 // если пользователь захочет его переслать???
@@ -122,7 +123,7 @@ if (document.querySelector('#userid')) {
 //
 // !!! СДЕЛАНО 20. вывод списка пользователей
 // 
-// 21. рассылка групповых сообщений
+// !!! СДЕЛАНО 21. рассылка групповых сообщений
 //
 // !!! СДЕЛАНО 22. удаление пользователя из группы
 //
@@ -138,7 +139,7 @@ if (document.querySelector('#userid')) {
 // 
 // !!! СДЕЛАНО 27. !!! ??? при удалении контакта ??? тоже удалять себя у него
 //
-// 28. НАДО еще подумать над вкл/выкл оповещения сейчас оно отключает не только беззвучный режим,
+// !!! СДЕЛАНО 28. НАДО еще подумать над вкл/выкл оповещения сейчас оно отключает не только беззвучный режим,
 // но и полностью оповещение о приходе сообщений, при этом если при отключенном оповещении
 // кликнуть на пользователя, выводится сообщение, что пользователь не в чате (ЭТО надо поправить
 // чтобы пользователь мог загружать сообщения),
@@ -151,11 +152,14 @@ if (document.querySelector('#userid')) {
 // !!! СДЕЛАНО 30. !!! ??? НАДО ПОДУМАТЬ И ПЕРЕДЕЛАТЬ ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ сделать добавление только через сокет
 // сейчас очень запутанная схема надо ее упростить
 //
-// 31. !!! ??? отправка сообщений только активным пользователям ???
+// !!! СДЕЛАНО 31. !!! ??? отправка сообщений только активным пользователям ???
 //
-// 32. !!! ??? разобраться с выделением цветами и рамками групп ???
+// !!! СДЕЛАНО 32. !!! ??? разобраться с выделением цветами и рамками групп ???
 //
-// 33. вывод nickname отправившего пользователя в сообщении
+// !!! СДЕЛАНО 33. вывод nickname отправившего пользователя в сообщении
+//
+// 34. удаление/редактирование сообщений в группе и в привате, ??? сейчас когда добавил
+// имя отправителя берется не тот текст для редактирования
 
 
 
@@ -312,7 +316,7 @@ window.oncontextmenu = (e) => {
         offNotification.onclick = () => {
             // console.log(e.target.id);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
-            chatUserWithoutNotice.classList.contains('div-chat-user-onchat') ? chatUserWithoutNotice.classList.remove('div-chat-user-onchat') : null;
+            // chatUserWithoutNotice.classList.contains('div-chat-user-onchat') ? chatUserWithoutNotice.classList.remove('div-chat-user-onchat') : null;
             chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
         }
 
@@ -320,15 +324,8 @@ window.oncontextmenu = (e) => {
         let onNotification = document.querySelector('#onnotificationuser');
         onNotification.onclick = () => {
             // console.log(e.target.id);
-            // console.log(connectedUsers);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
             chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
-            // если пользователь активен, то добаляем ему соответствущий класс
-            Object.values(connectedUsers).forEach(value => {
-                if (value === e.target.id) {
-                    chatUserWithoutNotice.classList.add('div-chat-user-onchat');
-                }
-            })
         }
 
         // удаляем переписку с пользователем
@@ -405,7 +402,6 @@ window.oncontextmenu = (e) => {
         offNotification.onclick = () => {
             // console.log(e);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
-            chatUserWithoutNotice.classList.contains('div-chat-user-onchat') ? chatUserWithoutNotice.classList.remove('div-chat-user-onchat') : null;
             chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
         }
 
@@ -415,12 +411,6 @@ window.oncontextmenu = (e) => {
             // console.log(e);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
             chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
-            // если пользователь активен, то добаляем ему соответствущий класс
-            Object.values(connectedUsers).forEach(value => {
-                if (value === e.target.id) {
-                    chatUserWithoutNotice.classList.add('div-chat-user-onchat');
-                }
-            })
         }
 
         // добавляем пользователя в группу
@@ -572,7 +562,7 @@ window.oncontextmenu = (e) => {
         let deleteMessage = document.querySelector('#deletemessage');
         deleteMessage.onclick = () => {
             // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
-            let chatUser = document.querySelector('.div-chat-user-active').id
+            let chatUser = document.querySelector('.div-chat-active').id
             to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
             WS.send(JSON.stringify({
                 command: 'deleteMessage',
@@ -596,7 +586,7 @@ window.oncontextmenu = (e) => {
             document.getElementById(e.target.id).classList.remove('div-message-active');
             // отправка измененного сообщения
             const MESSAGE_SEND = document.querySelector('#sendmessage');
-            let chatUser = document.querySelector('.div-chat-user-active').id
+            let chatUser = document.querySelector('.div-chat-active').id
             MESSAGE_SEND.onclick = () => {
                 let textSendMessage = TEXT_AREA_MESSAGE.value;
                 // проверить не пусто ли сообщение

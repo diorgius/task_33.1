@@ -46,7 +46,6 @@
     margin-bottom: 1rem;
 }
 
-
 .div-chat-user {
     margin: 1rem;
     border: .1rem solid #cccccc;
@@ -62,10 +61,6 @@
 .div-chat-user-nickname {
     padding-left: .5rem;
 }
-
-/* .div-chat-user-active {
-    border: .1rem solid #007bff;
-} */
 
 .sidebar-right {
     display: flex;
@@ -266,18 +261,6 @@
 .a-send-message:focus-within {
     border: .1rem solid #007bff;
     outline: none;
-}
-
-.div-chat-user-without-notice {
-    background-color: #eeeeee;
-}
-
-.div-chat-user-onchat {
-    background-color: #cef1ff;
-}
-
-.div-chat-user-onmessage {
-    background-color: #fcffce;
 }
 
 .div-user-messages {
@@ -516,10 +499,23 @@
     align-items: center;
     cursor: pointer;
     user-select: none;
+    background-color: #dfffdf;
 }
 
 .div-chat-active {
     border: .1rem solid #007bff;
+}
+
+.div-chat-user-onchat {
+    background-color: #cef1ff;
+}
+
+.div-chat-user-without-notice {
+    background-color: #eeeeee;
+}
+
+.div-chat-user-onmessage {
+    background-color: #fcffce;
 }
 
 .ul-chat-group-menu {
@@ -549,10 +545,6 @@
 .groups-exist {
     height: 45%;
 }
-
-/* .div-chat-group-onchat {
-    background-color: #dcffdc;
-} */
 
 .div-delete-group-user {
     display: flex;

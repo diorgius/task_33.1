@@ -1,5 +1,3 @@
-const USER_ID = document.querySelector('#userid').value;
-const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
 const NOTICE = new Audio('../../img/notice.mp3');
 const DELETEMESSAGE = new Audio('../../img/deletemessage.mp3');
 let connectedUsers = '';
@@ -55,19 +53,19 @@ WS.onmessage = (e) => {
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
             break;
         case 'privateMessage':
-            console.log(data);
+            // console.log(data);
             // вызываем функцию вывода сообщений
             showMessage(data, 'private');
             break;
         case 'replay':
-            console.log(data);
+            // console.log(data);
             // добавлена отправка сообщения самому себе после отправки сообщения адресату
             // для того чтобы получить message_id из БД, дату и время сообщения
             // для присвоения div id для однозначной идентификации и возможности удалять, редактировать, персылать
             // сообщения и вывода даты и времени
             // вызываем функцию для вывода себе сообщения, отправленного адресату
             let divUserMessages = document.querySelector('.div-user-messages');
-            outputMessage(divUserMessages, data);
+            outputMessage(divUserMessages, data, 'private');
             break;
         case 'deleteContact':
             // console.log(data);
@@ -107,7 +105,7 @@ WS.onmessage = (e) => {
             }
             break;
         case 'addedToGroup':
-            console.log(data);
+            // console.log(data);
             // выводим сообщение о добавлении в группу
             alertMessage(data.alert);
             // вызываем функцию добавления группы в левую панель у пользователя добавленного в группу 
@@ -133,7 +131,7 @@ WS.onmessage = (e) => {
             }
             break;
         case 'deleteGroupUser':
-            console.log(data);
+            // console.log(data);
             // выводим сообщение, что только создатель группы может удалять из нее пользователей
             alertMessage(data.alert);
             // удалеяем элемент удаленного пользователя
@@ -171,6 +169,7 @@ WS.onmessage = (e) => {
 // обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку (загружаем ранние сообщения из БД))
 document.body.addEventListener('click', async (e) => {
     // console.log(e);
+    // клик на пользователе или группе
     if (e.target.classList.contains('div-chat-user') || e.target.classList.contains('div-chat-group')) {
         // определяем тип чата
         e.target.classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group';
@@ -188,13 +187,13 @@ document.body.addEventListener('click', async (e) => {
             BUTTON_CREATE_GROUP.textContent = 'Создать группу';
             document.querySelector('#divcreategroup').remove();
         }
-        // при клике на пользователе проверяем есть ли открытый чат или, если это не чат 
-        // с пользователем на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
+        // при клике на пользователе/группе проверяем есть ли открытый чат или, если это не чат 
+        // с пользователем/группой на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
         if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
             // если у пользователя есть полученные и непрочитанные сообщения от других пользователей - убираем выделение цветом
             document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
-            // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
+            // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя/группы
             createDivUserMessages(e.target.innerText, chatType);
             // выводим ранние сообщения из БД
             // готовим данные для отправки на бэкенд
@@ -216,7 +215,7 @@ document.body.addEventListener('click', async (e) => {
                 };
             }
             // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения               
-            getUserMessages(data);
+            getUserMessages(data, chatType);
             // активируем поле ввода сообщения
             document.querySelector('.div-text-send-message').style.visibility = 'visible';
             TEXT_AREA_MESSAGE.focus();

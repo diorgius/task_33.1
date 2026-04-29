@@ -5,13 +5,12 @@
         <button class="btn-admin-action" onclick="location.href='/admin'">Страница администрирования</button>
         <?php phpinfo(); ?>
     <?php else: ?>
-        <!-- может его заменить на другой элемент -->
-        <input type="text" id="userid" hidden value="<?= $userId ?>">
+
         <aside class="sidebar-left" id="sidebarleft">
 
             <?php if (!empty($data['user'])): ?>
 
-                <div class="div-user-avatar">
+                <div class="div-user-avatar" id="<?=$data['user']['id']; ?>">
                     <?php isset($data['user']['avatar']) ? $image = URL . 'avatars/' . $data['user']['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
                     <img src="<?= $image; ?>" alt="avatar" width="90px">
                     <?php isset($data['user']['nickname']) && !empty($data['user']['nickname']) ?
