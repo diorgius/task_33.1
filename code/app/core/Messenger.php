@@ -200,7 +200,7 @@ class Messenger implements MessageComponentInterface
                     $client->send($message);
                 }
             }
-            // отправляем сообщение отправителю для вывода сообщения у него (message_id, datetime)
+            // отправляем сообщение отправителю для вывода сообщения у него (id, datetime)
             if ($client->resourceId === intval($data['from'])) {
                 $client->send($replay);
             }
@@ -246,6 +246,7 @@ class Messenger implements MessageComponentInterface
 
     protected function deleteMessage(ConnectionInterface $from, $data)
     {
+        var_dump($data);
         // делаем удаление сообщения из БД
         DB::dbconnect();
         // удаляем сообщение в БД
@@ -310,6 +311,7 @@ class Messenger implements MessageComponentInterface
             // записываем в БД
             $result = DB::create('messages', $values);
             // ищем среди активных пользователей тех кому адресована пересылка
+            // получаем id подключения
             $to = array_search($data['usersToForward'][$contact], $this->connectedUsers);
             // если есть подключеные пользователи из тех кому пересылается сообщение
             // то отправляем его им
@@ -361,6 +363,7 @@ class Messenger implements MessageComponentInterface
             $to = array_search($contact['user_id'], $this->connectedUsers);
             if ($to) {
                 // формируем сообщение пользователям группы
+                $data['command'] = 'groupMessage';
                 $data['message_id'] = $message_id;
                 $data['created'] = $created;
                 $message = json_encode($data);

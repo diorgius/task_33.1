@@ -558,21 +558,30 @@ window.oncontextmenu = (e) => {
         divMessageActive !== null ? divMessageActive.classList.remove('div-message-active') : null;
         e.target.classList.add('div-message-active');
 
+        // !!! переделываю чтобы можно было удалять и групповые сообщения
         // удаляем выбранное сообщение
         let deleteMessage = document.querySelector('#deletemessage');
         deleteMessage.onclick = () => {
-            // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
+            // определяем тип чата
+            document.querySelector('.div-chat-active').classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group';
+            console.log(chatType);
             let chatUser = document.querySelector('.div-chat-active').id
             to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
-            WS.send(JSON.stringify({
+            message = JSON.stringify({
                 command: 'deleteMessage',
-                id: e.target.id,
+                message_id: e.target.id,
                 to: to,
-                send_nickname: USER_NICKNAME
-            }))
+                accept_id: chatUser,
+                send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME,
+                chat_type: chatType
+            });
+            // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
+            console.log(message);
+            // WS.send(message);
             // выводим сообщение, что сообщение удалено
-            document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
-            e.target.classList.remove('div-message-active');
+            // document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
+            // e.target.classList.remove('div-message-active');
             DELETEMESSAGE.play();
         }
 

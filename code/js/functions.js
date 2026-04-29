@@ -265,11 +265,11 @@ function createDivUserMessages(divId, chatType) {
 
 // функция вывода сообщений
 function outputMessage(location, message, chatType) {
-    // console.log(message);
+    console.log(message);
     parseInt(message.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
-    divMessage.setAttribute('id', message.id);
+    divMessage.setAttribute('id', message.id); // вернуть везде при посылаемых сообщениях id заменить message_id
     location.appendChild(divMessage);
     let divSenderName = document.createElement('div')
     if (chatType === 'group') {
