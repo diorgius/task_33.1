@@ -55,7 +55,7 @@ WS.onmessage = (e) => {
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
             break;
         case 'privateMessage':
-            // console.log(data);
+            console.log(data);
             // вызываем функцию вывода сообщений
             showMessage(data, 'private');
             break;
@@ -107,7 +107,7 @@ WS.onmessage = (e) => {
             }
             break;
         case 'addedToGroup':
-            // console.log(data);
+            console.log(data);
             // выводим сообщение о добавлении в группу
             alertMessage(data.alert);
             // вызываем функцию добавления группы в левую панель у пользователя добавленного в группу 
@@ -168,19 +168,16 @@ WS.onmessage = (e) => {
     }
 }
 
-// обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку (загружаем ранние сообщения из базы))
+// обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку (загружаем ранние сообщения из БД))
 document.body.addEventListener('click', async (e) => {
+    // console.log(e);
     if (e.target.classList.contains('div-chat-user') || e.target.classList.contains('div-chat-group')) {
         // определяем тип чата
         e.target.classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group';
-        // console.log(e);
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
         let divChatUserActive = document.querySelector('.div-chat-active');
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-active') : null;
         e.target.classList.add('div-chat-active');
-        // let divChatUserActive = document.querySelector('.div-chat-user-active');
-        // divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-user-active') : null;
-        // e.target.classList.add('div-chat-user-active');
         // если открыто окно добавления пользователей убираем его
         if (document.querySelector('#divaddusers')) {
             document.querySelector('#divaddusers').remove();
@@ -191,60 +188,56 @@ document.body.addEventListener('click', async (e) => {
             BUTTON_CREATE_GROUP.textContent = 'Создать группу';
             document.querySelector('#divcreategroup').remove();
         }
-
-        // ??? НАДО ПОДУМАТЬ, а надо ли так или полюбому отправляем сообщение ???
-        // если пользователь не в чате, блокируем отправку сообщения
-        if (!e.target.classList.contains('div-chat-user-onchat') && !e.target.classList.contains('div-chat-group-onchat')) {
+        // при клике на пользователе проверяем есть ли открытый чат или, если это не чат 
+        // с пользователем на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
+        if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
-            // выводим сообщение, что пользователь не в чате
-            alertMessage(`Пользователь ${e.target.innerText} не в чате`);
-        } else {
-            // при клике на пользователе проверяем есть ли открытый чат или, если это не чат 
-            // с пользователем на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
-            if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
-                document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
-                // если у пользователя есть полученные и непрочитанные сообщения от других пользователей
-                document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
-                document.getElementById(e.target.id).classList.add('div-chat-user-onchat');
-                // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
-                createDivUserMessages(e.target.innerText, chatType);
-                // выводим ранние сообщения из базы
-                // готовим данные для отправки на бэкенд
-                if (chatType === 'private') {
-                    data = {
-                        action: 'getUserMessages',
-                        send_user_id: USER_ID,
-                        accept_user_id: e.target.id,
-                        chat_type: 'private'
-                    };
-                } else if (chatType === 'group') {
-                    data = {
-                        action: 'getUserMessages',
-                        send_user_id: USER_ID,
-                        accept_group_id: e.target.id,
-                        chat_type: 'group'
-                    };
-                }
-                // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения               
-                getUserMessages(data);
-                document.querySelector('.div-text-send-message').style.visibility = 'visible';
-                TEXT_AREA_MESSAGE.focus();
-                // если это тот же чат просто активируем поле ввода сообщения
-            } else {
-                document.querySelector('.div-text-send-message').style.visibility = 'visible';
-                TEXT_AREA_MESSAGE.focus();
+            // если у пользователя есть полученные и непрочитанные сообщения от других пользователей - убираем выделение цветом
+            document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
+            // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя
+            createDivUserMessages(e.target.innerText, chatType);
+            // выводим ранние сообщения из БД
+            // готовим данные для отправки на бэкенд
+            // если чат приватный
+            if (chatType === 'private') {
+                data = {
+                    action: 'getUserMessages',
+                    send_user_id: USER_ID,
+                    accept_user_id: e.target.id,
+                    chat_type: 'private'
+                };
+                // если чат групповой
+            } else if (chatType === 'group') {
+                data = {
+                    action: 'getUserMessages',
+                    send_user_id: USER_ID,
+                    accept_group_id: e.target.id,
+                    chat_type: 'group'
+                };
             }
+            // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения               
+            getUserMessages(data);
+            // активируем поле ввода сообщения
+            document.querySelector('.div-text-send-message').style.visibility = 'visible';
+            TEXT_AREA_MESSAGE.focus();
+            // если это тот же чат просто активируем поле ввода сообщения
+        } else {
+            document.querySelector('.div-text-send-message').style.visibility = 'visible';
+            TEXT_AREA_MESSAGE.focus();
+        }
 
-            // отправка сообщения
-            const MESSAGE_SEND = document.querySelector('#sendmessage');
-            MESSAGE_SEND.onclick = () => {
-                let textSendMessage = TEXT_AREA_MESSAGE.value;
-                // проверить не пусто ли сообщение
-                if (textSendMessage === '') {
-                    alertMessage('Введите текст сообщения');
-                } else {
-                    TEXT_AREA_MESSAGE.value = '';
+        // отправка сообщения
+        const MESSAGE_SEND = document.querySelector('#sendmessage');
+        MESSAGE_SEND.onclick = () => {
+            let textSendMessage = TEXT_AREA_MESSAGE.value;
+            // проверить не пусто ли сообщение
+            if (textSendMessage === '') {
+                alertMessage('Введите текст сообщения');
+            } else {
+                TEXT_AREA_MESSAGE.value = '';
+                // готовим сообщение
+                // если чат приватный
+                if (chatType === 'private') {
                     to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
                     message = JSON.stringify({
                         command: 'privateMessage',
@@ -255,16 +248,28 @@ document.body.addEventListener('click', async (e) => {
                         send_nickname: USER_NICKNAME,
                         text_message: textSendMessage
                     });
-                    WS.send(message);
-                    TEXT_AREA_MESSAGE.focus();
+                    // если чат групповой
+                } else if (chatType === 'group') {
+                    message = JSON.stringify({
+                        command: 'groupMessage',
+                        group_id: e.target.id,
+                        group_name: e.target.innerText,
+                        send_user_id: USER_ID,
+                        send_nickname: USER_NICKNAME,
+                        text_message: textSendMessage
+                    });
                 }
+                // посылаем сообщение
+                WS.send(message);
+                TEXT_AREA_MESSAGE.focus();
             }
         }
+        // }
     }
-    // если клик по крестику в хидере чата
+    // если клик по крестику в хидере чата - закрываем чат
     if (e.target.id === 'spanchatclose') {
         document.querySelector('.div-user-messages').remove();
-        document.querySelector('.div-chat-user-active').classList.remove('div-chat-user-active');
+        document.querySelector('.div-chat-active').classList.remove('div-chat-active');
         document.querySelector('.div-text-send-message').style.visibility = 'hidden';
     }
 });

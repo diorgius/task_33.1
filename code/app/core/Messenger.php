@@ -68,6 +68,10 @@ class Messenger implements MessageComponentInterface
                 // метод записи в БД и отправки пересылаемого сообщения
                 $this->forwardMessage($from, $data);
                 break;
+            case 'groupMessage';
+                // метод отправки групповых сообщений
+                $this->sendGroupMessage($from, $data);
+                break;
             case 'addedToGroup';
                 // метод добавления пользователей в группу
                 $this->addedToGroup($from, $data);
@@ -177,12 +181,12 @@ class Messenger implements MessageComponentInterface
             $data['from'] = (string) $from->resourceId;
             $data['created'] = $created;
         }
-        // формируем ответ отправителю сообщения, для вывода сообщения у него
+        // формируем ответ отправителю сообщения для вывода сообщения у него
         $replay = [
             'command' => 'replay',
             'message_id' => $result,
             'send_user_id' => $data['send_user_id'],
-            'accept_user_id' => $data['accept_user_d'],
+            'accept_user_id' => $data['accept_user_id'],
             'accept_nickname' => $data['accept_nickname'],
             'text_message' => $data['text_message'],
             'created' => $created
@@ -190,12 +194,13 @@ class Messenger implements MessageComponentInterface
         $message = json_encode($data);
         $replay = json_encode($replay);
         foreach ($this->clients as $client) {
-            if ($client->resourceId === intval($data['to'])) {
-                $client->send($message);
+            // если пользователь в чате, то отправляем ему сообщение, если нет записываем в БД, потом прочитает
+            if (isset($data['to'])) {
+                if ($client->resourceId === intval($data['to'])) {
+                    $client->send($message);
+                }
             }
-            // добавлена отправка сообщения самому себе после отправки сообщения адресату
-            // для того чтобы получить message_id из БД, дату и время сообщения
-            // для присвоения div id для идентификации сообщения и вывода даты и времени
+            // отправляем сообщение отправителю для вывода сообщения у него (message_id, datetime)
             if ($client->resourceId === intval($data['from'])) {
                 $client->send($replay);
             }
@@ -305,8 +310,6 @@ class Messenger implements MessageComponentInterface
             // записываем в БД
             $result = DB::create('messages', $values);
             // ищем среди активных пользователей тех кому адресована пересылка
-            // для отображения пересланного сообщения без перезагрузки страницы
-            // получаем id подключения
             $to = array_search($data['usersToForward'][$contact], $this->connectedUsers);
             // если есть подключеные пользователи из тех кому пересылается сообщение
             // то отправляем его им
@@ -323,6 +326,45 @@ class Messenger implements MessageComponentInterface
                 }
                 $message = json_encode($data);
                 // отправляем сообщение
+                foreach ($this->clients as $client) {
+                    if ($client->resourceId === intval($to)) {
+                        $client->send($message);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    protected function sendGroupMessage(ConnectionInterface $from, $data)
+    {
+        // отправляем групповое сообщение
+        DB::dbconnect();
+        // записываем сообщение в БД
+        // формируем метку времени
+        $date = new DateTime();
+        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        $created = $date->format('Y-m-d H:i:s');
+        // формируем массив для записи в БД
+        $values = [
+            'send_user_id' => $data['send_user_id'],
+            'accept_group_id' => $data['group_id'],
+            'text_message' => $data['text_message'],
+            'created' => $created
+        ];
+        // записываем в БД сообщение
+        $message_id = DB::create('messages', $values);
+        // получаем пользователей группы
+        $result = DB::getByPropAll('contacts', 'contact_group_id', $data['group_id']);
+        // ищем активных пользователей
+        foreach ($result as $contact) {
+            $to = array_search($contact['user_id'], $this->connectedUsers);
+            if ($to) {
+                // формируем сообщение пользователям группы
+                $data['message_id'] = $message_id;
+                $data['created'] = $created;
+                $message = json_encode($data);
+                // отправляем сообщение пользователям группы
                 foreach ($this->clients as $client) {
                     if ($client->resourceId === intval($to)) {
                         $client->send($message);
@@ -397,7 +439,7 @@ class Messenger implements MessageComponentInterface
                 // отправляем сообщение пользователю для создания элемента группы у него
                 $data['forUser'] = true;
                 unset($data['alert']);
-                // проверяем активенли ли пользователь
+                // проверяем активен ли пользователь
                 if (isset($data['to'])) {
                     $message = json_encode($data);
                     foreach ($this->clients as $client) {

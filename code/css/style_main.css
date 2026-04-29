@@ -63,9 +63,9 @@
     padding-left: .5rem;
 }
 
-.div-chat-user-active {
+/* .div-chat-user-active {
     border: .1rem solid #007bff;
-}
+} */
 
 .sidebar-right {
     display: flex;
@@ -550,9 +550,9 @@
     height: 45%;
 }
 
-.div-chat-group-onchat {
+/* .div-chat-group-onchat {
     background-color: #dcffdc;
-}
+} */
 
 .div-delete-group-user {
     display: flex;

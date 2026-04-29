@@ -1,6 +1,6 @@
 // функция вывода списка пользователей и добавления пользователя в список контактов
 function showUsersList(result, typeAction) {
-    console.log(result);
+    // console.log(result);
     let divAddUsers = document.createElement('div');
     DIV_LIST_USERS.appendChild(divAddUsers);
     divAddUsers.setAttribute('id', 'divaddusers');
@@ -225,7 +225,6 @@ function showMessage(data, chatType) {
         }
     }
 }
-
 
 // функция вывода информационных сообщений
 function alertMessage(msg) {
