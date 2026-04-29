@@ -264,16 +264,19 @@ function createDivUserMessages(divId, chatType) {
 }
 
 // функция вывода сообщений
+// !!! везде где пересылается сообщение надо использовать именно id, а не message_id,
+// потому, что из БД сообщения загружаются и ввыводятся по id
 function outputMessage(location, message, chatType) {
     console.log(message);
     parseInt(message.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
-    divMessage.setAttribute('id', message.id); // вернуть везде при посылаемых сообщениях id заменить message_id
+    divMessage.setAttribute('id', message.id);
     location.appendChild(divMessage);
     let divSenderName = document.createElement('div')
     if (chatType === 'group') {
         let senderNickname = document.getElementById(message.send_user_id.toString());
+        console.log(senderNickname.lastElementChild.lastChild);
         divSenderName.classList.add(`div-info-message`);
         divSenderName.textContent = senderNickname.lastElementChild.innerText;
     }

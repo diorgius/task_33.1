@@ -34,8 +34,7 @@ WS.onmessage = (e) => {
             // получаем список активных пользователей 
             connectedUsers = data.connectedUsers;
             // console.log(connectedUsers);
-            // проверяем есть ли у пользователя присоединившийся контакт и выделяем присоединившегося пользователя цветом 
-            // и даем возможность отправки сообщений этому пользователю
+            // проверяем есть ли у пользователя присоединившийся контакт и выделяем присоединившегося пользователя цветом, 
             Object.values(connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
                     document.getElementById(value) ? document.getElementById(value).classList.add('div-chat-user-onchat') : null;
@@ -59,10 +58,8 @@ WS.onmessage = (e) => {
             break;
         case 'replay':
             console.log(data);
-            // добавлена отправка сообщения самому себе после отправки сообщения адресату
-            // для того чтобы получить message_id из БД, дату и время сообщения
-            // для присвоения div id для однозначной идентификации и возможности удалять, редактировать, персылать
-            // сообщения и вывода даты и времени
+            // добавлена отправка сообщения отправителю после отправки сообщения адресату
+            // для того чтобы получить id, дату, время сообщения из БД и вывести это в сообщении
             // вызываем функцию для вывода себе сообщения, отправленного адресату
             let divUserMessages = document.querySelector('.div-user-messages');
             outputMessage(divUserMessages, data, 'private');
@@ -87,14 +84,14 @@ WS.onmessage = (e) => {
             // console.log(data);
             // удаляем сообщение
             // проверяем открыт ли чат с пользователем удалившим сообщение
-            if (document.getElementById(data.send_nickname)) {
+            if (document.getElementById(data.accept_name)) {
                 // удаляем текст удаленного сообщения
                 document.getElementById(data.id).textContent = 'Сообщение удалено';
                 DELETEMESSAGE.play();
             }
             break;
         case 'editMessage':
-            // console.log(data);
+            console.log(data);
             // изменяем сообщение
             // проверяем открыт ли чат с пользователем изменившим сообщение
             if (document.getElementById(data.send_nickname)) {

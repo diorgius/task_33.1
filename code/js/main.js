@@ -160,7 +160,9 @@ const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
 //
 // 34. удаление/редактирование сообщений в группе и в привате, ??? сейчас когда добавил
 // имя отправителя берется не тот текст для редактирования
-
+// 
+// 35. вылез косяк с именами отправителей в групповом чате, если у пользователя нет каких-то контактов,
+// то в чате вылазит ошибка при отображении имени
 
 
 
@@ -564,24 +566,26 @@ window.oncontextmenu = (e) => {
         deleteMessage.onclick = () => {
             // определяем тип чата
             document.querySelector('.div-chat-active').classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group';
-            console.log(chatType);
-            let chatUser = document.querySelector('.div-chat-active').id
-            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
+            // получаем id пользователя/группы
+            let chatId = document.querySelector('.div-chat-active').id;
+            // получаем название чата
+            chatType === 'private' ? chatName = USER_NICKNAME : chatName = document.querySelector('.div-user-messages').id;
+            to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatId);
             message = JSON.stringify({
                 command: 'deleteMessage',
-                message_id: e.target.id,
+                id: e.target.id,
                 to: to,
-                accept_id: chatUser,
+                accept_id: chatId,
+                accept_name: chatName,
                 send_user_id: USER_ID,
-                send_nickname: USER_NICKNAME,
                 chat_type: chatType
             });
-            // отравляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
+            // отправляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
             console.log(message);
-            // WS.send(message);
+            WS.send(message);
             // выводим сообщение, что сообщение удалено
             // document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
-            // e.target.classList.remove('div-message-active');
+            e.target.classList.remove('div-message-active');
             DELETEMESSAGE.play();
         }
 
