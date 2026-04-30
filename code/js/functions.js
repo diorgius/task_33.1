@@ -275,10 +275,14 @@ function outputMessage(location, message, chatType) {
     location.appendChild(divMessage);
     let divSenderName = document.createElement('div')
     if (chatType === 'group') {
-        let senderNickname = document.getElementById(message.send_user_id.toString());
-        console.log(senderNickname.lastElementChild.lastChild);
         divSenderName.classList.add(`div-info-message`);
-        divSenderName.textContent = senderNickname.lastElementChild.innerText;
+        if (!message.nickname) {
+            let senderNickname = message.send_nickname;
+            divSenderName.textContent = senderNickname;
+        } else {
+            let senderNickname = message.nickname !== null ? message.nickname : message.email;
+            divSenderName.textContent = senderNickname;
+        }
     }
     let divTextMessage = document.createElement('div');
     divTextMessage.classList.add(`div-text-message`);
@@ -297,7 +301,7 @@ function outputMessage(location, message, chatType) {
 
 // функция загрузки из БД и вывода сообщений пользователя
 async function getUserMessages(data, chatType) {
-    // console.log(data);
+    console.log(data);
     try {
         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
             method: 'POST',
@@ -307,7 +311,7 @@ async function getUserMessages(data, chatType) {
             body: JSON.stringify(data)
         });
         let result = await response.json();
-        // console.log('Успех: ', result);
+        console.log('Успех: ', result);
 
         // выводим ранние сообщения пользователя
         result.forEach((item) => {

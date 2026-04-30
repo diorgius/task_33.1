@@ -189,6 +189,19 @@ class DB
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function getGroupMessages(string $table, string $prop, string $value)
+    {
+        $stmt = self::$pdo->prepare(
+            "SELECT m.*, u.nickname, u.email  
+            FROM $table AS m LEFT JOIN users AS u ON 
+            u.id = m.send_user_id
+            WHERE $prop = :value"
+        );
+        $stmt->execute([
+            'value' => $value
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     public static function deleteContact(string $table, $prop, string $user_id, string $contact_id): void
     {
