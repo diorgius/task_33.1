@@ -267,7 +267,7 @@ function createDivUserMessages(divId, chatType) {
 // !!! везде где пересылается сообщение надо использовать именно id, а не message_id,
 // потому, что из БД сообщения загружаются и ввыводятся по id
 function outputMessage(location, message, chatType) {
-    console.log(message);
+    // console.log(message);
     parseInt(message.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
@@ -276,7 +276,7 @@ function outputMessage(location, message, chatType) {
     let divSenderName = document.createElement('div')
     if (chatType === 'group') {
         divSenderName.classList.add(`div-info-message`);
-        if (!message.nickname) {
+        if (message.send_nickname) {
             let senderNickname = message.send_nickname;
             divSenderName.textContent = senderNickname;
         } else {
@@ -301,7 +301,7 @@ function outputMessage(location, message, chatType) {
 
 // функция загрузки из БД и вывода сообщений пользователя
 async function getUserMessages(data, chatType) {
-    console.log(data);
+    // console.log(data);
     try {
         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
             method: 'POST',
@@ -311,7 +311,7 @@ async function getUserMessages(data, chatType) {
             body: JSON.stringify(data)
         });
         let result = await response.json();
-        console.log('Успех: ', result);
+        // console.log('Успех: ', result);
 
         // выводим ранние сообщения пользователя
         result.forEach((item) => {

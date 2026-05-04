@@ -581,13 +581,13 @@ window.oncontextmenu = (e) => {
                 accept_id: chatId,
                 accept_name: chatName,
                 send_user_id: USER_ID,
+                send_nickname: USER_NICKNAME,
                 chat_type: chatType
             });
             // отправляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
-            console.log(message);
             WS.send(message);
             // выводим сообщение, что сообщение удалено
-            // document.getElementById(`${e.target.id}`).textContent = 'Сообщение удалено'
+            document.getElementById(`${e.target.id}`).childNodes[1].textContent = 'Сообщение удалено'
             e.target.classList.remove('div-message-active');
             DELETEMESSAGE.play();
         }
@@ -597,7 +597,8 @@ window.oncontextmenu = (e) => {
         editMessage.onclick = () => {
             // console.log(e);
             // выводим текст сообщения в текстовую область для редактирования
-            TEXT_AREA_MESSAGE.value = e.target.firstChild.innerText;
+            TEXT_AREA_MESSAGE.value = e.target.childNodes[1].innerText;
+            // TEXT_AREA_MESSAGE.value = e.target.firstChild.innerText;
             // убираем выделение сообщения
             document.getElementById(e.target.id).classList.remove('div-message-active');
             // отправка измененного сообщения

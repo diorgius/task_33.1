@@ -250,10 +250,18 @@ class Messenger implements MessageComponentInterface
         // делаем удаление сообщения из БД
         DB::dbconnect();
         // удаляем сообщение в БД
-        DB::delete('messages', $data['id']);
+        // DB::delete('messages', $data['id']);
+        // заменяем текст сообщения в БД на "Сообщение удалено"
+        // формируем метку времени
+        // $date = new DateTime();
+        // $date->setTimezone(new DateTimeZone('Europe/Moscow'));
+        // $created = $date->format('Y-m-d H:i:s');
+        $text_message = "Сообщение удалено пользователем {$data['send_nickname']}";
+
         // если приватный чат  - отправляем сообщение активному пользователю для удаления сообщения в чате
         if ($data['chat_type'] === 'private') {
             if (isset($data['to'])) {
+                $data['text_message'] = $text_message;
                 $message = json_encode($data);
                 foreach ($this->clients as $client) {
                     if ($client->resourceId === intval($data['to'])) {
@@ -262,6 +270,18 @@ class Messenger implements MessageComponentInterface
                     }
                 }
             }
+
+            // формируем массив для записи в БД
+            $values = [
+                'id' => $data['id'],
+                'send_user_Id' => $data['send_user_id'],
+                'accept_user_id' => $data['accept_id'],
+                'text_message' => $text_message,
+                'status_message' => 'deleted'
+            ];
+            // записываем изменения в БД
+            DB::update('messages', $values);
+
             // если групповой чат - отправляем сообщение в группу активным пользователям для удаления сообщения в чате
         } else if ($data['chat_type'] === 'group') {
             // получаем из БД пользователей группы
@@ -270,9 +290,8 @@ class Messenger implements MessageComponentInterface
             foreach ($result as $contact) {
                 $to = array_search($contact['user_id'], $this->connectedUsers);
                 if ($to) {
-                    // формируем сообщение пользователям группы
+                    $data['text_message'] = $text_message;
                     $message = json_encode($data);
-                    // отправляем сообщение пользователям группы
                     foreach ($this->clients as $client) {
                         if ($client->resourceId === intval($to)) {
                             $client->send($message);
@@ -281,6 +300,17 @@ class Messenger implements MessageComponentInterface
                     }
                 }
             }
+            
+            // формируем массив для записи в БД
+            $values = [
+                'id' => $data['id'],
+                'send_user_Id' => $data['send_user_id'],
+                'accept_group_id' => $data['accept_id'],
+                'text_message' => $text_message,
+                'status_message' => 'deleted'
+            ];
+            // записываем изменения в БД
+            DB::update('messages', $values);
         }
     }
 

@@ -57,7 +57,7 @@ WS.onmessage = (e) => {
             showMessage(data, 'private');
             break;
         case 'replay':
-            console.log(data);
+            // console.log(data);
             // добавлена отправка сообщения отправителю после отправки сообщения адресату
             // для того чтобы получить id, дату, время сообщения из БД и вывести это в сообщении
             // вызываем функцию для вывода себе сообщения, отправленного адресату
@@ -86,7 +86,10 @@ WS.onmessage = (e) => {
             // проверяем открыт ли чат с пользователем удалившим сообщение
             if (document.getElementById(data.accept_name)) {
                 // удаляем текст удаленного сообщения
-                document.getElementById(data.id).textContent = 'Сообщение удалено';
+                let divUserMessage = document.getElementById(data.id);
+                data.chat_type === 'group' ? divUserMessage.childNodes[0].textContent = data.send_nickname : null;
+                divUserMessage.childNodes[1].textContent = data.text_message;
+                divUserMessage.lastChild.textContent = 'deleted';
                 DELETEMESSAGE.play();
             }
             break;
