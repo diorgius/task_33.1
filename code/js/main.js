@@ -643,7 +643,7 @@ window.oncontextmenu = (e) => {
             // console.log(event);
             // получаем список пользователей из своих контактов для пересылки сообщения
             data = {
-                action: 'getUserContacts',
+                action: 'getUserContactsAndGroups',
                 user_id: USER_ID
             }
             try {
@@ -663,9 +663,10 @@ window.oncontextmenu = (e) => {
                 ulChatUsers.classList.add('ul-users-menu');
                 ulChatUsers.setAttribute('id', 'ulforwardmessagemenu')
                 let divUserMessages = document.querySelector('.div-user-messages');
-                result.forEach((item) => {
+                result.contacts.forEach((item) => {
                     // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
                     if (divUserMessages.id !== item.nickname && divUserMessages.id !== item.email) {
+                        // showContactsAndGroups(item, 'private');
                         // выводим список пользователей
                         let liChatUser = document.createElement('li');
                         liChatUser.classList.add('li-users-menu');
@@ -675,12 +676,36 @@ window.oncontextmenu = (e) => {
                         let spanCheckbox = document.createElement('span');
                         spanCheckbox.classList.add('span-forward-user');
                         let checkbox = document.createElement('input');
-                        checkbox.setAttribute('type', 'checkbox');
                         checkbox.classList.add('checkbox-forward-user');
+                        checkbox.setAttribute('type', 'checkbox');
                         checkbox.setAttribute('id', item.contact_user_id);
+                        checkbox.setAttribute('name', 'private');
                         spanCheckbox.appendChild(checkbox);
                         liChatUser.append(spanUserNickname, spanCheckbox);
                         ulChatUsers.appendChild(liChatUser);
+                    }
+                });
+                result.groups.forEach((item) => {
+                    // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
+                    if (divUserMessages.id !== item.group_name) {
+                        // showContactsAndGroups(item, 'group');
+                        // выводим список групп
+                        
+                        let liChatUser = document.createElement('li');
+                        liChatUser.classList.add('li-users-menu');
+                        let spanUserNickname = document.createElement('span');
+                        spanUserNickname.classList.add('span-forward-user');
+                        spanUserNickname.textContent = item.group_name;
+                        let spanCheckbox = document.createElement('span');
+                        spanCheckbox.classList.add('span-forward-user');
+                        let checkbox = document.createElement('input');
+                        checkbox.classList.add('checkbox-forward-user');
+                        checkbox.setAttribute('type', 'checkbox');
+                        checkbox.setAttribute('id', item.contact_group_id);
+                        checkbox.setAttribute('name', 'group');
+                        spanCheckbox.appendChild(checkbox);
+                        liChatUser.append(spanUserNickname, spanCheckbox);
+                        ulChatUsers.appendChild(liChatUser);                        
                     }
                 });
                 // добавляем кнопку пересылки
@@ -707,21 +732,26 @@ window.oncontextmenu = (e) => {
                     let checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
                     // записываем их в массив
                     let usersToForward = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
+                    // определяем тип пересылки пользователь/группа
+                    // записываем в массив имя чекбокса, по которому определяем для кого рассылка
+                    let chatType = Array.from(checkedCheckboxes).map(checkbox => checkbox.name);
+                    console.log(chatType);
                     // console.log(userToForward);
                     // отправляем данные в сокет для записи в БД и отправки сообщения
                     // активным пользователям из числа тех кому пересылается сообщение
                     // определяем от кого пересылаем
                     e.target.classList.contains('div-accept-message') ?
-                        forwardUser = document.querySelector('.div-chat-user-active').lastElementChild.innerText :
+                        forwardUser = document.querySelector('.div-chat-active').lastElementChild.innerText :
                         forwardUser = USER_NICKNAME;
                     message = JSON.stringify({
                         command: 'forwardMessage',
                         id: e.target.id,
                         send_user_id: USER_ID,
-                        usersToForward: usersToForward,
+                        users_to_forward: usersToForward,
                         send_nickname: USER_NICKNAME,
-                        text_message: e.target.firstChild.innerText,
-                        status_message: `forwarded from ${forwardUser}`
+                        text_message: e.target.childNodes[1].innerText,
+                        status_message: `forwarded from ${forwardUser}`,
+                        chat_type: chatType
                     });
                     WS.send(message);
                     // убираем контекстное меню

@@ -113,7 +113,7 @@ WS.onmessage = (e) => {
             data.forUser ? addGroupIntoSidebar(data.group_id, data.group_name) : null;
             break;
         case 'groupMessage':
-            // console.log(data);
+            console.log(data);
             // вызываем функцию вывода сообщения
             showMessage(data, 'group');
             break;

@@ -54,7 +54,6 @@ class ActionsWithUsers
         if ($this->data['chat_type'] === 'private')  {
             $result = DB::getUserMessages('messages', $this->data['send_user_id'], $this->data['accept_user_id']);
         } elseif ($this->data['chat_type'] === 'group') {
-            // $result = DB::getByPropAll('messages', 'accept_group_id', $this->data['accept_group_id']);
             $result = DB::getGroupMessages('messages', 'accept_group_id', $this->data['accept_group_id']);
         }
         echo json_encode($result);
@@ -68,6 +67,18 @@ class ActionsWithUsers
         echo json_encode($result);
     }
 
+    public function getUserContactsAndGroups()
+    {
+        DB::dbconnect();
+        $contacts = DB::getContacts('contacts', 'user_id', 'contact_user_id', $this->data['user_id']);
+        $groups = DB::getGroups('contacts', 'user_id', $this->data['user_id']);
+        echo json_encode($result = [
+            'contacts' => $contacts,
+            'groups' => $groups
+        ]);
+    }
+
+    // метод получения контактов в группе
     public function getUserGroupContacts()
     {
         DB::dbconnect();
