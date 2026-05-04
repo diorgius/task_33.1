@@ -563,7 +563,6 @@ window.oncontextmenu = (e) => {
         divMessageActive !== null ? divMessageActive.classList.remove('div-message-active') : null;
         e.target.classList.add('div-message-active');
 
-        // !!! переделываю чтобы можно было удалять и групповые сообщения
         // удаляем выбранное сообщение
         let deleteMessage = document.querySelector('#deletemessage');
         deleteMessage.onclick = () => {
@@ -603,7 +602,12 @@ window.oncontextmenu = (e) => {
             document.getElementById(e.target.id).classList.remove('div-message-active');
             // отправка измененного сообщения
             const MESSAGE_SEND = document.querySelector('#sendmessage');
-            let chatUser = document.querySelector('.div-chat-active').id
+            // определяем тип чата
+            document.querySelector('.div-chat-active').classList.contains('div-chat-user') ? chatType = 'private' : chatType = 'group';
+            // получаем id пользователя/группы
+            let chatId = document.querySelector('.div-chat-active').id;
+            // получаем название чата
+            chatType === 'private' ? chatName = USER_NICKNAME : chatName = document.querySelector('.div-user-messages').id;
             MESSAGE_SEND.onclick = () => {
                 let textSendMessage = TEXT_AREA_MESSAGE.value;
                 // проверить не пусто ли сообщение
@@ -611,20 +615,22 @@ window.oncontextmenu = (e) => {
                     alertMessage('Введите текст сообщения');
                 } else {
                     TEXT_AREA_MESSAGE.value = '';
-                    to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatUser);
+                    to = Object.keys(connectedUsers).find(key => connectedUsers[key] === chatId);
                     message = JSON.stringify({
                         command: 'editMessage',
                         id: e.target.id,
                         to: to,
+                        accept_id: chatId,
+                        accept_name: chatName,
                         send_user_id: USER_ID,
-                        accept_user_id: chatUser,
                         send_nickname: USER_NICKNAME,
-                        text_message: textSendMessage
+                        text_message: textSendMessage,
+                        chat_type: chatType
                     });
                     WS.send(message);
                     TEXT_AREA_MESSAGE.focus();
                     // выводим текст измененного сообщение
-                    e.target.firstChild.textContent = textSendMessage;
+                    e.target.childNodes[1].textContent = textSendMessage;
                     // делаем пометку на сообщении
                     e.target.lastChild.textContent = 'edited';
                 }

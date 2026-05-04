@@ -85,7 +85,7 @@ WS.onmessage = (e) => {
             // удаляем сообщение
             // проверяем открыт ли чат с пользователем удалившим сообщение
             if (document.getElementById(data.accept_name)) {
-                // удаляем текст удаленного сообщения
+                // заменяем текст удаленного сообщения
                 let divUserMessage = document.getElementById(data.id);
                 data.chat_type === 'group' ? divUserMessage.childNodes[0].textContent = data.send_nickname : null;
                 divUserMessage.childNodes[1].textContent = data.text_message;
@@ -94,13 +94,14 @@ WS.onmessage = (e) => {
             }
             break;
         case 'editMessage':
-            console.log(data);
+            // console.log(data);
             // изменяем сообщение
             // проверяем открыт ли чат с пользователем изменившим сообщение
-            if (document.getElementById(data.send_nickname)) {
+            if (document.getElementById(data.accept_name)) {
                 let divUserMessage = document.getElementById(data.id);
                 // изменяем сообщение
-                divUserMessage.firstChild.textContent = data.text_message;
+                data.chat_type === 'group' ? divUserMessage.childNodes[0].textContent = data.send_nickname : null;
+                divUserMessage.childNodes[1].textContent = data.text_message;
                 divUserMessage.lastChild.textContent = 'edited';
             }
             break;

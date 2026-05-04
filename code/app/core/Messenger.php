@@ -246,18 +246,12 @@ class Messenger implements MessageComponentInterface
 
     protected function deleteMessage(ConnectionInterface $from, $data)
     {
-        var_dump($data);
-        // делаем удаление сообщения из БД
+        // изменяем сообщение в БД
         DB::dbconnect();
         // удаляем сообщение в БД
         // DB::delete('messages', $data['id']);
-        // заменяем текст сообщения в БД на "Сообщение удалено"
-        // формируем метку времени
-        // $date = new DateTime();
-        // $date->setTimezone(new DateTimeZone('Europe/Moscow'));
-        // $created = $date->format('Y-m-d H:i:s');
+        // заменяем текст сообщения в БД
         $text_message = "Сообщение удалено пользователем {$data['send_nickname']}";
-
         // если приватный чат  - отправляем сообщение активному пользователю для удаления сообщения в чате
         if ($data['chat_type'] === 'private') {
             if (isset($data['to'])) {
@@ -270,7 +264,6 @@ class Messenger implements MessageComponentInterface
                     }
                 }
             }
-
             // формируем массив для записи в БД
             $values = [
                 'id' => $data['id'],
@@ -281,7 +274,6 @@ class Messenger implements MessageComponentInterface
             ];
             // записываем изменения в БД
             DB::update('messages', $values);
-
             // если групповой чат - отправляем сообщение в группу активным пользователям для удаления сообщения в чате
         } else if ($data['chat_type'] === 'group') {
             // получаем из БД пользователей группы
@@ -300,7 +292,6 @@ class Messenger implements MessageComponentInterface
                     }
                 }
             }
-            
             // формируем массив для записи в БД
             $values = [
                 'id' => $data['id'],
@@ -323,23 +314,57 @@ class Messenger implements MessageComponentInterface
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
         // формируем массив для записи в БД
-        $values = [
-            'id' => $data['id'],
-            'send_user_Id' => $data['send_user_id'],
-            'accept_user_id' => $data['accept_user_id'],
-            'text_message' => htmlspecialchars($data['text_message']),
-            'status_message' => 'edited',
-            'created' => $created
-        ];
-        // записываем изменения в БД
-        DB::update('messages', $values);
-        // отправляем сообщение пользователю для изменения сообщения у него
-        $message = json_encode($data);
-        foreach ($this->clients as $client) {
-            if ($client->resourceId === intval($data['to'])) {
-                $client->send($message);
-                break;
+        $text_message = htmlspecialchars($data['text_message']);
+        // если приватный чат  - отправляем сообщение активному пользователю для изменения сообщения в чате
+        if ($data['chat_type'] === 'private') {
+            if (isset($data['to'])) {
+                $data['text_message'] = $text_message;
+                $message = json_encode($data);
+                foreach ($this->clients as $client) {
+                    if ($client->resourceId === intval($data['to'])) {
+                        $client->send($message);
+                        break;
+                    }
+                }
             }
+            // формируем массив для записи в БД
+            $values = [
+                'id' => $data['id'],
+                'send_user_Id' => $data['send_user_id'],
+                'accept_user_id' => $data['accept_id'],
+                'text_message' => $text_message,
+                'status_message' => 'edited'
+            ];
+            // записываем изменения в БД
+            DB::update('messages', $values);
+            // если групповой чат - отправляем сообщение в группу активным пользователям для удаления сообщения в чате
+        } else if ($data['chat_type'] === 'group') {
+            // получаем из БД пользователей группы
+            $result = DB::getByPropAll('contacts', 'contact_group_id', $data['accept_id']);
+            // ищем активных пользователей
+            foreach ($result as $contact) {
+                $to = array_search($contact['user_id'], $this->connectedUsers);
+                if ($to) {
+                    $data['text_message'] = $text_message;
+                    $message = json_encode($data);
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId === intval($to)) {
+                            $client->send($message);
+                            break;
+                        }
+                    }
+                }
+            }
+            // формируем массив для записи в БД
+            $values = [
+                'id' => $data['id'],
+                'send_user_Id' => $data['send_user_id'],
+                'accept_group_id' => $data['accept_id'],
+                'text_message' => $text_message,
+                'status_message' => 'edited'
+            ];
+            // записываем изменения в БД
+            DB::update('messages', $values);
         }
     }
 
