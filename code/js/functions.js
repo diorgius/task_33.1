@@ -339,22 +339,3 @@ function deleteGroupUser(contact_id, user_id, group_id, nickname, group_name) {
         send_nickname: USER_NICKNAME
     }))
 }
-
-// функция вывода пользователей и групп для пересылки сообщения
-function showContactsAndGroups(item, conatctType) {
-    // выводим список пользователей
-    let liChatUser = document.createElement('li');
-    liChatUser.classList.add('li-users-menu');
-    let spanUserNickname = document.createElement('span');
-    spanUserNickname.classList.add('span-forward-user');
-    item.nickname !== null ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
-    let spanCheckbox = document.createElement('span');
-    spanCheckbox.classList.add('span-forward-user');
-    let checkbox = document.createElement('input');
-    checkbox.setAttribute('type', 'checkbox');
-    checkbox.classList.add('checkbox-forward-user');
-    checkbox.setAttribute('id', item.contact_user_id);
-    spanCheckbox.appendChild(checkbox);
-    liChatUser.append(spanUserNickname, spanCheckbox);
-    ulChatUsers.appendChild(liChatUser);
-}

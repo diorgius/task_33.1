@@ -89,7 +89,7 @@ WS.onmessage = (e) => {
                 let divUserMessage = document.getElementById(data.id);
                 data.chat_type === 'group' ? divUserMessage.childNodes[0].textContent = data.send_nickname : null;
                 divUserMessage.childNodes[1].textContent = data.text_message;
-                divUserMessage.lastChild.textContent = 'deleted';
+                divUserMessage.lastChild.textContent = data.status_message;
                 DELETEMESSAGE.play();
             }
             break;
@@ -102,7 +102,7 @@ WS.onmessage = (e) => {
                 // изменяем сообщение
                 data.chat_type === 'group' ? divUserMessage.childNodes[0].textContent = data.send_nickname : null;
                 divUserMessage.childNodes[1].textContent = data.text_message;
-                divUserMessage.lastChild.textContent = 'edited';
+                divUserMessage.lastChild.textContent =  data.status_message;
             }
             break;
         case 'addedToGroup':
@@ -113,7 +113,7 @@ WS.onmessage = (e) => {
             data.forUser ? addGroupIntoSidebar(data.group_id, data.group_name) : null;
             break;
         case 'groupMessage':
-            console.log(data);
+            // console.log(data);
             // вызываем функцию вывода сообщения
             showMessage(data, 'group');
             break;

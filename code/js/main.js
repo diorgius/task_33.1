@@ -581,12 +581,15 @@ window.oncontextmenu = (e) => {
                 accept_name: chatName,
                 send_user_id: USER_ID,
                 send_nickname: USER_NICKNAME,
+                status_message: `the message was deleted by ${USER_NICKNAME}`,
                 chat_type: chatType
             });
             // отправляем сообщение пользователю, для удаления у него удаленного сообщения и удаления из БД
             WS.send(message);
             // выводим сообщение, что сообщение удалено
-            document.getElementById(`${e.target.id}`).childNodes[1].textContent = 'Сообщение удалено'
+            e.target.childNodes[1].textContent = 'Сообщение удалено';
+            // выводим пометку на сообщении
+            e.target.lastChild.textContent = `the message was deleted by ${USER_NICKNAME}`;
             e.target.classList.remove('div-message-active');
             DELETEMESSAGE.play();
         }
@@ -597,7 +600,6 @@ window.oncontextmenu = (e) => {
             // console.log(e);
             // выводим текст сообщения в текстовую область для редактирования
             TEXT_AREA_MESSAGE.value = e.target.childNodes[1].innerText;
-            // TEXT_AREA_MESSAGE.value = e.target.firstChild.innerText;
             // убираем выделение сообщения
             document.getElementById(e.target.id).classList.remove('div-message-active');
             // отправка измененного сообщения
@@ -625,6 +627,7 @@ window.oncontextmenu = (e) => {
                         send_user_id: USER_ID,
                         send_nickname: USER_NICKNAME,
                         text_message: textSendMessage,
+                        status_message: `the message was edited by ${USER_NICKNAME}`,
                         chat_type: chatType
                     });
                     WS.send(message);
@@ -632,7 +635,8 @@ window.oncontextmenu = (e) => {
                     // выводим текст измененного сообщение
                     e.target.childNodes[1].textContent = textSendMessage;
                     // делаем пометку на сообщении
-                    e.target.lastChild.textContent = 'edited';
+                    e.target.lastChild.textContent = `the message was edited by ${USER_NICKNAME}`;
+                    e.target.classList.remove('div-message-active');
                 }
             }
         }
@@ -672,7 +676,7 @@ window.oncontextmenu = (e) => {
                         liChatUser.classList.add('li-users-menu');
                         let spanUserNickname = document.createElement('span');
                         spanUserNickname.classList.add('span-forward-user');
-                        item.nickname !== null ? spanUserNickname.textContent = item.nickname : spanUserNickname.textContent = item.email;
+                        spanUserNickname.textContent = item.nickname !== null ?  item.nickname : item.email;
                         let spanCheckbox = document.createElement('span');
                         spanCheckbox.classList.add('span-forward-user');
                         let checkbox = document.createElement('input');
@@ -680,6 +684,7 @@ window.oncontextmenu = (e) => {
                         checkbox.setAttribute('type', 'checkbox');
                         checkbox.setAttribute('id', item.contact_user_id);
                         checkbox.setAttribute('name', 'private');
+                        checkbox.setAttribute('value', item.nickname !== null ?  item.nickname : item.email);
                         spanCheckbox.appendChild(checkbox);
                         liChatUser.append(spanUserNickname, spanCheckbox);
                         ulChatUsers.appendChild(liChatUser);
@@ -703,6 +708,7 @@ window.oncontextmenu = (e) => {
                         checkbox.setAttribute('type', 'checkbox');
                         checkbox.setAttribute('id', item.contact_group_id);
                         checkbox.setAttribute('name', 'group');
+                        checkbox.setAttribute('value', item.group_name);
                         spanCheckbox.appendChild(checkbox);
                         liChatUser.append(spanUserNickname, spanCheckbox);
                         ulChatUsers.appendChild(liChatUser);                        
@@ -735,7 +741,9 @@ window.oncontextmenu = (e) => {
                     // определяем тип пересылки пользователь/группа
                     // записываем в массив имя чекбокса, по которому определяем для кого рассылка
                     let chatType = Array.from(checkedCheckboxes).map(checkbox => checkbox.name);
-                    console.log(chatType);
+                    let acceptName = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
+                    // console.log(chatType);
+                    // console.log(acceptName);
                     // console.log(userToForward);
                     // отправляем данные в сокет для записи в БД и отправки сообщения
                     // активным пользователям из числа тех кому пересылается сообщение
@@ -750,8 +758,9 @@ window.oncontextmenu = (e) => {
                         users_to_forward: usersToForward,
                         send_nickname: USER_NICKNAME,
                         text_message: e.target.childNodes[1].innerText,
-                        status_message: `forwarded from ${forwardUser}`,
-                        chat_type: chatType
+                        status_message: `the message forwarded from ${forwardUser}`,
+                        chat_type: chatType,
+                        accept_name: acceptName
                     });
                     WS.send(message);
                     // убираем контекстное меню

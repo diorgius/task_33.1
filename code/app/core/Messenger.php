@@ -247,12 +247,11 @@ class Messenger implements MessageComponentInterface
 
     protected function deleteMessage(ConnectionInterface $from, $data)
     {
-        // изменяем сообщение в БД
         DB::dbconnect();
         // удаляем сообщение в БД
         // DB::delete('messages', $data['id']);
         // заменяем текст сообщения в БД
-        $text_message = "Сообщение удалено пользователем {$data['send_nickname']}";
+        $text_message = 'Сообщение удалено';
         // если приватный чат  - отправляем сообщение активному пользователю для удаления сообщения в чате
         if ($data['chat_type'] === 'private') {
             if (isset($data['to'])) {
@@ -271,7 +270,7 @@ class Messenger implements MessageComponentInterface
                 'send_user_Id' => $data['send_user_id'],
                 'accept_user_id' => $data['accept_id'],
                 'text_message' => $text_message,
-                'status_message' => 'deleted'
+                'status_message' => $data['status_message']
             ];
             // записываем изменения в БД
             DB::update('messages', $values);
@@ -299,7 +298,7 @@ class Messenger implements MessageComponentInterface
                 'send_user_Id' => $data['send_user_id'],
                 'accept_group_id' => $data['accept_id'],
                 'text_message' => $text_message,
-                'status_message' => 'deleted'
+                'status_message' => $data['status_message']
             ];
             // записываем изменения в БД
             DB::update('messages', $values);
@@ -308,13 +307,11 @@ class Messenger implements MessageComponentInterface
 
     protected function editMessage(ConnectionInterface $from, $data)
     {
-        // делаем изменение сообщения в БД
         DB::dbconnect();
         // формируем метку времени
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
-        // формируем массив для записи в БД
         $text_message = htmlspecialchars($data['text_message']);
         // если приватный чат  - отправляем сообщение активному пользователю для изменения сообщения в чате
         if ($data['chat_type'] === 'private') {
@@ -334,7 +331,8 @@ class Messenger implements MessageComponentInterface
                 'send_user_Id' => $data['send_user_id'],
                 'accept_user_id' => $data['accept_id'],
                 'text_message' => $text_message,
-                'status_message' => 'edited'
+                'status_message' => $data['status_message'],
+                'created' => $created
             ];
             // записываем изменения в БД
             DB::update('messages', $values);
@@ -362,7 +360,8 @@ class Messenger implements MessageComponentInterface
                 'send_user_Id' => $data['send_user_id'],
                 'accept_group_id' => $data['accept_id'],
                 'text_message' => $text_message,
-                'status_message' => 'edited'
+                'status_message' => $data['status_message'],
+                'created' => $created
             ];
             // записываем изменения в БД
             DB::update('messages', $values);
@@ -371,8 +370,6 @@ class Messenger implements MessageComponentInterface
 
     protected function forwardMessage(ConnectionInterface $from, $data)
     {
-        var_dump($data);
-        // var_dump($this->connectedUsers);
         // делаем запись в БД перенаправленного сообщения
         DB::dbconnect();
         // формируем метку времени
@@ -381,7 +378,6 @@ class Messenger implements MessageComponentInterface
         $created = $date->format('Y-m-d H:i:s');
         // в цикле проходим по адресатам пересылки
         foreach ($data['users_to_forward'] as $contact => $value) {
-            var_dump($data['chat_type'][$contact]);
             // проверяем кому пересылаем сообщение пользователь/группа
             // если пользователь
             if ($data['chat_type'][$contact] === 'private') {
@@ -395,20 +391,18 @@ class Messenger implements MessageComponentInterface
                 ];
                 // записываем в БД
                 $result = DB::create('messages', $values);
-                // ищем среди активных пользователей тех кому адресована пересылка получаем id подключения
+                // получаем из БД пользователей группы
                 $to = array_search($data['users_to_forward'][$contact], $this->connectedUsers);
                 // если есть подключеные пользователи из тех кому пересылается сообщение то отправляем его им
                 if ($to) {
-                    if ($result) {
-                        // дополняем сообщение для отправки пользователям
-                        // ставим ему статус privateMessage для того что бы на стороне
-                        // клиента отрабатывались те же условиями как и у обычного сообщения
-                        $data['command'] = 'privateMessage';
-                        $data['accept_user_id'] = $data['users_to_forward'][$contact];
-                        $data['id'] = $result;
-                        $data['from'] = (string) $from->resourceId;
-                        $data['created'] = $created;
-                    }
+                    // дополняем сообщение для отправки пользователям
+                    // ставим ему статус privateMessage для того что бы на стороне
+                    // клиента отрабатывались те же условия как и у обычного сообщения
+                    $data['command'] = 'privateMessage';
+                    $data['accept_user_id'] = $data['users_to_forward'][$contact];
+                    $data['id'] = $result;
+                    $data['from'] = (string) $from->resourceId;
+                    $data['created'] = $created;
                     $message = json_encode($data);
                     // отправляем сообщение
                     foreach ($this->clients as $client) {
@@ -430,22 +424,19 @@ class Messenger implements MessageComponentInterface
                 ];
                 // записываем в БД
                 $result = DB::create('messages', $values);
-                var_dump($data['users_to_forward'][$contact]);
-                // ищем среди активных пользователей тех кому адресована пересылка получаем id подключения
+                // получаем из БД пользователей группы
                 $contacts = DB::getByPropAll('contacts', 'contact_group_id', $data['users_to_forward'][$contact]);
-                var_dump($contacts);
-                // ищем активных пользователей
+                // ищем активных пользователей группы
                 foreach ($contacts as $cont) {
                     $to = array_search($cont['user_id'], $this->connectedUsers);
                     if ($to) {
                         // дополняем сообщение для отправки пользователям
                         // ставим ему статус groupMessage для того что бы на стороне
-                        // клиента отрабатывались те же условиями как и у обычного сообщения
-                        // !!! НАДО ИЗМЕНИТЬ ПОЛЯ СООБЩЕНИЯ КАК В ГРУППОВОМ !!!
+                        // клиента отрабатывались те же условия как и у обычного сообщения
                         $data['command'] = 'groupMessage';
-                        $data['accept_group_id'] = $data['users_to_forward'][$contact];
+                        $data['group_id'] = $data['users_to_forward'][$contact];
+                        $data['group_name'] = $data['accept_name'][$contact];
                         $data['id'] = $result;
-                        $data['from'] = (string) $from->resourceId;
                         $data['created'] = $created;
                         $message = json_encode($data);
                         foreach ($this->clients as $client) {
@@ -456,28 +447,6 @@ class Messenger implements MessageComponentInterface
                         }
                     }
                 }
-                // $to = array_search($data['users_to_forward'][$contact], $this->connectedUsers);
-                // // если есть подключеные пользователи из тех кому пересылается сообщение то отправляем его им
-                // if ($to) {
-                //     if ($result) {
-                //         // дополняем сообщение для отправки пользователям
-                //         // ставим ему статус groupMessage для того что бы на стороне
-                //         // клиента отрабатывались те же условиями как и у обычного сообщения
-                //         $data['command'] = 'groupMessage';
-                //         $data['accept_group_id'] = $data['users_to_forward'][$contact];
-                //         $data['id'] = $result;
-                //         $data['from'] = (string) $from->resourceId;
-                //         $data['created'] = $created;
-                //     }
-                //     $message = json_encode($data);
-                //     // отправляем сообщение
-                //     foreach ($this->clients as $client) {
-                //         if ($client->resourceId === intval($to)) {
-                //             $client->send($message);
-                //             break;
-                //         }
-                //     }
-                // }
             } 
         }
     }
