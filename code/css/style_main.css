@@ -268,14 +268,27 @@
     width: 80%;
 }
 
+.div-user-messages-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    padding: .3rem;
+    color: #007bff;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
 .div-accept-message {
     color: #666666;
     border: .1rem solid #cccccc;
-    /* border-radius: .2rem; */
     padding: .5rem;
     margin: 1rem 0 1rem 0;
     max-width: 70%;
-    /* width: max-content; */
     height: auto;
     display: flex;
     flex-direction: column;
@@ -283,17 +296,15 @@
     border-top-left-radius: .6rem;
     border-top-right-radius: .6rem;
     border-bottom-left-radius: .6rem;
-    overflow-y: auto;
+    cursor: pointer;
 }
 
 .div-send-message {
     color: #666666;
     border: .1rem solid #cccccc;
-    /* border-radius: .2rem; */
     padding: .3rem;
     margin: 1rem 0 1rem 0;
     max-width: 70%;
-    /* width: max-content; */
     height: auto;
     display: flex;
     flex-direction: column;
@@ -301,24 +312,32 @@
     border-top-left-radius: .6rem;
     border-top-right-radius: .6rem;
     border-bottom-right-radius: .6rem;
+    cursor: pointer;
 }
 
 .div-text-message {
     margin: .2rem;
-    text-align: left;
+    display: flex;
+    align-self: start;
+    max-width: fit-content;
 }
 
 .div-datetime-message {
     margin: .4rem .2rem .2rem .2rem;
-    text-align: right;
     font-size: .7rem;
+    display: flex;
+    align-self: end;
+    max-width: fit-content;
+    user-select: none;
 }
 
-.div-user-messages-header {
+.div-info-message {
+    font-size: .7rem;
+    color: #007bff;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: .5rem;
+    align-self: end;
+    max-width: fit-content;
+    user-select: none;
 }
 
 .span-chat-close {
@@ -333,7 +352,7 @@
 
 .span-chat-close::after {
     content: '\2717';
-    font-size: 1.5rem;
+    font-size: 1.8rem;
 }
 
 .span-chat-close:hover {
@@ -367,12 +386,6 @@
 .div-message-active {
     border: .1rem solid #007bff;
     /* border: .1rem solid #009900; */
-}
-
-.div-info-message {
-    text-align: right;
-    font-size: .7rem;
-    color: #007bff;
 }
 
 .ul-users-menu {

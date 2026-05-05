@@ -601,7 +601,7 @@ class Messenger implements MessageComponentInterface
         // проверяем создателя группы (создатель группы не может ее покинуть)
         $result = DB::getByProp('groupchats', 'id', $data['group_id']);
         if ($result['creator'] === intval($data['send_user_id'])) {
-            $data['alert'] = 'Создатель группы не может ее покинуть';
+            $data['alert'] = 'Администратор группы не может ее покинуть';
             $message = json_encode($data);
             foreach ($this->clients as $client) {
                 if ($client->resourceId === $from->resourceId) {

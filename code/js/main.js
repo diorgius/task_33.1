@@ -132,7 +132,7 @@ const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
 // !!! СДЕЛАНО 24. при добавлении пользователя в список своих контактов
 // добавлять себя в список его контактов с отправкой ему сообщения об этом
 //
-// 25. правый клик не только на див сообщения, а на всей области сообщения
+// !!! СДЕЛАНО 25. правый клик не только на див сообщения, а на всей области сообщения
 //
 // 26. !!! ??? НАДО ПОДУМАТЬ о статусе сообщения прочитано/непрочитано, чтобы пользователь
 // при входе мог видеть, что ему поступили новые сообщения и от кого, пока он был неактивен
@@ -158,14 +158,14 @@ const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
 //
 // !!! СДЕЛАНО 33. вывод nickname отправившего пользователя в сообщении
 //
-// 34. удаление/редактирование сообщений в группе и в привате, ??? сейчас когда добавил
+// !!! СДЕЛАНО 34. удаление/редактирование/пересылка сообщений в группе и в привате, !!! СДЕЛАНО ??? сейчас когда добавил
 // имя отправителя берется не тот текст для редактирования
 // 
 // !!! СДЕЛАНО 35. вылез косяк с именами отправителей в групповом чате, если у пользователя нет каких-то контактов,
 // то в чате вылазит ошибка при отображении имени
 //
-// 36. сделать не удаление сообщения из БД, обновление вместо текта сообщения - сообщение удалено,
-// и изменять дату и кем удалено
+// !!! СДЕЛАНО 36. сделать не удаление сообщения из БД, обновление вместо текта сообщения - сообщение удалено,
+//  и кем удалено
 
 
 
@@ -302,13 +302,15 @@ window.oncontextmenu = (e) => {
         e.preventDefault();
         // если открыто меню сообщения, убираем его
         document.querySelector('.ul-message-menu') ? document.querySelector('.ul-message-menu').style.display = 'none' : null;
+        // если открыто меню пользователей для пересылки, убираем его
         document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
         // если открыто меню группы, убираем его
         document.querySelector('.ul-chat-group-menu') ? document.querySelector('.ul-chat-group-menu').style.display = 'none' : null;
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-user-menu');
         CHAT_USER_MENU.style.display = 'block';
-        positionY = e.pageY - CHAT_USER_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
+        // меняем позицию, чтобы меню выводилось вверх от курсора
+        positionY = e.pageY - CHAT_USER_MENU.offsetHeight;
         CHAT_USER_MENU.style.top = positionY + 'px';
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
@@ -388,13 +390,15 @@ window.oncontextmenu = (e) => {
         e.preventDefault();
         // если открыто меню сообщения, убираем его
         document.querySelector('.ul-message-menu') ? document.querySelector('.ul-message-menu').style.display = 'none' : null;
+        // если открыто меню пользователей для пересылки, убираем его
         document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
         // если открыто меню пользователя, убираем его
         document.querySelector('.ul-chat-user-menu') ? document.querySelector('.ul-chat-user-menu').style.display = 'none' : null;
         // выводим меню
         const CHAT_USER_MENU = document.querySelector('.ul-chat-group-menu');
         CHAT_USER_MENU.style.display = 'block';
-        positionY = e.pageY - CHAT_USER_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
+        // меняем позицию, чтобы меню выводилось вверх от курсора
+        positionY = e.pageY - CHAT_USER_MENU.offsetHeight;
         CHAT_USER_MENU.style.top = positionY + 'px';
         CHAT_USER_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом пользователе
@@ -542,20 +546,20 @@ window.oncontextmenu = (e) => {
 
     // выводим контекстное меню на сообщении
     if (e.target.classList.contains('div-send-message')
-        || e.target.classList.contains('div-accept-message')
-        // || e.target.classList.contains('div-text-message')
-        // || e.target.classList.contains('div-datetime-message')
-    ) {
+        || e.target.classList.contains('div-accept-message')) {
         // console.log(e.target.id);
         e.preventDefault();
         // если открыто меню пользователя, убираем его
         document.querySelector('.ul-chat-user-menu') ? document.querySelector('.ul-chat-user-menu').style.display = 'none' : null;
+        // если открыто меню пользователей для пересылки, убираем его
+        document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
         // если открыто меню группы, убираем его
         document.querySelector('.ul-chat-group-menu') ? document.querySelector('.ul-chat-group-menu').style.display = 'none' : null;
         // выводим меню
         const CHAT_MESSAGE_MENU = document.querySelector('.ul-message-menu');
         CHAT_MESSAGE_MENU.style.display = 'block';
-        positionY = e.pageY - CHAT_MESSAGE_MENU.offsetHeight; // чтобы меню выводилось вверх от курсора
+        // меняем позицию, чтобы меню выводилось вверх от курсора
+        positionY = e.pageY - CHAT_MESSAGE_MENU.offsetHeight;
         CHAT_MESSAGE_MENU.style.top = positionY + 'px';
         CHAT_MESSAGE_MENU.style.left = `${e.pageX}px`;
         // добавляем/удаляем выделение элемента border на кликнутом сообщении
@@ -645,6 +649,8 @@ window.oncontextmenu = (e) => {
         let forwardMessage = document.querySelector('#forwardmessage');
         forwardMessage.onclick = async (event) => {
             // console.log(event);
+            // если открыто меню пользователей для пересылки, убираем его
+            document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
             // получаем список пользователей из своих контактов для пересылки сообщения
             data = {
                 action: 'getUserContactsAndGroups',
@@ -670,7 +676,6 @@ window.oncontextmenu = (e) => {
                 result.contacts.forEach((item) => {
                     // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
                     if (divUserMessages.id !== item.nickname && divUserMessages.id !== item.email) {
-                        // showContactsAndGroups(item, 'private');
                         // выводим список пользователей
                         let liChatUser = document.createElement('li');
                         liChatUser.classList.add('li-users-menu');
@@ -693,9 +698,7 @@ window.oncontextmenu = (e) => {
                 result.groups.forEach((item) => {
                     // если это контакт с которым открыт чат, не выводим этот контакт для пересылки
                     if (divUserMessages.id !== item.group_name) {
-                        // showContactsAndGroups(item, 'group');
                         // выводим список групп
-                        
                         let liChatUser = document.createElement('li');
                         liChatUser.classList.add('li-users-menu');
                         let spanUserNickname = document.createElement('span');
@@ -741,10 +744,9 @@ window.oncontextmenu = (e) => {
                     // определяем тип пересылки пользователь/группа
                     // записываем в массив имя чекбокса, по которому определяем для кого рассылка
                     let chatType = Array.from(checkedCheckboxes).map(checkbox => checkbox.name);
+                    // определяем имя группы
+                    // записываем в массив значение чекбокса, по которому определяем для какой группы рассылка
                     let acceptName = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-                    // console.log(chatType);
-                    // console.log(acceptName);
-                    // console.log(userToForward);
                     // отправляем данные в сокет для записи в БД и отправки сообщения
                     // активным пользователям из числа тех кому пересылается сообщение
                     // определяем от кого пересылаем
@@ -777,12 +779,6 @@ window.oncontextmenu = (e) => {
     window.addEventListener('click', (elem) => {
         document.querySelector('.ul-chat-user-menu').style.display = 'none';
         document.querySelector('.ul-chat-group-menu').style.display = 'none';
-        // !!! если здесь убирать выделение кликнутого пользователя рамкой,
-        // то потом при клике левой кнопкой пользователь не выделяется
-        // пока не понял почему
-        // e.target.classList.remove('div-chat-user-active');
-
-        // console.log(elem.target);
         // если клики не на пункте меню или пользователе или чекбоксе, то убираем меню
         if (!elem.target.classList.contains('li-users-menu')
             && !elem.target.classList.contains('span-forward-user')
@@ -797,9 +793,6 @@ window.oncontextmenu = (e) => {
         if (press.key === 'Escape') {
             document.querySelector('.ul-chat-user-menu').style.display = 'none';
             document.querySelector('.ul-chat-group-menu').style.display = 'none';
-            // аналогично
-            // e.target.classList.remove('div-chat-user-active');
-            // по клавише убираем все меню
             document.querySelector('.ul-message-menu').style.display = 'none';
             document.querySelector('#ulusersmenu') ? document.querySelector('#ulusersmenu').remove() : null;
         }

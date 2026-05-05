@@ -167,7 +167,7 @@ WS.onmessage = (e) => {
     }
 }
 
-// обрабатываем клик на пользователях чата (выделяем пользователя, открываем переписку (загружаем ранние сообщения из БД))
+// обрабатываем клик на пользователях чата (выделяем пользователя, загружаем ранние сообщения из БД)
 document.body.addEventListener('click', async (e) => {
     // console.log(e);
     // клик на пользователе или группе
@@ -189,7 +189,7 @@ document.body.addEventListener('click', async (e) => {
             document.querySelector('#divcreategroup').remove();
         }
         // при клике на пользователе/группе проверяем есть ли открытый чат или, если это не чат 
-        // с пользователем/группой на котором кликнули. то удаляем окрытый и создаем новый с кликнутым пользователем
+        // с пользователем/группой на котором кликнули, то удаляем окрытый и создаем новый с кликнутым пользователем
         if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
             // если у пользователя есть полученные и непрочитанные сообщения от других пользователей - убираем выделение цветом

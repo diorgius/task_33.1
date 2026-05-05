@@ -272,7 +272,7 @@ function outputMessage(location, message, chatType) {
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
     divMessage.setAttribute('id', message.id);
-    location.appendChild(divMessage);
+    // location.appendChild(divMessage);
     let divSenderName = document.createElement('div')
     if (chatType === 'group') {
         divSenderName.classList.add(`div-info-message`);
@@ -294,8 +294,8 @@ function outputMessage(location, message, chatType) {
     let divInfoMessage = document.createElement('div')
     divInfoMessage.classList.add(`div-info-message`);
     divInfoMessage.textContent = message.status_message;
-    location.appendChild(divMessage);
     divMessage.append(divSenderName, divTextMessage, divDateTimeMessage, divInfoMessage);
+    location.appendChild(divMessage);
     location.scrollIntoView({ block: 'end', behavior: 'smooth' });
 }
 
