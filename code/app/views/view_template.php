@@ -1,24 +1,25 @@
 <?php
-    $auth = $_SESSION['auth'] ?? null;
-    $userId = $_SESSION['userId'] ?? null;
-    $nickname = $_SESSION['nickname'] ?? null;
-    $role = $_SESSION['role'] ?? null;
+$auth = $_SESSION['auth'] ?? null;
+$userId = $_SESSION['userId'] ?? null;
+$nickname = $_SESSION['nickname'] ?? null;
+$role = $_SESSION['role'] ?? null;
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style_styleload.css">
     <script defer src="../../js/functions.js"></script>
     <script defer src="../../js/validation.js"></script>
-    <script defer src="../../js/main.js"></script>
     <title>Мессенджер</title>
 </head>
+
 <body>
     <header class="header">
-        <div class="div-header-title">   
+        <div class="div-header-title">
             <p>Мессенджер</p>
         </div>
         <div class="div-header-btn-login">
@@ -28,7 +29,7 @@
             <?php else: ?>
                 <button class="btn-login" onclick="location.href='/login/signout'">Выход</button>
                 <button class="btn-login" onclick="location.href='/profile'">Профиль</button>
-            <?php endif; ?>   
+            <?php endif; ?>
         </div>
     </header>
 
@@ -45,4 +46,5 @@
     </footer>
 
 </body>
+
 </html>

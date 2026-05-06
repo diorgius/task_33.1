@@ -2,24 +2,22 @@
 
 namespace App\core;
 use App\data\DB;
-use DateTime;
-use DateTimeZone;
 
 // если принудительно не подключать эти файлы, то при отправке запроса в этот
 // файл из js возникает ошибка (не находит класс DB и метод), возможно, 
-// что в таком случае не срабатыват autoload, как подругому решить эту проблемму пока не знаю
+// что в таком случае не срабатыват autoload, как подругому решить это не знаю
 require_once 'config.php';
 require_once DATA . 'DB.php';
 
 class ActionsWithUsers
 {
-
     protected $data;
-    
+
     public function __construct()
     {
         if (isset($_POST)) {
             $this->data = json_decode(file_get_contents("php://input"), true);
+            // получаем наименование метода
             $method = $this->data['action'];
             $this->$method();
         }
@@ -47,11 +45,11 @@ class ActionsWithUsers
         echo json_encode($result);
     }
 
-    // метод получения всех сообщений с контактом
+    // метод получения всех сообщений контакта
     public function getUserMessages()
     {
         DB::dbconnect();
-        if ($this->data['chat_type'] === 'private')  {
+        if ($this->data['chat_type'] === 'private') {
             $result = DB::getUserMessages('messages', $this->data['send_user_id'], $this->data['accept_user_id']);
         } elseif ($this->data['chat_type'] === 'group') {
             $result = DB::getGroupMessages('messages', 'accept_group_id', $this->data['accept_group_id']);
@@ -67,6 +65,7 @@ class ActionsWithUsers
         echo json_encode($result);
     }
 
+    // метод получения контактов и групп пользователя
     public function getUserContactsAndGroups()
     {
         DB::dbconnect();
@@ -106,4 +105,5 @@ class ActionsWithUsers
     }
 }
 
+// создаем экземпляр класса
 new ActionsWithUsers();

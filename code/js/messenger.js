@@ -4,7 +4,6 @@ let connectedUsers = '';
 
 // открываем соединение websocket
 const WS = new WebSocket("WS://localhost:8080/");
-// console.log(WS);
 
 WS.onopen = () => {
     console.log('Connected');
@@ -33,7 +32,6 @@ WS.onmessage = (e) => {
             data.userId !== USER_ID ? alertMessage(`Пользователь ${data.nickname} в чате`) : null;
             // получаем список активных пользователей 
             connectedUsers = data.connectedUsers;
-            // console.log(connectedUsers);
             // проверяем есть ли у пользователя присоединившийся контакт и выделяем присоединившегося пользователя цветом, 
             Object.values(connectedUsers).forEach(value => {
                 if (value !== USER_ID) {
@@ -42,8 +40,7 @@ WS.onmessage = (e) => {
             })
             break;
         case 'addedToContacts':
-            // console.log(data);
-            // после получения сообщения о внешнем добавлении в чей-то контакт, вызываем функцию
+            // при получении сообщения о добавлении в чей-то контакт, вызываем функцию
             // добавления контакта этого пользователя в контакты добавленного пользователя
             addContactIntoSidebar(USER_ID, data.send_user_id, data.email, data.nickname, data.avatar);
             // отмечаем, что пользователь в чате
@@ -52,12 +49,10 @@ WS.onmessage = (e) => {
             document.getElementById(data.send_user_id).classList.add('div-chat-user-onmessage');
             break;
         case 'privateMessage':
-            // console.log(data);
             // вызываем функцию вывода сообщений
             showMessage(data, 'private');
             break;
         case 'replay':
-            // console.log(data);
             // добавлена отправка сообщения отправителю после отправки сообщения адресату
             // для того чтобы получить id, дату, время сообщения из БД и вывести это в сообщении
             // вызываем функцию для вывода себе сообщения, отправленного адресату
@@ -65,7 +60,6 @@ WS.onmessage = (e) => {
             outputMessage(divUserMessages, data, 'private');
             break;
         case 'deleteContact':
-            // console.log(data);
             // удаляем чат если он открыт
             document.getElementById(data.send_nickname) ? document.getElementById(data.send_nickname).remove() : null;
             // удаляем пользователя из списка контактов
@@ -74,15 +68,12 @@ WS.onmessage = (e) => {
             alertMessage(`Пользователь ${data.send_nickname} удалил Ваш контакт`);
             break;
         case 'deleteAllMessages':
-            // console.log(data);
             // удаляем чат если он открыт
             document.getElementById(data.send_nickname) ? document.getElementById(data.send_nickname).remove() : null;
             // выводим сообщение об удалении всей переписки
             alertMessage(`Пользователь ${data.send_nickname} удалил все сообщения`);
             break;
         case 'deleteMessage':
-            // console.log(data);
-            // удаляем сообщение
             // проверяем открыт ли чат с пользователем удалившим сообщение
             if (document.getElementById(data.accept_name)) {
                 // заменяем текст удаленного сообщения
@@ -94,31 +85,26 @@ WS.onmessage = (e) => {
             }
             break;
         case 'editMessage':
-            // console.log(data);
-            // изменяем сообщение
             // проверяем открыт ли чат с пользователем изменившим сообщение
             if (document.getElementById(data.accept_name)) {
                 let divUserMessage = document.getElementById(data.id);
-                // изменяем сообщение
+                // изменяем текст сообщение
                 data.chat_type === 'group' ? divUserMessage.childNodes[0].textContent = data.send_nickname : null;
                 divUserMessage.childNodes[1].textContent = data.text_message;
-                divUserMessage.lastChild.textContent =  data.status_message;
+                divUserMessage.lastChild.textContent = data.status_message;
             }
             break;
         case 'addedToGroup':
-            // console.log(data);
             // выводим сообщение о добавлении в группу
             alertMessage(data.alert);
             // вызываем функцию добавления группы в левую панель у пользователя добавленного в группу 
             data.forUser ? addGroupIntoSidebar(data.group_id, data.group_name) : null;
             break;
         case 'groupMessage':
-            // console.log(data);
             // вызываем функцию вывода сообщения
             showMessage(data, 'group');
             break;
         case 'leaveGroup':
-            // console.log(data);
             // выводим сообщение, что создатель группы не может ее покинуть
             alertMessage(data.alert);
             if (data.leaveGroup) {
@@ -132,7 +118,6 @@ WS.onmessage = (e) => {
             }
             break;
         case 'deleteGroupUser':
-            // console.log(data);
             // выводим сообщение, что только создатель группы может удалять из нее пользователей
             alertMessage(data.alert);
             // удалеяем элемент удаленного пользователя
@@ -148,7 +133,6 @@ WS.onmessage = (e) => {
             }
             break;
         case 'deleteGroup':
-            // console.log(data);
             // выводим сообщение об удалении
             alertMessage(data.alert);
             // удаляем группу из левой панели
@@ -157,7 +141,6 @@ WS.onmessage = (e) => {
         case 'disconnect':
             // если пользователь отключается, то удаляем его из списка активных пользователей
             delete connectedUsers[data.connectId];
-            // console.log(connectedUsers);
             // проверяем есть ли у пользователя такой контакт и убираем отметку об активности пользователя
             if (document.getElementById(data.userId)) {
                 let inactiveChatUser = document.getElementById(data.userId);
@@ -169,7 +152,6 @@ WS.onmessage = (e) => {
 
 // обрабатываем клик на пользователях чата (выделяем пользователя, загружаем ранние сообщения из БД)
 document.body.addEventListener('click', async (e) => {
-    // console.log(e);
     // клик на пользователе или группе
     if (e.target.classList.contains('div-chat-user') || e.target.classList.contains('div-chat-group')) {
         // определяем тип чата
@@ -178,20 +160,11 @@ document.body.addEventListener('click', async (e) => {
         let divChatUserActive = document.querySelector('.div-chat-active');
         divChatUserActive !== null ? divChatUserActive.classList.remove('div-chat-active') : null;
         e.target.classList.add('div-chat-active');
-        // если открыто окно добавления пользователей убираем его
-        if (document.querySelector('#divaddusers')) {
-            document.querySelector('#divaddusers').remove();
-            BUTTON_ADD_USER.textContent = 'Добавить пользователей';
-        }
-        // если открыто создание группы убираем его
-        if (document.querySelector('#divcreategroup')) {
-            BUTTON_CREATE_GROUP.textContent = 'Создать группу';
-            document.querySelector('#divcreategroup').remove();
-        }
+        // вызываем функцию закрытия окон
+        closeWindow();
         // при клике на пользователе/группе проверяем есть ли открытый чат или, если это не чат 
-        // с пользователем/группой на котором кликнули, то удаляем окрытый и создаем новый с кликнутым пользователем
+        // с пользователем/группой на котором кликнули создаем новый с кликнутым пользователем
         if (!document.querySelector('.div-user-messages') || document.querySelector('.div-user-messages').id !== e.target.innerText) {
-            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null;
             // если у пользователя есть полученные и непрочитанные сообщения от других пользователей - убираем выделение цветом
             document.getElementById(e.target.id).classList.remove('div-chat-user-onmessage');
             // создаем див в котором будут отображаться принятые/отправленные сообщения этого пользователя/группы

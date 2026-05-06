@@ -10,7 +10,7 @@
 
             <?php if (!empty($data['user'])): ?>
 
-                <div class="div-user-avatar" id="<?=$data['user']['id']; ?>">
+                <div class="div-user-avatar" id="<?= $data['user']['id']; ?>">
                     <?php isset($data['user']['avatar']) ? $image = URL . 'avatars/' . $data['user']['avatar'] : $image = URL . 'img/avatar_0.jpg'; ?>
                     <img src="<?= $image; ?>" alt="avatar" width="90px">
                     <?php isset($data['user']['nickname']) && !empty($data['user']['nickname']) ?
@@ -111,6 +111,7 @@
             </div>
 
         </section>
+        <script defer src="../../js/main.js"></script>
         <script defer src="../../js/messenger.js"></script>
     <?php endif; ?>
 <?php endif; ?>

@@ -78,7 +78,7 @@ class Messenger implements MessageComponentInterface
                 $this->addedToGroup($from, $data);
                 break;
             case 'leaveGroup';
-                // метод выхода выхода из группу
+                // метод выхода выхода из группы
                 $this->leaveGroup($from, $data);
                 break;
             case 'deleteGroupUser';
@@ -135,9 +135,7 @@ class Messenger implements MessageComponentInterface
         ];
         // записываем в БД сообщение
         DB::create('messages', $values);
-
-        // если пользователь активен, то отправляем ему сообщение для добавления
-        // добавившего пользователя в его контакты
+        // если пользователь активен, то отправляем ему сообщение для добавления добавившего его пользователя в контакты
         if (isset($data['to'])) {
             // делаем запрос в БД для получения сведений о добавившем пользователе
             $user = DB::getByProp('users', 'id', $data['send_user_id']);
@@ -176,12 +174,9 @@ class Messenger implements MessageComponentInterface
         // записываем в БД
         $result = DB::create('messages', $values);
         // дополняем сообщение для отправки пользователю
-        if ($result) {
-
-            $data['id'] = $result;
-            $data['from'] = (string) $from->resourceId;
-            $data['created'] = $created;
-        }
+        $data['id'] = $result;
+        $data['from'] = (string) $from->resourceId;
+        $data['created'] = $created;
         // формируем ответ отправителю сообщения для вывода сообщения у него
         $replay = [
             'command' => 'replay',
@@ -229,7 +224,6 @@ class Messenger implements MessageComponentInterface
 
     protected function deleteAllMessages(ConnectionInterface $from, $data)
     {
-        var_dump($data);
         DB::dbconnect();
         // удаляем сообщения в БД
         DB::deleteUserMessages('messages', $data['user_id'], $data['send_user_id']);
@@ -312,6 +306,7 @@ class Messenger implements MessageComponentInterface
         $date = new DateTime();
         $date->setTimezone(new DateTimeZone('Europe/Moscow'));
         $created = $date->format('Y-m-d H:i:s');
+        // получаем измененное сообщение
         $text_message = htmlspecialchars($data['text_message']);
         // если приватный чат  - отправляем сообщение активному пользователю для изменения сообщения в чате
         if ($data['chat_type'] === 'private') {
@@ -378,8 +373,8 @@ class Messenger implements MessageComponentInterface
         $created = $date->format('Y-m-d H:i:s');
         // в цикле проходим по адресатам пересылки
         foreach ($data['users_to_forward'] as $contact => $value) {
-            // проверяем кому пересылаем сообщение пользователь/группа
-            // если пользователь
+            // проверяем кому пересылаем сообщение приват/группа
+            // если чат приватный
             if ($data['chat_type'][$contact] === 'private') {
                 // формируем массив для записи в БД
                 $values = [
@@ -396,8 +391,7 @@ class Messenger implements MessageComponentInterface
                 // если есть подключеные пользователи из тех кому пересылается сообщение то отправляем его им
                 if ($to) {
                     // дополняем сообщение для отправки пользователям
-                    // ставим ему статус privateMessage для того что бы на стороне
-                    // клиента отрабатывались те же условия как и у обычного сообщения
+                    // ставим ему статус privateMessage для того оно отображалось как обычное
                     $data['command'] = 'privateMessage';
                     $data['accept_user_id'] = $data['users_to_forward'][$contact];
                     $data['id'] = $result;
@@ -412,7 +406,7 @@ class Messenger implements MessageComponentInterface
                         }
                     }
                 }
-                // если группа
+                // если чат групповой
             } else if ($data['chat_type'][$contact] === 'group') {
                 // формируем массив для записи в БД
                 $values = [
@@ -431,8 +425,7 @@ class Messenger implements MessageComponentInterface
                     $to = array_search($cont['user_id'], $this->connectedUsers);
                     if ($to) {
                         // дополняем сообщение для отправки пользователям
-                        // ставим ему статус groupMessage для того что бы на стороне
-                        // клиента отрабатывались те же условия как и у обычного сообщения
+                        // ставим ему статус groupMessage для того что бы оно отображалось как обычное
                         $data['command'] = 'groupMessage';
                         $data['group_id'] = $data['users_to_forward'][$contact];
                         $data['group_name'] = $data['accept_name'][$contact];
@@ -447,7 +440,7 @@ class Messenger implements MessageComponentInterface
                         }
                     }
                 }
-            } 
+            }
         }
     }
 
@@ -574,8 +567,7 @@ class Messenger implements MessageComponentInterface
                     $to = array_search($contact['user_id'], $this->connectedUsers);
                     if ($to) {
                         // дополняем сообщение для отправки пользователям
-                        // ставим ему статус groupMessage для того что бы на стороне
-                        // клиента отрабатывались те же условиями как и у обычного сообщения
+                        // ставим ему статус groupMessage для того что бы оно отображалось как обычное
                         $data['command'] = 'groupMessage';
                         $data['id'] = $message_id;
                         $data['text_message'] = $text_message;
@@ -646,8 +638,7 @@ class Messenger implements MessageComponentInterface
                 $to = array_search($contact['user_id'], $this->connectedUsers);
                 if ($to) {
                     // дополняем сообщение для отправки пользователям
-                    // ставим ему статус groupMessage для того что бы на стороне
-                    // клиента отрабатывались те же условиями как и у обычного сообщения
+                    // ставим ему статус groupMessage для того что бы оно отображалось как обычное
                     unset($data['alert']);
                     unset($data['leaveGroup']);
                     $data['command'] = 'groupMessage';
@@ -729,8 +720,7 @@ class Messenger implements MessageComponentInterface
                         continue;
                     }
                     // дополняем сообщение для отправки пользователям
-                    // ставим ему статус groupMessage для того что бы на стороне
-                    // клиента отрабатывались те же условиями как и у обычного сообщения
+                    // ставим ему статус groupMessage для того что бы оно отображалось как обычное
                     unset($data['alert']);
                     unset($data['forAdmin']);
                     unset($data['deleteGroupUser']);
@@ -795,22 +785,20 @@ class Messenger implements MessageComponentInterface
 
     public function onClose(ConnectionInterface $conn)
     {
-
         $userId = $this->clients->userId[$conn->resourceId];
-
+        // создаем сообщение о выходе
         $data = [
             'command' => 'disconnect',
             'userId' => $userId,
             'connectId' => (string) $conn->resourceId,
         ];
+        // отправляем сообщение о выходе
         $message = json_encode($data);
-
         foreach ($this->clients as $client) {
             if ($conn->resourceId !== $client->resourceId) {
                 $client->send($message);
             }
         }
-
         unset($this->clients->userId[$conn->resourceId]);
         unset($this->connectedUsers[$client->resourceId]);
         $this->clients->offsetUnset($conn);

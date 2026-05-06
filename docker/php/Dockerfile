@@ -1,6 +1,6 @@
 FROM php:8.4-fpm
  
-# ставим необходимые для нормальной работы модули
+# ставим необходимые модули
 RUN apt-get update && apt-get install -y \
         curl \
         wget \
@@ -25,3 +25,6 @@ WORKDIR /data/messenger.local
 VOLUME /data
  
 CMD ["php-fpm"]
+
+# если так, то сервер стартует, но nginx не загружается
+#CMD ["php", "app/core/wsserver.php"]

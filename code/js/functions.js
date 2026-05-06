@@ -1,13 +1,12 @@
 // функция вывода списка пользователей и добавления пользователя в список контактов
 function showUsersList(result, typeAction) {
-    // console.log(result);
     let divAddUsers = document.createElement('div');
     DIV_LIST_USERS.appendChild(divAddUsers);
     divAddUsers.setAttribute('id', 'divaddusers');
     result.forEach((item) => {
-        // проверяем пользователя, что бы в списках он не выводился
-        if ((typeAction === 'addUserToPrivate' && `${item.id}` !== USER_ID) || 
-            (typeAction === 'addUserToGroup' && `${item.contact_user_id}` !== null) || 
+        // проверяем пользователя который добавляет, что бы в списках он не выводился
+        if ((typeAction === 'addUserToPrivate' && `${item.id}` !== USER_ID) ||
+            (typeAction === 'addUserToGroup' && `${item.contact_user_id}` !== null) ||
             (typeAction === 'deleteGroupUser' && `${item.user_id}` !== USER_ID)) {
             let divUser = document.createElement('div');
             divUser.classList.add('div-user');
@@ -65,7 +64,7 @@ function addUserToPrivate(user_id, contact_user_id, email, nickname, avatar) {
     if (!document.getElementById(contact_user_id)) {
         // вызываем функцию добавления контакта в левую панель
         addContactIntoSidebar(user_id, contact_user_id, email, nickname, avatar)
-        // если пользователь активен, то потом будем отправлять ему сообщение о добавлении его в контаты
+        // если пользователь активен, то отправляем ему сообщение о добавлении его в контаты
         to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
         message = JSON.stringify({
             command: 'addedToContacts',
@@ -90,7 +89,7 @@ function addUserToPrivate(user_id, contact_user_id, email, nickname, avatar) {
 
 // функция добавления пользователя в группу
 function addUserToGroup(group_id, contact_user_id, nickname, group_name) {
-    // если пользователь активен, то потом будем отправлять ему сообщение о добавлении его в группу
+    // если пользователь активен, то отправляем ему сообщение о добавлении его в группу
     to = Object.keys(connectedUsers).find(key => connectedUsers[key] === contact_user_id.toString());
     message = JSON.stringify({
         command: 'addedToGroup',
@@ -163,7 +162,6 @@ function addGroupIntoSidebar(group_id, group_name) {
 
 // функция проверки и вывода сообщений
 function showMessage(data, chatType) {
-    // console.log(data);
     if (chatType === 'private') {
         contactId = data.send_user_id;
         contactName = data.send_nickname;
@@ -203,6 +201,7 @@ function showMessage(data, chatType) {
                 createDivUserMessages(contactName, chatType);
                 // выводим ранние сообщения из БД
                 // готовим данные для отправки на бэкенд
+                // если чат приватный
                 if (chatType === 'private') {
                     data = {
                         action: 'getUserMessages',
@@ -210,6 +209,7 @@ function showMessage(data, chatType) {
                         accept_user_id: contactId,
                         chat_type: 'private'
                     };
+                    // если чат групповой
                 } else if (chatType === 'group') {
                     data = {
                         action: 'getUserMessages',
@@ -264,21 +264,20 @@ function createDivUserMessages(divId, chatType) {
 }
 
 // функция вывода сообщений
-// !!! везде где пересылается сообщение надо использовать именно id, а не message_id,
-// потому, что из БД сообщения загружаются и ввыводятся по id
 function outputMessage(location, message, chatType) {
-    // console.log(message);
     parseInt(message.send_user_id) === parseInt(USER_ID) ? type = 'send' : type = 'accept';
     let divMessage = document.createElement('div');
     divMessage.classList.add(`div-${type}-message`);
     divMessage.setAttribute('id', message.id);
-    // location.appendChild(divMessage);
-    let divSenderName = document.createElement('div')
+    let divSenderName = document.createElement('div');
+    // если чат групповой, выводим имя отправителя
     if (chatType === 'group') {
         divSenderName.classList.add(`div-info-message`);
+        // если сообщение онлайн
         if (message.send_nickname) {
             let senderNickname = message.send_nickname;
             divSenderName.textContent = senderNickname;
+            // если сообщение из БД
         } else {
             let senderNickname = message.nickname !== null ? message.nickname : message.email;
             divSenderName.textContent = senderNickname;
@@ -301,7 +300,7 @@ function outputMessage(location, message, chatType) {
 
 // функция загрузки из БД и вывода сообщений пользователя
 async function getUserMessages(data, chatType) {
-    // console.log(data);
+    // делаем запрос в БД на получение сообщений
     try {
         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {
             method: 'POST',
@@ -326,7 +325,6 @@ async function getUserMessages(data, chatType) {
 
 // функция удаления пользователя из группы
 function deleteGroupUser(contact_id, user_id, group_id, nickname, group_name) {
-    // console.log(e.target.id);
     // удаляем пользователя из группы и послаем сообщение пользователям об этом
     WS.send(JSON.stringify({
         command: 'deleteGroupUser',
@@ -338,4 +336,22 @@ function deleteGroupUser(contact_id, user_id, group_id, nickname, group_name) {
         send_user_id: USER_ID,
         send_nickname: USER_NICKNAME
     }))
+}
+
+// функция закрытия окон
+function closeWindow() {
+    // если открыто окно добавления пользователей - убираем его
+    if (document.querySelector('#divaddusers')) {
+        document.querySelector('#divaddusers').remove();
+        BUTTON_ADD_USER.textContent = 'Добавить пользователей';
+    }
+    // если открыто окно создание группы - убираем его
+    if (document.querySelector('#divcreategroup')) {
+        document.querySelector('#divcreategroup').remove();
+        BUTTON_CREATE_GROUP.textContent = 'Создать группу';
+    }
+    // если есть открытый чат - убираем его
+    document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
+    // скрываем текстовую область
+    document.querySelector('.div-text-send-message').style.visibility = 'hidden';
 }

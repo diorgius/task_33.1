@@ -52,13 +52,12 @@ if (INPUT_FILE_AVATAR) {
 // INPUT_NICKNAME.setAttribute('style', 'border: .1rem solid #ff0000');
 // и убирать таким:
 // INPUT_PASSWORD.setAttribute('style', 'border: .1rem solid #007bff');
-// хотя на форме регистрации работает работает добавление класса:
+// хотя на форме регистрации работает через добавление класса:
 // INPUT_EMAIL.classList.add('wrong-data');
 // и удаление класса:
 // INPUT_EMAIL.classList.remove('wrong-data');
 // если на форме регистрации он добавляется перед основным классом,
 // то на форме редактирования профиля этот класс добавляется после основного класса и поэтому не срабатывает
-// почему так происходит я пока не разобрался
 
 async function validation(e) {
     if (e.target.id === 'email') {

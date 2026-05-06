@@ -7,170 +7,6 @@ const TEXT_AREA_MESSAGE = document.querySelector('#textsendmessage');
 const USER_ID = document.querySelector('.div-user-avatar').id;
 const USER_NICKNAME = document.querySelector('.p-nickname').innerText;
 
-
-// !!! БЫЛА ОСНОВНАЯ КОНЦЕПЦИЯ
-// если пользователь активен (в чате), то ему можно отправлять сообщения иначе выводится сообщение, 
-// что пользователь не в чате и ему нет возможности отправить сообщение
-// при поступлении сообщения, если не открыт чат с пользователем который отправил сообщения или 
-// открыты какие либо другие окна (добавление пользователей и т.д.) или открыт чат с другим пользователем,
-// отправивший сообщение пользователь в левой панели выделяется цветом, если не открыто ничего,
-// то сам открывается чат, происходит загрузка ранних сообщений из БД и новые поступающие и отправляемые
-// сообщения выводятся в реальном времени,
-// если было что-то открыто и пришло собщение, то при клике на пользователе отправившем сообщение
-// (выделенным цветом) открывается с ним чат, загружаются сообщения из БД и далее сообщения 
-// отправляются и принимаются в реальном времени
-//
-// ПО ПОВОДУ ОПОВЕЩЕНИЯ В ТЗ ОПИСАНО НЕ ОДНОЗНАЧНО (!!!ПО КРАЙНЕЙ МЕРЕ Я НЕ СОВСЕМ ПОНЯЛ)
-// ОПОВЕЩЕНИЕ О ПРИХОДЕ СООБЩЕНИЙ ОТКЛЮЧАЕТСЯ ВООБЩЕ ИЛИ ТОЛЬКО ЗВУКОВОЕ
-// ЕСЛИ ТОЛЬКО ЗВУКОВОЕ, ТО НАДО ЛИ ОТКРЫВАТЬ С НИМ ЧАТ ПРИ ПОСТУПЛЕНИИ СООБЩЕНИЯ???
-// БЫЛО ТАК:
-// если пользователь отключает оповещением на каком-либо из свох контактов, то
-// он не принимает сообщения от него в реальном времени и пользователь 
-// отпавивший сообщение не выделяется цветом, но при клике на этого пользователя открывается чат, ранние сообщения 
-// загружаются из БД, но новые сообщения не приходят в режиме реального времени, !?! но отправляются
-//
-// !!! 29.04.2026 ПОМЕНЯЛ ОСНОВНУЮ КОНЦЕПЦИЮ
-// неважно активен (в чате) или нет пользователь ему все равно можно отправлять сообщения
-// (изменил потому, что думаю так более логично),
-// если он в чате, то все как было описано ранее он в зависимости от открытых у него окон
-// открывает чат или он открывается сам при получении сообщения, загружаются сообщения из БД
-// и далее происходит обмен сообщениями в реальном времени, если пользователь не активен, то
-// направленное ему сообщение записывается в БД, а пользователь при подключении к чату и выборе
-// контакта направившего сообщение его получит из БД
-// 
-// ПО ПОВОДУ ОПОВЕЩЕНИЯ
-// !!! ??? если отключено оповещение, все будет как обычно, только без звукового оповещения
-// и автоматического открытия чата
-// 
-// ПО ГРУППОВЫМ ЧАТАМ
-// в группу можно отправлять сообщения в любом случае, те пользователи которые активны,
-// если у них не открыто ничего, то при получении сообщения откроется групповой чат, загрузятся 
-// ранние сообщения из БД и далее переписка в реальном времени, если что-то открыто, то при поступлении
-// сообщения группа будет выделена цветом, при клике на нее тот же процесс как и с пользователем,
-// если пользователь не активен, то когда он подключится и выберет группу все сообщения загрузятся из БД
-//
-
-
-// !!!TO DO
-// !!!СДЕЛАНО 1. изменить добавление nickname, при регистрации не задавать nickname автоматически 
-// (у разных почтовиков могут быть одинаковые nickname)
-// только если пользователь сам его добавляет, при этом учитывать скрытие email, 
-// если не задан nickname, то не давать возможность скрыть email
-// при выводе списка пользователей и добавленных пользователей вывод nickname/email
-//
-// !!!СДЕЛАНО 2. разобраться с отправкой сообщений только выбранному пользователю и 
-// при открытии чата задавать id divusermessages уникальным 
-// (??? nickname? emai? id - уже нельзя, занят в списке добавленных пользоватей)
-// !!! для дива задается id с ником или емайл(если нет ника)
-// или как-то комбинировать, чтобы потом закрывать и открывать
-// в зависимости от того с кем чат
-//
-// !!! СДЕЛАНО 3. если у пользователя нет открытого чата,
-// активировать пользователя из списка контактов (имитировать клик), 
-// активировать divusermessages писать в заголовке с кем чат (от кого пришло сообщение)
-// и примать сообщения в него 
-// 
-// !!! СДЕЛАНО 4. если у пользователя уже открыт чат с другим пользователем
-// выдать сообщение о приходе сообщения от другого пользователя (этот пользователь выделяется желтым цветом)
-// ??? или просто делать оповещение в любом случае, а чат пусть пользователь открывает сам
-//
-// !!! СДЕЛАНО 5. запись сообщений в БД
-//
-// !!! СДЕЛАНО 6. при активации пользователя загружать из БД ранние сообщения от этого пользователя
-//
-// !!! СДЕЛАНО 6.1 при получение сообщения от другого пользователя когда открыт чат, при активации также загружать 
-// направленные ему сообщения
-//
-// !!! СДЕЛАНО 7. выдавать звуковое оповещение о приходе сообщения 
-// (воспроизводится только если пользователь повзаимодействовал со страницей)
-//
-// !!! СДЕЛАНО 8. вкл/выкл оповещения и отображение этого
-//
-// !!! ПОКА НЕ РАЗОБРАЛСЯ 9. проверить выделение бордером при левом клике после кликов правой кнопкой
-//
-// !!! СДЕЛАНО 10. добавить к сообщению дату и время отправки
-//
-// !!! СДЕЛАНО 11. добавить возможность закрытия чата
-//
-// 12. сделать автозапуск wsserver.php в контейнере
-// 
-// !!! СДЕЛАНО 13. 
-//          (
-//            // добавлена отправка сообщения самому себе после отправки сообщения адресату
-//            // для того чтобы получить message_id из БД и дату и время сообщения
-//            // для присвоения div id для однозначной идентификации
-//            // сообщения и вывода даты и времени
-//          )
-// как идентифицировать сообщение на стороне отправителя??? в момент его отправки???
-// на стороне получателя мы при записе в БД получаем message_id и пересылаем его адресату
-// уже с уникальным id, а на стороне отправителя??? id нет и как потом его идентифицировать
-// если пользователь захочет его переслать???
-// при открытии чата сообщения будут загружены из БД и тут проблем нет т.к. id будет
-//
-// !!! СДЕЛАНО 14. сделать удаление всей переписки с пользователем
-//
-// !!! СДЕЛАНО 14.1 при удалении пользователя из списка контактов ??? НАДО ЛИ удалять переписку с ним
-//
-// !!! СДЕЛАНО 15. удаление конкретного сообщения
-//
-// !!! СДЕЛАНО 16. редактирование сообщения
-//
-// !!! СДЕЛАНО 17. пересылка сообщения ??? НАДО ЛИ У СЕБЯ ДЕЛАТЬ ОТМЕТКУ О ПЕРЕСЫЛКЕ ???
-//
-// 18. !!! ??? ВОЗМОЖНО ПЕРЕДЕЛАТЬ ??? запись отправленного сообщения не от кого кому, а по id контакта !!!
-//
-// !!! СДЕЛАНО 19. создание группы и добавление пользователей в группу
-//
-// !!! СДЕЛАНО 20. вывод списка пользователей
-// 
-// !!! СДЕЛАНО 21. рассылка групповых сообщений
-//
-// !!! СДЕЛАНО 22. удаление пользователя из группы
-//
-// !!! СДЕЛАНО 23. удаление группы
-// 
-// !!! СДЕЛАНО 24. при добавлении пользователя в список своих контактов
-// добавлять себя в список его контактов с отправкой ему сообщения об этом
-//
-// !!! СДЕЛАНО 25. правый клик не только на див сообщения, а на всей области сообщения
-//
-// 26. !!! ??? НАДО ПОДУМАТЬ о статусе сообщения прочитано/непрочитано, чтобы пользователь
-// при входе мог видеть, что ему поступили новые сообщения и от кого, пока он был неактивен
-// 
-// !!! СДЕЛАНО 27. !!! ??? при удалении контакта ??? тоже удалять себя у него
-//
-// !!! СДЕЛАНО 28. НАДО еще подумать над вкл/выкл оповещения сейчас оно отключает не только беззвучный режим,
-// но и полностью оповещение о приходе сообщений, при этом если при отключенном оповещении
-// кликнуть на пользователя, выводится сообщение, что пользователь не в чате (ЭТО надо поправить
-// чтобы пользователь мог загружать сообщения),
-// ПОКА я не понял вкл/выкл оповещения ЭТО только беззвучный режим или ВООБЩЕ 
-// отключение оповещения о приходе новых сообщений
-//
-// 29. сортировка пользователей чата при входе в соответствии с полученными последними сообщениями
-// И ВОЗМОЖНО перемещение пользователя вверх при поступлении сообщения
-//
-// !!! СДЕЛАНО 30. !!! ??? НАДО ПОДУМАТЬ И ПЕРЕДЕЛАТЬ ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ сделать добавление только через сокет
-// сейчас очень запутанная схема надо ее упростить
-//
-// !!! СДЕЛАНО 31. !!! ??? отправка сообщений только активным пользователям ???
-//
-// !!! СДЕЛАНО 32. !!! ??? разобраться с выделением цветами и рамками групп ???
-//
-// !!! СДЕЛАНО 33. вывод nickname отправившего пользователя в сообщении
-//
-// !!! СДЕЛАНО 34. удаление/редактирование/пересылка сообщений в группе и в привате, !!! СДЕЛАНО ??? сейчас когда добавил
-// имя отправителя берется не тот текст для редактирования
-// 
-// !!! СДЕЛАНО 35. вылез косяк с именами отправителей в групповом чате, если у пользователя нет каких-то контактов,
-// то в чате вылазит ошибка при отображении имени
-//
-// !!! СДЕЛАНО 36. сделать не удаление сообщения из БД, обновление вместо текта сообщения - сообщение удалено,
-//  и кем удалено
-
-
-
-
-
 // маштабируем текстовую область сообщений
 let actions = ['input', 'cut', 'paste', 'drop', 'onchange'];
 if (TEXT_AREA_MESSAGE) {
@@ -200,7 +36,7 @@ if (BUTTON_ADD_USER) {
             // если есть открытый чат - убираем его
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
             // скрываем текстовую область
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';            
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
             // отправляем запрос в БД, получаем список пользователей
             data = { action: 'getAllUsers' };
             try {
@@ -241,7 +77,7 @@ if (BUTTON_CREATE_GROUP) {
             // если есть открытый чат - убираем его
             document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
             // скрываем текстовую область
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';            
+            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
             // добавляем окно создания группы
             document.querySelector('#divwrappercreategroup').innerHTML =
                 `<div class="div-create-group" id="divcreategroup">
@@ -284,7 +120,6 @@ if (BUTTON_CREATE_GROUP) {
                         // убираем окно создания группы
                         document.querySelector('#divcreategroup').remove();
                         BUTTON_CREATE_GROUP.textContent = 'Создать группу';
-
                     } catch (error) {
                         console.log('Ошибка: ', error);
                     }
@@ -298,7 +133,6 @@ if (BUTTON_CREATE_GROUP) {
 window.oncontextmenu = (e) => {
     // выводим контекстное меню на пользователях чата
     if (e.target.classList.contains('div-chat-user')) {
-        // console.log(e.target.id);
         e.preventDefault();
         // если открыто меню сообщения, убираем его
         document.querySelector('.ul-message-menu') ? document.querySelector('.ul-message-menu').style.display = 'none' : null;
@@ -321,16 +155,13 @@ window.oncontextmenu = (e) => {
         // отключаем оповещение
         let offNotification = document.querySelector('#offnotificationuser');
         offNotification.onclick = () => {
-            // console.log(e.target.id);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
-            // chatUserWithoutNotice.classList.contains('div-chat-user-onchat') ? chatUserWithoutNotice.classList.remove('div-chat-user-onchat') : null;
             chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
         }
 
         // включаем оповещение
         let onNotification = document.querySelector('#onnotificationuser');
         onNotification.onclick = () => {
-            // console.log(e.target.id);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
             chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
         }
@@ -338,7 +169,6 @@ window.oncontextmenu = (e) => {
         // удаляем переписку с пользователем
         let deleteUserChats = document.querySelector('#deleteuserchats');
         deleteUserChats.onclick = () => {
-            // console.log(e.target.id);
             // отправляем сообщение в сокет для удаления всей переписки с пользователем и
             // если пользователь активен отправляем сообщение пользователю, что переписка удалена
             to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
@@ -361,7 +191,6 @@ window.oncontextmenu = (e) => {
         // удаляем пользователя из списка контактов с удалением всей переписки и удаляем у него свой контакт
         let deleteChatUser = document.querySelector('#deletechatuser');
         deleteChatUser.onclick = () => {
-            // console.log(e);
             // отправляем сообщение в сокет для удаления контакта пользователя и
             // если пользователь активен отправляем сообщение пользователю, что его контакт удален
             to = Object.keys(connectedUsers).find(key => connectedUsers[key] === e.target.id);
@@ -386,7 +215,6 @@ window.oncontextmenu = (e) => {
 
     // выводим контекстное меню на группе
     if (e.target.classList.contains('div-chat-group')) {
-        // console.log(e);
         e.preventDefault();
         // если открыто меню сообщения, убираем его
         document.querySelector('.ul-message-menu') ? document.querySelector('.ul-message-menu').style.display = 'none' : null;
@@ -409,7 +237,6 @@ window.oncontextmenu = (e) => {
         // отключаем оповещение
         let offNotification = document.querySelector('#offnotificationgroup');
         offNotification.onclick = () => {
-            // console.log(e);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
             chatUserWithoutNotice.classList.add('div-chat-user-without-notice');
         }
@@ -417,7 +244,6 @@ window.oncontextmenu = (e) => {
         // включаем оповещение
         let onNotification = document.querySelector('#onnotificationgroup');
         onNotification.onclick = () => {
-            // console.log(e);
             let chatUserWithoutNotice = document.getElementById(e.target.id);
             chatUserWithoutNotice.classList.remove('div-chat-user-without-notice');
         }
@@ -425,22 +251,10 @@ window.oncontextmenu = (e) => {
         // добавляем пользователя в группу
         let addGroupChatUser = document.querySelector('#addgroupchatuser');
         addGroupChatUser.onclick = async () => {
+            // вызываем функцию закрытия окон
+            closeWindow();
             BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
-            // если выведен список добавления пользователей - убираем его и меняем надпись на кнопке
-            if (document.querySelector('#divaddusers')) {
-                BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
-                document.querySelector('#divaddusers').remove();
-            }
-            // если открыто окно создание группы - убираем его
-            if (document.querySelector('#divcreategroup')) {
-                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
-                document.querySelector('#divcreategroup').remove();
-            }
-            // если есть открытый чат - убираем его
-            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
-            // скрываем текстовую область
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';
-            // получаем список пользователей из своих контактов для добавления в группу
+            // делаем запрос в БД на получение контактов пользователя
             data = {
                 action: 'getUserContacts',
                 user_id: USER_ID
@@ -458,6 +272,7 @@ window.oncontextmenu = (e) => {
 
                 // добавляем id группы
                 result.group_id = e.target.id;
+                // добавляем имя группы
                 result.group_name = e.target.innerText;
                 // вызываем функцию вывода списка пользователей
                 // в которой при клике на пользователе вызывается функция добавления пользователя
@@ -470,22 +285,10 @@ window.oncontextmenu = (e) => {
         // выводим список группы
         let showGroupUsers = document.querySelector('#showgroupchatuser');
         showGroupUsers.onclick = async () => {
+            // вызываем функцию закрытия окон
+            closeWindow();
             BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
-            // если выведен список добавления пользователей - убираем его и меняем надпись на кнопке
-            if (document.querySelector('#divaddusers')) {
-                BUTTON_ADD_USER.textContent = 'Убрать список пользователей';
-                document.querySelector('#divaddusers').remove();
-            }
-            // если открыто окно создание группы - убираем его
-            if (document.querySelector('#divcreategroup')) {
-                BUTTON_CREATE_GROUP.textContent = 'Создать группу';
-                document.querySelector('#divcreategroup').remove();
-            }
-            // если есть открытый чат - убираем его
-            document.querySelector('.div-user-messages') ? document.querySelector('.div-user-messages').remove() : null
-            // скрываем текстовую область
-            document.querySelector('.div-text-send-message').style.visibility = 'hidden';            
-            // получаем список пользователей из своих контактов для добавления в группу
+            // делаем запрос в БД на получение списка пользователей группы
             data = {
                 action: 'getUserGroupContacts',
                 user_id: USER_ID,
@@ -501,11 +304,13 @@ window.oncontextmenu = (e) => {
                 });
                 let result = await response.json();
                 // console.log('Успех: ', result);
+
                 // добавляем id группы
                 result.group_id = e.target.id;
+                // добавляем имя группы
                 result.group_name = e.target.innerText;
                 // вызываем функцию вывода списка пользователей
-                // в которой при клике на пользователе вызывается функция добавления пользователя
+                // в которой при клике на пользователе вызывается функция удаления пользователя
                 showUsersList(result, 'deleteGroupUser');
             } catch (error) {
                 console.log('Ошибка: ', error);
@@ -515,7 +320,6 @@ window.oncontextmenu = (e) => {
         // покидаем группу
         let leaveGroup = document.querySelector('#leavegroupchatuser');
         leaveGroup.onclick = () => {
-            // console.log(e.target.id);
             // покидаем группу и послаем сообщение пользователям об этом
             WS.send(JSON.stringify({
                 command: 'leaveGroup',
@@ -547,7 +351,6 @@ window.oncontextmenu = (e) => {
     // выводим контекстное меню на сообщении
     if (e.target.classList.contains('div-send-message')
         || e.target.classList.contains('div-accept-message')) {
-        // console.log(e.target.id);
         e.preventDefault();
         // если открыто меню пользователя, убираем его
         document.querySelector('.ul-chat-user-menu') ? document.querySelector('.ul-chat-user-menu').style.display = 'none' : null;
@@ -601,7 +404,6 @@ window.oncontextmenu = (e) => {
         // редактируем выбранное сообщение
         let editMessage = document.querySelector('#editmessage');
         editMessage.onclick = () => {
-            // console.log(e);
             // выводим текст сообщения в текстовую область для редактирования
             TEXT_AREA_MESSAGE.value = e.target.childNodes[1].innerText;
             // убираем выделение сообщения
@@ -648,10 +450,9 @@ window.oncontextmenu = (e) => {
         // пересылаем выбранное сообщение
         let forwardMessage = document.querySelector('#forwardmessage');
         forwardMessage.onclick = async (event) => {
-            // console.log(event);
             // если открыто меню пользователей для пересылки, убираем его
             document.querySelector('#ulforwardmessagemenu') ? document.querySelector('#ulforwardmessagemenu').remove() : null;
-            // получаем список пользователей из своих контактов для пересылки сообщения
+            // делаем запрос в БД на получение списка контактов пользователя для пересылки сообщения
             data = {
                 action: 'getUserContactsAndGroups',
                 user_id: USER_ID
@@ -681,7 +482,7 @@ window.oncontextmenu = (e) => {
                         liChatUser.classList.add('li-users-menu');
                         let spanUserNickname = document.createElement('span');
                         spanUserNickname.classList.add('span-forward-user');
-                        spanUserNickname.textContent = item.nickname !== null ?  item.nickname : item.email;
+                        spanUserNickname.textContent = item.nickname !== null ? item.nickname : item.email;
                         let spanCheckbox = document.createElement('span');
                         spanCheckbox.classList.add('span-forward-user');
                         let checkbox = document.createElement('input');
@@ -689,7 +490,7 @@ window.oncontextmenu = (e) => {
                         checkbox.setAttribute('type', 'checkbox');
                         checkbox.setAttribute('id', item.contact_user_id);
                         checkbox.setAttribute('name', 'private');
-                        checkbox.setAttribute('value', item.nickname !== null ?  item.nickname : item.email);
+                        checkbox.setAttribute('value', item.nickname !== null ? item.nickname : item.email);
                         spanCheckbox.appendChild(checkbox);
                         liChatUser.append(spanUserNickname, spanCheckbox);
                         ulChatUsers.appendChild(liChatUser);
@@ -714,7 +515,7 @@ window.oncontextmenu = (e) => {
                         checkbox.setAttribute('value', item.group_name);
                         spanCheckbox.appendChild(checkbox);
                         liChatUser.append(spanUserNickname, spanCheckbox);
-                        ulChatUsers.appendChild(liChatUser);                        
+                        ulChatUsers.appendChild(liChatUser);
                     }
                 });
                 // добавляем кнопку пересылки
