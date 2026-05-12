@@ -14,21 +14,21 @@ function mailsend($email, $code)
     // $mail->Debugoutput = 'html';
 
     // указываем доступы к SMTP
-    $mail->Host = 'smtp.gmail.com'; # хост
+    $mail->Host = 'smtp.gmail.com'; // хост
     $mail->Port = 587; # порт
-    $mail->SMTPSecure = 'tls'; # шифрование
-    $mail->SMTPAuth = true; # авторизация
-    $mail->Username = "diorgius@gmail.com"; # логин
-    $mail->Password = "jxwy zrbz wjkq iejc"; # полученный пароль
+    $mail->SMTPSecure = 'tls'; // шифрование
+    $mail->SMTPAuth = true; // авторизация
+    $mail->Username = "diorgius@gmail.com"; // логин
+    $mail->Password = "jxwy zrbz wjkq iejc"; // полученный пароль
 
     // получатели и отправители
-    $mail->setFrom('diorgius@gmail.com'); # от кого
-    $mail->addReplyTo('diorgius@gmail.com'); # адрес для ответа
-    $mail->addAddress($email); # кому
+    $mail->setFrom('diorgius@gmail.com'); // от кого
+    $mail->addReplyTo('diorgius@gmail.com'); // адрес для ответа
+    $mail->addAddress($email); // кому
 
     // тема и содержание
-    $mail->Subject = 'Confirmation of registration'; # тема
-    $mail->msgHTML("<h2>Welcome to our messenger. To confirm your registration, enter the code you received in this email on the messenger.local website</h1> <h2>$code<h2>"); # содержание в формате HTML
+    $mail->Subject = 'Confirmation of registration'; // тема
+    $mail->msgHTML("<h2>Welcome to our messenger. To confirm your registration, enter the code you received in this email on the messenger.local website</h1> <h2>$code<h2>");
 
     // выводим результат
     if (!$mail->send()) {

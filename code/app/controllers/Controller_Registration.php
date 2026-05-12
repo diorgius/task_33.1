@@ -13,15 +13,6 @@ class Controller_Registration extends Controller
 {
     protected $model;
 
-    // хотел сделать передачу значений между методами signup() и codeverification() типа 
-    // $this->credentials = $_POST и $email = trim($this->credentials['email'])
-    // через свойства класса, но не работает (работает внутри метода signup(), а в метод codeverification() приходят пустые данные), 
-    // вероятно потому что сначала отрабатывается один метод, 
-    // потом обновляеется страница и вызывается другой метод, поэтому буду использовать сесси
-
-    // protected $credentials; 
-    // protected $code;
-
     public function index()
     {
         $this->view->generate('view_registration.php', 'view_template.php');
@@ -41,8 +32,6 @@ class Controller_Registration extends Controller
             } else {
 
                 // реализуем отправку 6-ти значного КОДА подтверждения на почту 
-                // (НЕ ССЫЛКУ для активании, потому что как потом перенапралять ссылку из письма на localhost???)
-
                 $credentials = $_POST;
                 $_SESSION['credentials'] = $credentials;
                 $email = trim($credentials['email']);
@@ -50,11 +39,10 @@ class Controller_Registration extends Controller
                 $code = $rand->getInt(100000, 999999);
                 $_SESSION['code'] = $code;
 
-                $send = true; // заглушка для проверки валидности кода
-                // $send = mailsend($email, $code);
+                $send = mailsend($email, $code);
 
                 if ($send) {
-                    $data = 'На указанную почту отправлено письмо с кодом для подтверждения регистрации ' . $code; // $code временно, для проверки
+                    $data = 'На указанную почту отправлено письмо с кодом для подтверждения регистрации ';
                     $this->view->generate('view_codeverification.php', 'view_template.php', $data);
                 } else {
                     $data = 'Ошибка отправки кода, проверте email';
