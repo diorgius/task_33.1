@@ -18,12 +18,12 @@ function mailsend($email, $code)
     $mail->Port = 587; # порт
     $mail->SMTPSecure = 'tls'; // шифрование
     $mail->SMTPAuth = true; // авторизация
-    $mail->Username = "diorgius@gmail.com"; // логин
-    $mail->Password = "jxwy zrbz wjkq iejc"; // полученный пароль
+    $mail->Username = "messengerlocal2026@gmail.com"; // логин
+    $mail->Password = "qyxe wckb xxkg maoh"; // пароль mailsender
 
     // получатели и отправители
-    $mail->setFrom('diorgius@gmail.com'); // от кого
-    $mail->addReplyTo('diorgius@gmail.com'); // адрес для ответа
+    $mail->setFrom('messengerlocal2026@gmail.com'); // от кого
+    $mail->addReplyTo('messengerlocal2026@gmail.com'); // адрес для ответа
     $mail->addAddress($email); // кому
 
     // тема и содержание

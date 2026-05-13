@@ -130,7 +130,8 @@
     top: 5.2rem;
     left: 20%;
     width: 64.3%;
-    height: 74.3%;
+    /* height: calc(74.3% - 10%); */
+    max-height: 74.3%;
     transition: all 0.5s ease;
     overflow-y: auto;
     z-index: 99;
@@ -162,6 +163,7 @@
 
 .div-user-nickname {
     padding-left: .5rem;
+    font-size: .85rem;
 }
 
 .ul-chat-user-menu {

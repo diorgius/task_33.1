@@ -3,7 +3,7 @@ const DELETEMESSAGE = new Audio('../../img/deletemessage.mp3');
 let connectedUsers = '';
 
 // открываем соединение websocket
-const WS = new WebSocket("WS://localhost:8080/");
+const WS = new WebSocket("WS://messenger.local:8080/");
 
 WS.onopen = () => {
     console.log('Connected');
