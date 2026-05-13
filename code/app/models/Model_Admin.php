@@ -23,7 +23,7 @@ class Model_Admin extends Model
     {
         $email = htmlspecialchars(trim($data['email']));
         $password = password_hash(htmlspecialchars(trim($data['password'])), PASSWORD_DEFAULT);
-        $avatarFileName=$file['fileavatar']['name'];
+        $avatarFileName = $file['fileavatar']['name'];
         $nickname = htmlspecialchars(trim($data['nickname']));
         $role = htmlspecialchars(trim($data['role']));
 
@@ -53,7 +53,7 @@ class Model_Admin extends Model
                     echo "Что-то пошло не так";
                     return false; // надо как-то обработать ошибки
                 }
-            }            
+            }
             return true;
         } else {
             echo "Что-то пошло не так";
@@ -78,14 +78,14 @@ class Model_Admin extends Model
         $id = $data['id'];
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
-        $avatarFileName=$file['fileavatar']['name'];
+        $avatarFileName = $file['fileavatar']['name'];
         isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
         $nickname = htmlspecialchars(trim($data['nickname']));
         $role = htmlspecialchars(trim($data['role']));
 
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $id);
-        
+
         // проверяем, если пароль не менялся, то оставляем старый
         $password === $user['password'] ? $password = $user['password'] : $password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -97,7 +97,7 @@ class Model_Admin extends Model
         } else {
             $avatarFileName = $user['avatar'];
         }
-        
+
         $credentials = [
             'id' => $id,
             'email' => $email,
@@ -115,14 +115,15 @@ class Model_Admin extends Model
                 $filePath = AVATARS . basename($avatarFileName);
                 if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
                     echo "Что-то пошло не так";
-                    return false; // надо как-то обработать ошибки
+                    return false;
                 }
-                if ($oldAvatarFileName !='') unlink(AVATARS . $oldAvatarFileName);
+                if ($oldAvatarFileName != '')
+                    unlink(AVATARS . $oldAvatarFileName);
             }
             return true;
         } else {
             echo "Что-то пошло не так";
-            return false; // надо как-то обработать ошибки
+            return false;
         }
     }
 

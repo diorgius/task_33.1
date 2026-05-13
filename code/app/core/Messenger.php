@@ -7,7 +7,6 @@ use Ratchet\ConnectionInterface;
 use App\data\DB;
 use DateTime;
 use DateTimeZone;
-use SebastianBergmann\Environment\Console;
 
 class Messenger implements MessageComponentInterface
 {

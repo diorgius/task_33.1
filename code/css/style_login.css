@@ -85,7 +85,7 @@
     cursor: pointer;
 }
 
-.btn-signup:hover {    
+.btn-signup:hover {
     background-color: #ffffff;
     border: .1rem solid #a5cbf3;
     color: #a5cbf3;
@@ -102,6 +102,6 @@
     outline: none;
 }
 
-.wrong-data{
+.wrong-data {
     border: .1rem solid #ff0000;
 }

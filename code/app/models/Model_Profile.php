@@ -24,21 +24,13 @@ class Model_Profile extends Model
         $id = $_SESSION['userId'];
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
-        $avatarFileName=$file['fileavatar']['name'];
+        $avatarFileName = $file['fileavatar']['name'];
         isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
         $nickname = htmlspecialchars(trim($data['nickname']));
-                
-        // с загрузкой изображений в базу до конца не разобрался, в базу данные загружаются,
-        // но почему-то, при извлечении картинка не востанавливается, либо при загрузке двоичных данных в blob, 
-        // либо при извлечении что-то не так (разобраться интересно, но пока не хочу тратить время), поэтому в базу
-        // будем загружать название картинки, которое будем изменять на уникально-сгенерированное и присваивать 
-        // расширение на основании типа изображение (или писать без расширения, а браузер сам разберется (если, что тип файла проверен)), 
-        // сами файлы загружать в директорию avatars, проверять есть ли старый аватар и удалять его
-        // $image=addslashes(file_get_contents($file['fileavatar']['tmp_name']));
 
         DB::dbconnect();
         $user = DB::getByProp('users', 'id', $id);
-        
+
         // проверяем, если пароль не менялся, то оставляем старый
         $password === $user['password'] ? $password = $user['password'] : $password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -66,18 +58,16 @@ class Model_Profile extends Model
             if (isset($newAvatar)) {
                 $filePath = AVATARS . basename($avatarFileName);
                 if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
-                    // надо как-то обработать ошибки
                     echo "Что-то пошло не так";
-                    return false; 
+                    return false;
                 }
-                if ($oldAvatarFileName !='') unlink(AVATARS . $oldAvatarFileName);
+                if ($oldAvatarFileName != '')
+                    unlink(AVATARS . $oldAvatarFileName);
             }
             return true;
         } else {
-            // надо здесь подумать над возвратом данных, такое условие не работает, потому-что в user, все равно возвращается что-то и это условие не работает
-            // надо как-то обработать ошибки
             echo "Что-то пошло не так";
-            return false; 
+            return false;
         }
     }
 

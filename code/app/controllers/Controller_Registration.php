@@ -2,7 +2,6 @@
 
 namespace App\controllers;
 use App\core\Controller;
-use App\models\Model_Login;
 use App\models\Model_Registration;
 use Random\Randomizer;
 

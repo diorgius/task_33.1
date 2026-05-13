@@ -19,13 +19,13 @@
             </label>
             <p>Максимальный размер файла: <?= UPLOAD_MAX_SIZE / 1000; ?> Кб<br>
                 Допустимые форматы: <?= implode(', ', ALLOWED_TYPES) ?></p>
-            <label for="role">Роль:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp     
+            <label for="role">Роль:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                 <select class="input-editprofile" id="role" name="role">
                     <option></option>
                     <option value="admin">Администратор</option>
                     <option value="user">Пользователь</option>
                 </select>
-            </label> 
+            </label>
             <button class="btn-editprofile" type="submit" name="send" id="send">Записать</button>
         </form>
     </div>
