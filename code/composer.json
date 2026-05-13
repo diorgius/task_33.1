@@ -2,7 +2,6 @@
     "name": "sf/task_33.1",
     "type": "project",
     "require": {
-        "gabordemooij/redbean": "dev-master",
         "monolog/monolog": "3.0.*",
         "phpmailer/phpmailer": "dev-master",
         "cboden/ratchet": "v0.5.x-dev"

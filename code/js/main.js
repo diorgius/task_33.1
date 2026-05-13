@@ -82,7 +82,7 @@ if (BUTTON_CREATE_GROUP) {
             document.querySelector('#divwrappercreategroup').innerHTML =
                 `<div class="div-create-group" id="divcreategroup">
                 <div class="div-create-group-header" id="divcreategroupheader">
-                    <p>Создание группы пользователей</p>
+                    <p>Создание группового чата</p>
                 </div>
                 <label for="inputgroupname">Введите название группы</label>
                 <input class="input-group-name" type="text" id="inputgroupname" name="inputgroupname" />

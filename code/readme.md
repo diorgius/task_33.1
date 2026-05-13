@@ -13,8 +13,12 @@
 - phpmyadmin
 
 Контенеры собраны из образов на основе docker-compose.yaml и Dockerfile. Запуск контенеров осуществляется в терминале командой docker-compose up -d.
-В файле hosts необходимо прописать: 127.0.0.1 messenger.local
+В файле hosts необходимо прописать: 127.0.0.1 messenger.local.
 
+Для работы приложения надо в контейнере PHP через composer установить все необходимые библиотеки:
+- подключиться к контенеру PHP: docker exec -it messenger-php bash
+- перейти в директорию: cd code
+- выполнить: php composer.phar install
 Для запуска PHP WebSocket сервера необходимо:
 - подключиться к контенеру PHP: docker exec -it messenger-php bash
 - перейти в директорию: cd app/core

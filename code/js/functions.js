@@ -162,6 +162,8 @@ function addGroupIntoSidebar(group_id, group_name) {
 
 // функция проверки и вывода сообщений
 function showMessage(data, chatType) {
+    console.log(data);
+    console.log(chatType);
     if (chatType === 'private') {
         contactId = data.send_user_id;
         contactName = data.send_nickname;
@@ -202,28 +204,33 @@ function showMessage(data, chatType) {
                 // выводим ранние сообщения из БД
                 // готовим данные для отправки на бэкенд
                 // если чат приватный
-                if (chatType === 'private') {
-                    data = {
-                        action: 'getUserMessages',
-                        send_user_id: USER_ID,
-                        accept_user_id: contactId,
-                        chat_type: 'private'
-                    };
-                    // если чат групповой
-                } else if (chatType === 'group') {
-                    data = {
-                        action: 'getUserMessages',
-                        send_user_id: USER_ID,
-                        accept_group_id: contactId,
-                        chat_type: 'group'
-                    };
-                }
-                // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
-                getUserMessages(data, chatType);
+                // if (chatType === 'private') {
+                //     data = {
+                //         action: 'getUserMessages',
+                //         send_user_id: USER_ID,
+                //         accept_user_id: contactId,
+                //         chat_type: 'private'
+                //     };
+                //     // если чат групповой
+                // } else if (chatType === 'group') {
+                //     data = {
+                //         action: 'getUserMessages',
+                //         send_user_id: USER_ID,
+                //         accept_group_id: contactId,
+                //         chat_type: 'group'
+                //     };
+                // }
+                // // отправляем запрос на бэкенд для загрузки ранних сообщений и выводим сообщения
+                // getUserMessages(data, chatType);
                 // воспроизводим звук
                 NOTICE.play();
-                // имитируем клик на пользователе от которого пришло сообщение для возможности отправки ему сообщений
+                // кликаем на пользователе от которого пришло сообщение
                 document.getElementById(contactId).click();
+                // // активируем пользователя/группу от которого пришло сообщение
+                // document.getElementById(contactId).classList.add('div-chat-active');
+                // // активируем поле ввода сообщения
+                // document.querySelector('.div-text-send-message').style.visibility = 'visible';
+                // TEXT_AREA_MESSAGE.focus();
             }
         }
     }
@@ -300,6 +307,8 @@ function outputMessage(location, message, chatType) {
 
 // функция загрузки из БД и вывода сообщений пользователя
 async function getUserMessages(data, chatType) {
+    console.log(data);
+    console.log(chatType);    
     // делаем запрос в БД на получение сообщений
     try {
         let response = await fetch(URL + '/app/core/ActionsWithUsers.php', {

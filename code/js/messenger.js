@@ -25,7 +25,6 @@ WS.onclose = (e) => {
 
 WS.onmessage = (e) => {
     let data = JSON.parse(e.data);
-    // console.log('Received:', data);
     switch (data.command) {
         case 'connect':
             // сообщение, о том что пользователь присоединился к чату
@@ -237,8 +236,8 @@ document.body.addEventListener('click', async (e) => {
                 TEXT_AREA_MESSAGE.focus();
             }
         }
-        // }
     }
+    
     // если клик по крестику в хидере чата - закрываем чат
     if (e.target.id === 'spanchatclose') {
         document.querySelector('.div-user-messages').remove();
