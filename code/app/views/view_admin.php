@@ -21,7 +21,7 @@
         <?php foreach ($data as $key => $value): ?>
             <tr onclick="location.href='/admin/edituser/<?= $value['id'] ?>'" title="Редактировать пользователя">
                 <?php foreach ($value as $k => $v): ?>
-                    <?php if ($k == 'password' || $k == 'cookiehash')
+                    <?php if ($k === 'password' || $k === 'cookiehash')
                         continue; ?>
                     <td><?= $v; ?></td>
                 <?php endforeach; ?>

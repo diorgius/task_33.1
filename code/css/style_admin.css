@@ -1,10 +1,14 @@
 .div-admin-btn-group {
-    margin: 0;
+    margin-top: 2rem;
+    width: 30%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
 }
 
 .btn-admin-action {
-    margin-top: 2rem;
-    height: 3rem;
+    height: 2.5rem;
     width: 12rem;
     background-color: #ffffff;
     border: .1rem solid #007bff;
@@ -29,14 +33,13 @@
 
 .table-users {
     margin-top: 1rem;
-    width: 85%;
+    width: 70%;
     border: .1rem solid #cccccc;
     font-size: 1rem;
     border-collapse: collapse;
 }
 
-.table-users td,
-th {
+.table-users td, th {
     border: .1rem solid #cccccc;
     text-align: center;
     height: 1.5rem;

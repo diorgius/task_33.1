@@ -9,7 +9,7 @@ services:
       - ../code:/data/messenger.local
       - ./nginx/conf/hosts/messenger.local.conf:/etc/nginx/sites-enabled/messenger.local.conf
     ports:
-      - "8888:80"
+      - "80:80"
     depends_on:
       - messenger-php
     networks:

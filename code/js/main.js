@@ -50,9 +50,15 @@ if (BUTTON_ADD_USER) {
                 let result = await response.json();
                 // console.log('Успех: ', result);
 
-                // вызываем функцию вывода списка пользователей
-                // в которой при клике на пользователе вызывается функция добавления пользователя                
-                showUsersList(result, 'addUserToPrivate');
+                // проверяем есть ли кто-то еще зарегистрированный в мессенджере
+                if (result.length === 1) {
+                    alertMessage('Пока больше никто не зарегистрировался');
+                    BUTTON_ADD_USER.textContent = 'Добавить пользователей';
+                } else {
+                    // вызываем функцию вывода списка пользователей
+                    // в которой при клике на пользователе вызывается функция добавления пользователя                
+                    showUsersList(result, 'addUserToPrivate');
+                }
             } catch (error) {
                 console.log('Ошибка: ', error);
             }

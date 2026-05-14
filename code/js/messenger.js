@@ -237,7 +237,7 @@ document.body.addEventListener('click', async (e) => {
             }
         }
     }
-    
+
     // если клик по крестику в хидере чата - закрываем чат
     if (e.target.id === 'spanchatclose') {
         document.querySelector('.div-user-messages').remove();

@@ -1,5 +1,5 @@
 <div class="div-back">
-    <button class="btn-back" onclick="location.href='/'">&nbspНазад</button>
+    <button class="btn-back" onclick="location.href='/admin/getusers'">&nbspНазад</button>
 </div>
 <div class="div-alert"></div>
 <div class="div-editprofile">
@@ -20,7 +20,7 @@
             <p>Максимальный размер файла: <?= UPLOAD_MAX_SIZE / 1000; ?> Кб<br>
                 Допустимые форматы: <?= implode(', ', ALLOWED_TYPES) ?></p>
             <label for="role">Роль:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                <select class="input-editprofile" id="role" name="role">
+                <select class="input-editprofile" id="role" name="role" required>
                     <option></option>
                     <option value="admin">Администратор</option>
                     <option value="user">Пользователь</option>

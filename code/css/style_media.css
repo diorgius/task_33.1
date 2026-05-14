@@ -1,0 +1,35 @@
+@media (max-height: 850px) {
+    .section-main-window {
+    height: calc(74.3% - 10%);  
+    }
+}
+
+@media (max-height: 750px) {
+    .section-main-window {
+    height: calc(64.3% - 10%);  
+    }
+}
+
+@media (max-width: 1200px) {
+    html {
+        font-size: 85%;
+    }
+}
+
+@media (max-width: 1000px) {
+    html {
+        font-size: 75%;
+    }
+    .btn-add, .btn-admin-action {
+        width: 80%;
+    }
+}
+
+@media (max-width: 870px) {
+    html {
+        font-size: 65%;
+    }
+    .btn-add, .btn-admin-action {
+        width: 75%;
+    }
+}

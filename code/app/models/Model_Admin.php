@@ -24,7 +24,8 @@ class Model_Admin extends Model
         $email = htmlspecialchars(trim($data['email']));
         $password = password_hash(htmlspecialchars(trim($data['password'])), PASSWORD_DEFAULT);
         $avatarFileName = $file['fileavatar']['name'];
-        $nickname = htmlspecialchars(trim($data['nickname']));
+        $data['nickname'] !== '' ? $nickname = htmlspecialchars(trim($data['nickname'])) : $nickname = NULL;
+        $hideemail = 0;
         $role = htmlspecialchars(trim($data['role']));
 
         // проверяем, есть ли новый аватар
@@ -32,7 +33,7 @@ class Model_Admin extends Model
             $avatarFileName = md5($email . time());
             $newAvatar = true;
         } else {
-            $avatarFileName = '';
+            $avatarFileName = NULL;
         }
 
         $credentials = [
@@ -40,6 +41,7 @@ class Model_Admin extends Model
             'password' => $password,
             'nickname' => $nickname,
             'avatar' => $avatarFileName,
+            'hideemail' => $hideemail,
             'role' => $role
         ];
 
@@ -51,13 +53,13 @@ class Model_Admin extends Model
                 $filePath = AVATARS . basename($avatarFileName);
                 if (!move_uploaded_file($file['fileavatar']['tmp_name'], $filePath)) {
                     echo "Что-то пошло не так";
-                    return false; // надо как-то обработать ошибки
+                    return false;
                 }
             }
             return true;
         } else {
             echo "Что-то пошло не так";
-            return false; // надо как-то обработать ошибки
+            return false;
         }
     }
 
@@ -79,8 +81,8 @@ class Model_Admin extends Model
         $email = htmlspecialchars(trim($data['email']));
         $password = htmlspecialchars(trim($data['password']));
         $avatarFileName = $file['fileavatar']['name'];
-        isset($_POST['hideemail']) ? $hideemail = 1 : $hideemail = 0;
-        $nickname = htmlspecialchars(trim($data['nickname']));
+        isset($data['hideemail']) ? $hideemail = 1 : $hideemail = 0;
+        $data['nickname'] !== '' ? $nickname = htmlspecialchars(trim($data['nickname'])) : $nickname = NULL;
         $role = htmlspecialchars(trim($data['role']));
 
         DB::dbconnect();
@@ -117,8 +119,7 @@ class Model_Admin extends Model
                     echo "Что-то пошло не так";
                     return false;
                 }
-                if ($oldAvatarFileName != '')
-                    unlink(AVATARS . $oldAvatarFileName);
+                if ($oldAvatarFileName != '') unlink(AVATARS . $oldAvatarFileName);
             }
             return true;
         } else {
@@ -130,6 +131,8 @@ class Model_Admin extends Model
     public function deleteUser(int $id): void
     {
         DB::dbconnect();
+        $user = DB::getByProp('users', 'id', $id);
+        if ($user['avatar'] != '') unlink(AVATARS . $user['avatar']);
         DB::delete('users', $id);
     }
 }

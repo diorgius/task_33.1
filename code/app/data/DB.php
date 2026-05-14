@@ -74,6 +74,8 @@ class DB
 	            INDEX `FK_contacts_contact_group_id` (`contact_group_id`) USING BTREE,
 	            CONSTRAINT `FK_contacts_users_id` FOREIGN KEY (`user_id`) 
                 REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+	            CONSTRAINT `FK_contacts_contact_users_id` FOREIGN KEY (`contact_user_id`) 
+                REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
 	            CONSTRAINT `FK_contacts_contact_group_id` FOREIGN KEY (`contact_group_id`) 
                 REFERENCES `groupchats` (`id`) ON UPDATE CASCADE ON DELETE CASCADE)";
             self::$pdo->exec($sql);
